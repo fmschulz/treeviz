@@ -1,0 +1,27 @@
+# Local tooling
+.DS_Store
+.idea/
+.vscode/
+.codex/
+.memd/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# JavaScript
+node_modules/
+
+# Generated outputs
+dist/
+tmp/
+test-results/
+playwright-report/
+coverage/
+*.log
+*.treeviz.json
+*.png
+*.svg
+*.pdf
+*.metrics.json
