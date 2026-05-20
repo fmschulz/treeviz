@@ -205,6 +205,10 @@ validate_session(session)
 `prettyTerminalBranches` is the same setting as the browser checkbox. It
 decorates branches entering terminal leaves in rectangular, circular, and
 radial layouts while preserving branch color and branch width mappings.
+Direct per-node overrides can be stored under `view["cladeStyles"][stable_key]`
+with fields such as `labelFontSize`, `nodeCircleDiameter`, and
+`nodeCircleColor`; the browser Inspector is the easiest way to create those
+stable-keyed entries.
 
 ## Tree Inspection
 

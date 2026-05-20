@@ -47,8 +47,10 @@ views when you need more than one layout for the same session.
 
 For figure styling, the Controls panel includes **Pretty terminal branches**.
 It thickens and rounds only branches leading into terminal leaves, in any
-layout. Metadata or tree annotations can also drive exact node-circle diameter,
-node-circle color, branch width, and branch color. See
+layout. The same panel includes **Exact styling** selectors for node-circle
+diameter/color and branch width/color attributes. Metadata or tree annotations
+can also drive those exact values. For one-off edits, select a leaf or internal
+node and use the Inspector's branch and circle controls. See
 [Tree styling](STYLING.md).
 
 ## Save And Export

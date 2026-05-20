@@ -192,6 +192,15 @@ await api.execute('view.set-pretty-terminal-branches', {
 Pretty terminal branches are view-wide and work in rectangular, circular, and
 radial layouts. They preserve each branch's current color and mapped width.
 
+Visible UI equivalents:
+
+- **Controls** > **Exact styling** selects node-circle diameter/color and branch
+  width/color attributes.
+- Right-click **Style clade** uses visual line-style buttons and includes label
+  color/style/size.
+- **Inspector** on one leaf or internal node edits branch color/width and direct
+  node-circle diameter/color for that stable key.
+
 ## Layout Pass
 
 ```js

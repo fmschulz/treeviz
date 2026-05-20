@@ -19,12 +19,23 @@ TreeViz supports these tree-level visual channels:
 Branch style values are keyed by the child node: a row or tree annotation for
 leaf `A` styles the branch leading into `A`. The root has no incoming branch.
 
-## Browser Checkbox
+## Browser Controls
 
-The browser Controls panel includes **Pretty terminal branches**. Enable it to
+The browser Controls panel includes **Exact styling** selectors for node-circle
+diameter, node-circle color, branch width, and branch color attributes. These
+selectors use columns or tree node metadata already present in the loaded
+session.
+
+The same Controls panel includes **Pretty terminal branches**. Enable it to
 thicken and round only the branch stubs leading into terminal leaves. The option
 works in rectangular, circular, and radial layouts, and it keeps the branch's
 current color and mapped width.
+
+For manual edits, right-click a clade and choose **Style clade** to set branch
+color, line width, line dash pattern, label color, label style, label font size,
+clade annotation, and clade underlay. Select a single leaf or internal node and
+open the **Inspector** to directly edit that node's branch color/width and
+circle diameter/color.
 
 This is a view setting. It is saved in `.treeviz.json` as:
 

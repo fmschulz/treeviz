@@ -74,6 +74,9 @@ For repeatable file-based rerooting from metadata, use
 - Internal-node support markers: `view.set-internal-node-marker`.
 - Exact node/branch style values: `view.set-tree-style-attributes`.
 - Pretty terminal branches: `view.set-pretty-terminal-branches`.
+- Manual single-node webapp edits: Inspector controls backed by
+  `tree.style-clade` patch fields `color`, `lineWidth`, `labelColor`,
+  `labelFontSize`, `nodeCircleDiameter`, and `nodeCircleColor`.
 - Numeric branch coloring: `view.set-branch-colour-attribute`.
 - Rerooting: `tree.reroot`, `tree.reroot-at-outgroup`, `tree.midpoint-reroot`.
 - Collapsing, expanding, hiding, pruning: `tree.collapse-clade`,

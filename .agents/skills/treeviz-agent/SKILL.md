@@ -47,6 +47,9 @@ Use the hosted app unless the user explicitly provides another TreeViz runtime.
 - Use exact style attributes for data-defined node circles and branch
   width/color; enable pretty terminal branches when the user asks for styled
   leaf-facing terminal branches.
+- For one-off webapp edits, use Controls > Exact styling for data attributes,
+  Style clade for clade branch/label styling, and Inspector for direct
+  selected-node circle diameter/color and branch width/color.
 - Use explicit legend titles and item labels when exporting publication figures.
 - Treat high unmatched-leaf or unmatched-row counts as a binding problem to fix or report.
 

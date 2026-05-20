@@ -131,12 +131,14 @@ Command mutability has three values:
 `tree.style-clade` accepts a narrow `patch` object for visual styling:
 
 - Branch styling: `color`, `lineWidth`, `dashPattern`.
-- Tip label styling: `labelColor`, `labelBold`, `labelItalic`.
+- Tip label styling: `labelColor`, `labelBold`, `labelItalic`,
+  `labelFontSize`.
 - Clade annotations: `label`, `cladeLabelColor`, `cladeLabelBold`,
   `cladeLabelFontSize`.
 - Clade underlay: `cladeBackground`. `cladeLabelBackground` is still accepted
   as a legacy alias.
-- Node/leaf markers: `internalDotSize`, `leafShape`.
+- Node/leaf markers: `internalDotSize`, `leafShape`,
+  `nodeCircleDiameter`, `nodeCircleColor`.
 
 Branch styling applies to the target clade root and its descendants while the
 clade remains expanded; collapsing is not required to color the clade. A
@@ -219,6 +221,13 @@ await api.execute('view.set-tree-style-attributes', {
 The pretty terminal branch option works in rectangular, circular, and radial
 layouts. It thickens and rounds only the branch stubs entering terminal leaves
 and preserves each branch's current color and mapped width.
+
+In the webapp, open **Controls** to select exact node-circle diameter/color and
+branch width/color attributes. Right-click a clade and choose **Style clade**
+for clade branch color, line width, dash pattern, label color, label size, and
+clade annotation styling. Open the **Inspector** on a single leaf or internal
+node to edit branch color/width and direct node-circle diameter/color without
+writing an API call.
 
 See [Tree styling](STYLING.md) for TOML, metadata, and Python examples.
 
