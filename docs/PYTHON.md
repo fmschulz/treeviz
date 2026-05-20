@@ -1,31 +1,24 @@
 # Use TreeViz From Python
 
-`treeviz-phylo` is the Python package for building TreeViz-native
-`.treeviz.json` sessions from scripts and notebooks. It provides helpers for
-tree input, metadata binding, validation, notebook iframe views, and static
-exports through an external TreeViz renderer.
+`treeviz-phylo` builds TreeViz-native `.treeviz.json` sessions from Python
+scripts and notebooks. It handles tree input, metadata binding, schema
+validation, notebook iframe views, basic tree inspection, and static export
+through an external renderer command.
 
-The package does not vendor the TreeViz browser app, `dist/`, `public/`,
-`src/`, `node_modules/`, or other frontend source. Static SVG/PNG/PDF export
-uses an installed TreeViz CLI or a source checkout; interactive notebook views
-use the hosted app at `https://treeviz.newlineages.com/`.
+The package does not vendor the TreeViz browser app or frontend source. It
+ships Python helpers and the TreeViz session schema.
 
 ## Install
-
-After a release is uploaded to PyPI:
 
 ```bash
 pip install treeviz-phylo
 ```
 
-For notebooks that import `IPython.display`:
+Notebook extra:
 
 ```bash
 pip install "treeviz-phylo[notebook]"
 ```
-
-Development installs from a source checkout are maintained in the private
-implementation repository.
 
 Import name:
 
@@ -33,7 +26,7 @@ Import name:
 import treeviz
 ```
 
-## Minimal Example
+## Minimal Session
 
 ```python
 from treeviz import build_session, save_session, validate_session, view_session
@@ -49,8 +42,9 @@ tracks = [
     {"kind": "color_strip", "column_key": "group", "title": "Group"},
     {"kind": "gradient", "column_key": "value", "title": "Value"},
 ]
+view = {"prettyTerminalBranches": True}
 
-session = build_session(tree, metadata=metadata, tracks=tracks, row_key_column="id")
+session = build_session(tree, metadata=metadata, tracks=tracks, row_key_column="id", view=view)
 validate_session(session)
 save_session(session, "example.treeviz.json")
 
@@ -58,73 +52,81 @@ view = view_session(session, open_browser=False)
 view.url
 ```
 
-In a notebook:
+Open the saved `.treeviz.json` in the browser, or display `view` in a notebook.
+
+## Notebook Use
 
 ```python
 from IPython.display import display
+from treeviz import view_tree
 
+view = view_tree(
+    "(A,B,(C,D));",
+    metadata=metadata,
+    tracks=tracks,
+    row_key_column="id",
+    open_browser=False,
+)
 display(view)
 ```
 
-## Runnable Plotting Script
+Small sessions are embedded in a TreeViz URL fragment. Large sessions are too
+large for inline display; save them as `.treeviz.json` and open the file in the
+browser.
 
-This repository includes a script that imports the package, builds two
-example sessions, validates metadata binding, writes `.treeviz.json`, and
-renders SVG, PNG, and PDF outputs through the TreeViz CLI:
-
-```bash
-python examples/plot_treeviz_examples.py \
-  --out /tmp/treeviz-python-plots
+```python
+if view.fragment is None:
+    save_session(view.session, "large-session.treeviz.json")
 ```
 
-The same script can be used after a PyPI install. If no local renderer is
-available, use `--skip-static` to write sessions and hosted URLs only.
+## Tree Inputs
 
-## Metadata Structure
+`build_session(...)`, `view_tree(...)`, and `render_tree(...)` accept:
 
-Metadata can be provided as:
+- Newick strings;
+- Newick or Nexus file paths;
+- supported tree objects with Newick export methods;
+- Biopython tree objects when Biopython is installed.
+
+Passing a list of trees to `build_session(...)` returns a list of independent
+session dictionaries.
+
+## Metadata Inputs
+
+Metadata can be:
 
 - a list or iterable of row dictionaries;
 - a pandas `DataFrame`;
 - a CSV or TSV file path;
 - `None`.
 
-Each metadata row should describe one leaf. One column must identify the tree
-leaf label exactly. Pass that column as `row_key_column` whenever possible:
+Each row should describe one leaf. One column should match the tree leaf
+labels exactly. Pass that column as `row_key_column`.
 
 ```python
 metadata = [
     {"sample_id": "A", "lineage": "alpha", "load": 1.2, "detected": True},
     {"sample_id": "B", "lineage": "alpha", "load": 0.8, "detected": False},
 ]
+
 session = build_session("(A,B);", metadata=metadata, row_key_column="sample_id")
 ```
 
-If `row_key_column` is omitted, TreeViz chooses the metadata column with the
-most exact leaf-name matches. Use `binding_diagnostics(session)` after building
-to check unmatched leaves or rows.
+If `row_key_column` is omitted, the package chooses the metadata column with
+the most exact leaf-name matches.
 
-Cell values may be strings, numbers, booleans, `None`, or empty strings. Empty
-strings and `None` are treated as missing values. Column types are inferred as
-continuous, binary, categorical, or text.
+## Track Definitions
 
-## Tracks
+Tracks map metadata columns to visual encodings.
 
-Tracks are dictionaries that map metadata columns to visual encodings. Use
-`column_key` for one column and `column_keys` for heatmaps. Underscores in
-`kind` are normalized to hyphens, so `color_strip` and `color-strip` are both
-accepted.
-
-Supported track kinds:
-
-| Kind | Required columns | Typical use |
+| Kind | Required key | Typical use |
 | --- | --- | --- |
 | `color_strip` | `column_key` | categorical group bands |
 | `gradient` | `column_key` | continuous values |
 | `heatmap` | `column_keys` | multiple continuous columns |
 | `bar` | `column_key` | continuous bar tracks |
 | `text` | `column_key` | labels from metadata |
-| `binary_dots` | `column_key` | boolean presence/absence |
+| `binary_dots` | `column_key` | boolean presence/absence symbols |
 
 Example:
 
@@ -132,20 +134,97 @@ Example:
 tracks = [
     {"kind": "color_strip", "column_key": "lineage", "title": "Lineage"},
     {"kind": "gradient", "column_key": "load", "title": "Load", "palette": "viridis"},
+    {"kind": "heatmap", "column_keys": ["score_a", "score_b"], "title": "Scores"},
     {"kind": "bar", "column_key": "day", "title": "Collection day", "show_axis": True},
-    {"kind": "binary_dots", "column_key": "detected", "title": "Detected"},
+    {"kind": "binary_dots", "column_key": "detected", "title": "Detected", "shape": "circle"},
+    {"kind": "text", "column_key": "note", "title": "Note"},
 ]
 ```
 
-## Static Exports
+Underscores and hyphens are both accepted in track kinds:
+`color_strip` and `color-strip` are equivalent.
 
-`render_tree(...)` writes a temporary `.treeviz.json` session and calls a
-TreeViz renderer command. It supports `svg`, `png`, and `pdf`.
+## View Settings
 
-If you have access to a TreeViz renderer command:
+Pass a `view` dictionary to set layout defaults:
 
 ```python
-from pathlib import Path
+view = {
+    "layout": "rectangular",
+    "showSupport": True,
+    "branchScale": 0.8,
+    "leafSpacing": 0.9,
+    "metadataGap": 0,
+    "labelFontSize": 11,
+    "internalNodeMarkerAttribute": "support",
+    "internalNodeMarkerEncoding": "shade",
+    "prettyTerminalBranches": True,
+}
+
+session = build_session(tree, metadata=metadata, tracks=tracks, view=view)
+```
+
+The browser can further adjust and save view settings.
+
+### Data-Defined Node And Branch Styling
+
+The Python package preserves TreeViz view fields for exact node and branch
+styling. Put terminal-node style values in metadata columns and select those
+columns in `view`:
+
+```python
+metadata = [
+    {
+        "id": "A",
+        "node_diameter": 10,
+        "node_color": "#5eead4",
+        "branch_width": 2.6,
+        "branch_color": "#5eead4",
+    },
+    {
+        "id": "B",
+        "node_diameter": 8,
+        "node_color": "#fb923c",
+        "branch_width": 1.8,
+        "branch_color": "#fb923c",
+    },
+]
+
+view = {
+    "nodeCircleDiameterAttribute": "node_diameter",
+    "nodeCircleColorAttribute": "node_color",
+    "branchWidthAttribute": "branch_width",
+    "branchColorAttribute": "branch_color",
+    "prettyTerminalBranches": True,
+}
+
+session = build_session("(A:0.2,B:0.2);", metadata=metadata, row_key_column="id", view=view)
+validate_session(session)
+```
+
+`prettyTerminalBranches` is the same setting as the browser checkbox. It
+decorates branches entering terminal leaves in rectangular, circular, and
+radial layouts while preserving branch color and branch width mappings.
+
+## Tree Inspection
+
+```python
+from treeviz import binding_diagnostics, leaf_names, tree_stats
+
+leaf_names(session)
+tree_stats(session)
+binding_diagnostics(session)
+```
+
+`binding_diagnostics(session)` reports unmatched leaves, unmatched rows, and
+duplicate row keys.
+
+## Static Export
+
+`render_tree(...)` writes a temporary `.treeviz.json` session and calls an
+external TreeViz renderer command. It supports `svg`, `png`, and `pdf`.
+
+```python
 from treeviz import render_tree
 
 render_tree(
@@ -154,94 +233,43 @@ render_tree(
     tracks=tracks,
     format="pdf",
     output="example.pdf",
+    command=["treeviz", "render"],
     width=1400,
-    height=620,
+    height=700,
     auto_crop=True,
     crop_padding=24,
     metrics="example.metrics.json",
-    command=["treeviz", "render"],
 )
 ```
 
-`render_tree` defaults to `bun run treeviz render`, which is meant for the
-TreeViz implementation checkout. Public package users should provide a renderer
-command with `command=[...]` when one is available. If no local renderer is
-available, use `view_session(...)` or `session_url(...)` to open sessions in the
-hosted browser app.
-
-`auto_crop=True` tightens SVG, PNG, and PDF exports to the visible tree content
-after rendering. `crop_padding` is measured in pixels. `metrics` writes a JSON
-file with the measured content box, crop box, whitespace margins, fill ratios,
-and warnings such as `excess-vertical-whitespace`.
+If no renderer command is available, use `view_session(...)`,
+`view_tree(...)`, or `session_url(...)` and open the session in the hosted
+browser app.
 
 ## Public API
 
-`build_session(tree, metadata=None, tracks=None, view=None, name=None, row_key_column=None)`
+| Function | Purpose |
+| --- | --- |
+| `build_session(tree, metadata=None, tracks=None, view=None, name=None, row_key_column=None)` | Build one session dictionary, or a list of sessions when `tree` is a list. |
+| `validate_session(session, schema_path=None)` | Validate a session against the packaged JSON schema. |
+| `save_session(session, path)` | Write a `.treeviz.json` session and return the output path. |
+| `load_session(path, validate=True, schema_path=None)` | Read a saved session; validation is enabled by default. |
+| `view_tree(tree, metadata=None, tracks=None, view=None, open_browser=True, app_url=..., name=None, row_key_column=None)` | Build a session and return a notebook/browser view object. |
+| `view_session(session, open_browser=True, app_url=...)` | Return a notebook/browser view for an existing session. |
+| `session_url(session, app_url=...)` | Return the hosted TreeViz URL for a session. |
+| `leaf_names(tree_or_session)` | Return terminal leaf labels. |
+| `tree_stats(tree_or_session)` | Return topology and branch-length summary statistics. |
+| `binding_diagnostics(session)` | Return metadata binding diagnostics. |
+| `render_tree(tree, metadata=None, tracks=None, view=None, format="svg", output=None, command=None, width=None, height=None, auto_crop=False, crop_padding=None, metrics=None, cwd=None)` | Render SVG, PNG, or PDF through an external renderer command. |
+| `TreeVizSession(session, app_url=...)` | Notebook-friendly view object with `.url`, `.fragment`, and `._repr_html_()`. |
 
-Build one TreeViz session from a Newick string, Newick/Nexus file path, or a
-supported tree object. A list of trees returns a list of sessions.
+## Runnable Example Script
 
-`validate_session(session, schema_path=None)`
-
-Validate a session against the packaged TreeViz session JSON schema.
-
-`save_session(session, path)`
-
-Write a `.treeviz.json` session and return the output path.
-
-`load_session(path, validate=True, schema_path=None)`
-
-Read a saved session. Validation is enabled by default.
-
-`view_tree(tree, metadata=None, tracks=None, view=None, open_browser=True, app_url=..., name=None, row_key_column=None)`
-
-Build a session and return a `TreeVizSession` view object. Set
-`open_browser=False` in notebooks and scripts.
-
-`view_session(session, open_browser=True, app_url=...)`
-
-Return a `TreeVizSession` view object for an existing session.
-
-`session_url(session, app_url=...)`
-
-Return the hosted TreeViz URL for a session. Small sessions are encoded in the
-URL fragment; large sessions return the base app URL and should be opened from
-a saved `.treeviz.json` file.
-
-`leaf_names(tree_or_session)`
-
-Return terminal leaf labels from a Newick/tree object, TreeViz tree document,
-or full TreeViz session.
-
-`tree_stats(tree_or_session)`
-
-Return leaf count, internal-node count, total-node count, max depth, tree
-height, rooted/binary flags, and branch-length summary.
-
-`binding_diagnostics(session)`
-
-Return metadata binding diagnostics, including unmatched leaves and unmatched
-metadata rows.
-
-`render_tree(tree, metadata=None, tracks=None, view=None, format="svg", output=None, command=None, width=None, height=None, auto_crop=False, crop_padding=None, metrics=None, cwd=None)`
-
-Render SVG, PNG, or PDF through the external TreeViz renderer and return the
-output path.
-
-`TreeVizSession(session, app_url=...)`
-
-Notebook-friendly view object. It exposes `.url`, `.fragment`, and
-`._repr_html_()` for iframe display.
-
-## Verification
-
-The implementation repository runs package checks before publishing:
+This repository includes a public script that imports the package, builds 30
+and 100 leaf examples, validates metadata binding, and writes sessions:
 
 ```bash
-pixi run -e py py-test
-pixi run -e py py-example
-pixi run -e py py-notebook
-pixi run -e py py-build
-pixi run -e py py-twine-check
-pixi run -e py py-package-check
+python examples/plot_treeviz_examples.py --out treeviz-example-output
 ```
+
+See [Examples](EXAMPLES.md) for static rendering options.

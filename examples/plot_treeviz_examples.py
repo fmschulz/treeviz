@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""Build and plot TreeViz examples from the Python package.
+"""Build public TreeViz examples from the Python package.
 
 Run after installing the package:
 
-    python examples/plot_treeviz_examples.py --out /tmp/treeviz-python-plots
+    python examples/plot_treeviz_examples.py --out treeviz-example-output
 
-The script can build sessions and hosted TreeViz URLs. Static SVG/PNG/PDF
-export requires an installed TreeViz renderer or an implementation checkout
-with Bun available. Static outputs are auto-cropped and write crop metrics for
-visual QA.
+The script writes two metadata-rich sessions, two matching bare sessions, and a
+summary JSON file. Static SVG/PNG/PDF export is optional and requires an
+external TreeViz renderer command.
 """
 
 from __future__ import annotations
@@ -29,163 +28,277 @@ from treeviz import (
     tree_stats,
     validate_session,
     view_session,
-    view_tree,
 )
 
 
-EXAMPLES: dict[str, dict[str, Any]] = {
-    "variant_surveillance": {
-        "tree": (
-            "((Alpha_01:0.09,Alpha_02:0.08)Alpha:0.05,"
-            "(Beta_01:0.07,(Beta_02:0.04,Beta_03:0.05)Beta_inner:0.03)Beta:0.06,"
-            "(Gamma_01:0.10,Gamma_02:0.09)Gamma:0.04);"
-        ),
-        "metadata": [
-            {"sample": "Alpha_01", "lineage": "Alpha", "region": "North", "collection_day": 4, "viral_load": 18.4, "has_marker": True},
-            {"sample": "Alpha_02", "lineage": "Alpha", "region": "North", "collection_day": 7, "viral_load": 16.2, "has_marker": True},
-            {"sample": "Beta_01", "lineage": "Beta", "region": "West", "collection_day": 11, "viral_load": 12.1, "has_marker": False},
-            {"sample": "Beta_02", "lineage": "Beta", "region": "West", "collection_day": 13, "viral_load": 10.8, "has_marker": False},
-            {"sample": "Beta_03", "lineage": "Beta", "region": "South", "collection_day": 15, "viral_load": 11.6, "has_marker": True},
-            {"sample": "Gamma_01", "lineage": "Gamma", "region": "East", "collection_day": 20, "viral_load": 22.4, "has_marker": True},
-            {"sample": "Gamma_02", "lineage": "Gamma", "region": "East", "collection_day": 23, "viral_load": 19.7, "has_marker": False},
-        ],
-        "row_key_column": "sample",
-        "tracks": [
-            {"kind": "color_strip", "column_key": "lineage", "title": "Lineage"},
-            {"kind": "color_strip", "column_key": "region", "title": "Region"},
-            {"kind": "gradient", "column_key": "viral_load", "title": "Viral load"},
-            {"kind": "bar", "column_key": "collection_day", "title": "Collection day", "show_axis": True},
-            {"kind": "binary_dots", "column_key": "has_marker", "title": "Marker"},
-        ],
-    },
-    "enzyme_families": {
-        "tree": (
-            "((HydA_1:0.13,HydA_2:0.11)HydA:0.08,"
-            "((NiFe_1:0.09,NiFe_2:0.12)NiFe:0.07,"
-            "(Ech_1:0.10,Ech_2:0.11)Ech:0.05)Group2:0.06,"
-            "Fdh_1:0.17);"
-        ),
-        "metadata": [
-            {"gene": "HydA_1", "family": "FeFe", "habitat": "sediment", "score_a": 0.91, "score_b": 0.64, "note": "reference"},
-            {"gene": "HydA_2", "family": "FeFe", "habitat": "sediment", "score_a": 0.86, "score_b": 0.58, "note": "candidate"},
-            {"gene": "NiFe_1", "family": "NiFe", "habitat": "hot_spring", "score_a": 0.78, "score_b": 0.82, "note": "candidate"},
-            {"gene": "NiFe_2", "family": "NiFe", "habitat": "hot_spring", "score_a": 0.81, "score_b": 0.79, "note": "reference"},
-            {"gene": "Ech_1", "family": "Ech", "habitat": "rumen", "score_a": 0.67, "score_b": 0.88, "note": "candidate"},
-            {"gene": "Ech_2", "family": "Ech", "habitat": "rumen", "score_a": 0.71, "score_b": 0.84, "note": "candidate"},
-            {"gene": "Fdh_1", "family": "Fdh", "habitat": "marine", "score_a": 0.74, "score_b": 0.69, "note": "outgroup"},
-        ],
-        "row_key_column": "gene",
-        "tracks": [
-            {"kind": "color_strip", "column_key": "family", "title": "Family"},
-            {"kind": "heatmap", "column_keys": ["score_a", "score_b"], "title": "Scores"},
-            {"kind": "text", "column_key": "note", "title": "Note"},
-        ],
-    },
-}
+CLADES = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon"]
+REGIONS = ["North", "South", "East", "West"]
+HOSTS = ["soil", "water", "sediment", "host"]
 
 
-def default_renderer_cwd() -> Path | None:
-    root = Path(__file__).resolve().parents[3]
-    if (root / "package.json").is_file() and (root / "src/cli/cli.ts").is_file():
-        return root
-    return None
+def make_balanced_newick(labels: list[str], offset: int = 0) -> str:
+    """Return deterministic Newick with numeric internal support labels."""
+
+    if len(labels) == 1:
+        length = 0.035 + ((offset * 7) % 11) * 0.006
+        return f"{labels[0]}:{length:.3f}"
+
+    split = len(labels) // 2
+    left = make_balanced_newick(labels[:split], offset + 1)
+    right = make_balanced_newick(labels[split:], offset + split + 1)
+    support = 58 + ((offset * 13 + len(labels) * 5) % 42)
+    length = 0.025 + ((offset * 5 + len(labels)) % 9) * 0.007
+    return f"({left},{right}){support}:{length:.3f}"
 
 
-def write_example(
-    name: str,
-    example: dict[str, Any],
-    out_dir: Path,
-    formats: list[str],
-    renderer_cwd: Path | None,
-    skip_static: bool,
-) -> dict[str, Any]:
-    session = build_session(
-        example["tree"],
-        metadata=example["metadata"],
-        tracks=example["tracks"],
-        name=name,
-        row_key_column=example["row_key_column"],
-    )
-    validate_session(session)
+def make_metadata(labels: list[str]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    block = max(1, len(labels) // len(CLADES))
+    turquoise = ["#0f766e", "#14b8a6", "#2dd4bf", "#5eead4"]
+    warm = ["#b91c1c", "#ea580c", "#f97316", "#fdba74"]
+    for index, label in enumerate(labels):
+        clade = CLADES[min(index // block, len(CLADES) - 1)]
+        clade_offset = index % block
+        if clade == "Alpha":
+            node_color = turquoise[min(clade_offset, len(turquoise) - 1)]
+            branch_color = node_color
+            node_diameter = max(7, 12 - clade_offset)
+            branch_width = max(1.8, 4.2 - clade_offset * 0.45)
+        elif clade == "Gamma":
+            node_color = warm[min(clade_offset, len(warm) - 1)]
+            branch_color = node_color
+            node_diameter = max(6, 11 - clade_offset)
+            branch_width = max(1.6, 3.6 - clade_offset * 0.4)
+        else:
+            node_color = "#94a3b8"
+            branch_color = "#cbd5e1"
+            node_diameter = 5
+            branch_width = 1.1
+        rows.append(
+            {
+                "leaf_id": label,
+                "clade": clade,
+                "region": REGIONS[index % len(REGIONS)],
+                "habitat": HOSTS[(index * 2 + 1) % len(HOSTS)],
+                "collection_day": 1 + index * 3,
+                "abundance": round(0.25 + ((index * 17) % 91) / 20, 3),
+                "score_a": round(((index * 19) % 100) / 100, 3),
+                "score_b": round(((index * 23 + 11) % 100) / 100, 3),
+                "gc": round(0.32 + ((index * 7) % 31) / 100, 3),
+                "marker_present": index % 4 in {0, 1},
+                "status": "reference" if index % 10 == 0 else "candidate",
+                "node_diameter": node_diameter,
+                "node_color": node_color,
+                "branch_width": round(branch_width, 2),
+                "branch_color": branch_color,
+            }
+        )
+    return rows
 
-    session_path = save_session(session, out_dir / f"{name}.treeviz.json")
-    loaded = load_session(session_path)
-    diagnostics = binding_diagnostics(loaded)
-    if diagnostics.get("unmatchedLeaves") or diagnostics.get("unmatchedRows"):
-        raise RuntimeError(f"{name} metadata did not bind cleanly: {diagnostics}")
 
-    view = view_session(loaded, open_browser=False)
-    direct_view = view_tree(
-        example["tree"],
-        metadata=example["metadata"],
-        tracks=example["tracks"],
-        open_browser=False,
-        name=name,
-        row_key_column=example["row_key_column"],
-    )
-    if direct_view.fragment is None:
-        raise RuntimeError(f"{name} is too large for URL-fragment notebook display")
+def make_tracks(include_text: bool) -> list[dict[str, Any]]:
+    tracks: list[dict[str, Any]] = [
+        {"kind": "color_strip", "column_key": "clade", "title": "Clade", "width": 16},
+        {"kind": "color_strip", "column_key": "region", "title": "Region", "width": 14},
+        {"kind": "gradient", "column_key": "abundance", "title": "Abundance", "width": 48},
+        {"kind": "heatmap", "column_keys": ["score_a", "score_b"], "title": "Scores", "cell_width": 14},
+        {"kind": "bar", "column_key": "collection_day", "title": "Day", "width": 52, "show_axis": True},
+        {
+            "kind": "binary_dots",
+            "column_key": "marker_present",
+            "title": "Marker",
+            "shape": "circle",
+            "color": "#0f766e",
+            "width": 16,
+        },
+    ]
+    if include_text:
+        tracks.append({"kind": "text", "column_key": "status", "title": "Status", "width": 72})
+    return tracks
 
-    outputs: dict[str, str] = {}
-    if not skip_static:
-        for fmt in formats:
-            path = out_dir / f"{name}.{fmt}"
-            metrics_path = out_dir / f"{name}.{fmt}.metrics.json"
-            render_tree(
-                example["tree"],
-                metadata=example["metadata"],
-                tracks=example["tracks"],
-                format=fmt,
-                output=path,
-                width=1400,
-                height=620,
-                auto_crop=True,
-                crop_padding=24,
-                metrics=metrics_path,
-                cwd=renderer_cwd,
-            )
-            outputs[fmt] = str(path)
-            outputs[f"{fmt}_metrics"] = str(metrics_path)
 
+def make_view(layout: str, leaves: int) -> dict[str, Any]:
+    show_labels = leaves <= 30
     return {
-        "session": str(session_path),
-        "url": session_url(loaded),
-        "notebook_fragment_available": view.fragment is not None,
-        "leaf_names": leaf_names(loaded),
-        "tree_stats": tree_stats(loaded),
-        "binding_diagnostics": diagnostics,
-        "static_outputs": outputs,
+        "layout": layout,
+        "showSupport": True,
+        "showBranchLengths": True,
+        "branchScale": 0.72 if layout == "rectangular" else 0.82,
+        "leafSpacing": 0.86 if leaves <= 30 else 0.42,
+        "metadataScale": 0.9,
+        "metadataGap": 0,
+        "metadataRowScale": 0.88,
+        "showLabels": show_labels,
+        "labelFontSize": 11 if show_labels else 9,
+        "allowLabelOverlap": False,
+        "tipAlignment": "tip",
+        "branchColourAttribute": "gc",
+        "nodeCircleDiameterAttribute": "node_diameter",
+        "nodeCircleColorAttribute": "node_color",
+        "branchWidthAttribute": "branch_width",
+        "branchColorAttribute": "branch_color",
+        "prettyTerminalBranches": True,
+        "internalNodeMarkerAttribute": "support",
+        "internalNodeMarkerEncoding": "shade",
+        "internalNodeMarkerColor": "#0f766e",
+        "internalNodeMarkerCategories": [
+            {"label": "Low support (<70)", "color": "#d1d5db", "max": 70, "maxInclusive": False, "size": 7},
+            {"label": "Medium support (70-90)", "color": "#7dd3fc", "min": 70, "max": 90, "size": 8},
+            {"label": "High support (>=90)", "color": "#0f766e", "min": 90, "minInclusive": True, "size": 9},
+        ],
+        "figureLegendVisible": True,
+        "figureLegendSectionIndex": None,
+        "stagePanelPositions": {"figureLegend": {"x": 24, "y": 24}},
     }
 
 
+def example_specs() -> dict[str, dict[str, Any]]:
+    lineage_labels = [f"L{i:02d}" for i in range(1, 31)]
+    clade_labels = [f"C{i:03d}" for i in range(1, 101)]
+    return {
+        "lineage_30": {
+            "tree": make_balanced_newick(lineage_labels) + ";",
+            "metadata": make_metadata(lineage_labels),
+            "tracks": make_tracks(include_text=True),
+            "view": make_view("rectangular", len(lineage_labels)),
+        },
+        "clade_100": {
+            "tree": make_balanced_newick(clade_labels) + ";",
+            "metadata": make_metadata(clade_labels),
+            "tracks": make_tracks(include_text=False),
+            "view": make_view("circular", len(clade_labels)),
+        },
+    }
+
+
+def write_session(
+    name: str,
+    tree: str,
+    metadata: list[dict[str, Any]] | None,
+    tracks: list[dict[str, Any]],
+    view: dict[str, Any],
+    out_dir: Path,
+) -> dict[str, Any]:
+    session = build_session(
+        tree,
+        metadata=metadata,
+        tracks=tracks if metadata else [],
+        view=view,
+        name=name,
+        row_key_column="leaf_id" if metadata else None,
+    )
+    validate_session(session)
+    session_path = save_session(session, out_dir / f"{name}.treeviz.json")
+    loaded = load_session(session_path)
+    diagnostics = binding_diagnostics(loaded)
+    if metadata and (diagnostics.get("unmatchedLeaves") or diagnostics.get("unmatchedRows")):
+        raise RuntimeError(f"{name} metadata did not bind cleanly: {diagnostics}")
+
+    view_obj = view_session(loaded, open_browser=False)
+    diagnostic_summary = {
+        "unmatched_leaf_count": len(diagnostics.get("unmatchedLeaves") or []),
+        "unmatched_row_count": len(diagnostics.get("unmatchedRows") or []),
+        "duplicate_count": len(diagnostics.get("duplicates") or []),
+    }
+    return {
+        "session": str(session_path),
+        "url": session_url(loaded),
+        "notebook_fragment_available": view_obj.fragment is not None,
+        "leaf_count": len(leaf_names(loaded)),
+        "tree_stats": tree_stats(loaded),
+        "binding_diagnostics": diagnostic_summary,
+    }
+
+
+def render_outputs(
+    name: str,
+    spec: dict[str, Any],
+    out_dir: Path,
+    formats: list[str],
+    renderer_command: list[str],
+) -> dict[str, str]:
+    outputs: dict[str, str] = {}
+    for fmt in formats:
+        path = out_dir / f"{name}.{fmt}"
+        metrics_path = out_dir / f"{name}.{fmt}.metrics.json"
+        render_tree(
+            spec["tree"],
+            metadata=spec.get("metadata"),
+            tracks=spec.get("tracks") or [],
+            view=spec["view"],
+            format=fmt,
+            output=path,
+            command=renderer_command,
+            width=1500,
+            height=900 if spec["view"]["layout"] == "circular" else 760,
+            auto_crop=True,
+            crop_padding=24,
+            metrics=metrics_path,
+        )
+        outputs[fmt] = str(path)
+        outputs[f"{fmt}_metrics"] = str(metrics_path)
+    return outputs
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build and plot example TreeViz Python sessions.")
-    parser.add_argument("--out", type=Path, default=Path("treeviz-python-plots"), help="Output directory.")
+    parser = argparse.ArgumentParser(description="Build public TreeViz Python example sessions.")
+    parser.add_argument("--out", type=Path, default=Path("treeviz-example-output"), help="Output directory.")
+    parser.add_argument("--render", action="store_true", help="Render static SVG/PNG/PDF files.")
     parser.add_argument(
         "--formats",
         nargs="+",
         default=["svg", "png", "pdf"],
         choices=["svg", "png", "pdf"],
-        help="Static formats to render through the TreeViz CLI.",
+        help="Static formats to render when --render is set.",
     )
     parser.add_argument(
-        "--renderer-cwd",
-        type=Path,
-        default=default_renderer_cwd(),
-        help="Directory containing the TreeViz browser app and CLI. Defaults to the source checkout root.",
+        "--renderer-command",
+        nargs="+",
+        default=None,
+        help="External renderer command, for example: --renderer-command treeviz render",
     )
     parser.add_argument(
         "--skip-static",
         action="store_true",
-        help="Only write .treeviz.json files and hosted URLs; do not call the external renderer.",
+        help="Deprecated alias for the default behavior; static rendering is off unless --render is set.",
     )
     args = parser.parse_args()
 
+    if args.render and not args.renderer_command:
+        parser.error("--render requires --renderer-command, for example: --renderer-command treeviz render")
+
     args.out.mkdir(parents=True, exist_ok=True)
-    report = {
-        name: write_example(name, example, args.out, args.formats, args.renderer_cwd, args.skip_static)
-        for name, example in EXAMPLES.items()
-    }
+    specs = example_specs()
+    report: dict[str, Any] = {}
+
+    for name, spec in specs.items():
+        report[name] = write_session(
+            name,
+            spec["tree"],
+            spec["metadata"],
+            spec["tracks"],
+            spec["view"],
+            args.out,
+        )
+        bare_name = f"{name}_bare"
+        report[bare_name] = write_session(
+            bare_name,
+            spec["tree"],
+            None,
+            [],
+            {**spec["view"], "showMetadata": False, "figureLegendVisible": False},
+            args.out,
+        )
+
+        if args.render and not args.skip_static:
+            report[name]["static_outputs"] = render_outputs(
+                name,
+                spec,
+                args.out,
+                args.formats,
+                args.renderer_command,
+            )
+
     report_path = args.out / "summary.json"
     report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"output_dir": str(args.out), "summary": str(report_path)}, indent=2))

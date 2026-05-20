@@ -1,0 +1,34 @@
+site_name: TreeViz Wiki
+site_url: https://fmschulz.github.io/treeviz/
+repo_url: https://github.com/fmschulz/treeviz
+edit_uri: edit/main/docs/
+exclude_docs: |
+  _Sidebar.md
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - search.highlight
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+nav:
+  - Home: index.md
+  - Getting Started: GETTING_STARTED.md
+  - Browser: BROWSER.md
+  - Python: PYTHON.md
+  - Metadata: METADATA.md
+  - Tree Styling: STYLING.md
+  - Exports: EXPORTS.md
+  - Browser API: API.md
+  - Agent Automation: AGENTS.md
+  - Examples:
+      - EXAMPLES.md
+      - Example Notes: examples/README.md
+  - Troubleshooting: TROUBLESHOOTING.md

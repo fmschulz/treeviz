@@ -1,142 +1,157 @@
-# Metadata FAQ
+# Metadata
 
 TreeViz metadata is a TSV or CSV table that attaches values to tree leaves.
-Those values can then drive color strips, gradients, heatmaps, bars, text
-tracks, binary dots, branch coloring, labels, and clade resolution.
+Those values can drive color strips, gradients, heatmaps, bars, text tracks,
+binary dots, branch coloring, clade resolution, and legends.
+Metadata can also provide exact terminal-node circle and terminal-branch style
+values when those columns are selected in the view.
 
-## What does a metadata file look like?
+## Table Shape
 
-Use one header row and one row per sample, genome, gene, or taxon.
-
-```tsv
-leaf_id	phylum	habitat	abundance	present	host
-A	Proteobacteria	soil	0.42	yes	mouse
-B	Firmicutes	water	1.10	no	human
-C	Actinobacteriota	soil	0.08	yes	mouse
-```
-
-The first column does not have to be called `leaf_id`, but one column must be
-chosen as the row-key column during import.
-
-## What is the row-key column?
-
-The row-key column is the metadata column used to match rows to tree leaves.
-By default TreeViz compares row-key values with leaf labels from the Newick or
-Nexus tree.
-
-For the example above, a tree containing leaves `A`, `B`, and `C` should import
-with `leaf_id` as the row-key column.
-
-## Can the row-key column have duplicates?
-
-It should be unique. Duplicate row keys are accepted, but the last row wins in
-the stored metadata table. TreeViz reports duplicate keys as warnings in the
-import review.
-
-## What happens to blank row keys?
-
-Rows with a blank value in the row-key column are skipped and reported as
-warnings. A row without a key cannot be bound to a leaf.
-
-## How are metadata rows matched to leaves?
-
-TreeViz tries exact matches first. If exact matching fails, it can apply
-normalization flags:
-
-- Trim leading and trailing whitespace.
-- Ignore case.
-- Strip underscores.
-- Strip common quoted-label decorations such as `/1`, branch-length suffixes,
-  and surrounding single quotes.
-
-The default normalization is trim-only. The import planner can suggest stronger
-normalization when it improves binding.
-
-## Can metadata bind to tree annotations instead of leaf labels?
-
-Yes. If the tree leaves carry metadata in Newick/Nexus node comments, TreeViz
-can use a leaf metadata field as the leaf identifier source. For example,
-leaves with NHX or BEAST-style comments can be matched by a metadata key in
-`node.meta` instead of by the visible label.
-
-## Which file formats are supported?
-
-- `.tsv` and `.tab`: tab-separated metadata.
-- `.csv`: RFC 4180-style CSV with quoted fields.
-- Gzipped files are accepted when the filename ends in `.gz`.
-
-TSV is intentionally simple: tabs and newlines always separate cells and rows.
-If a field needs quotes, commas, or embedded newlines, use CSV.
-
-## How are column types inferred?
-
-TreeViz infers a starting type for each column:
-
-- All finite numeric values -> `continuous`.
-- Values such as `true`, `false`, `yes`, `no`, `1`, `0`, `present`, `absent`
-  -> `binary`.
-- Two distinct non-numeric values -> `binary`.
-- Up to 32 distinct non-numeric values -> `categorical`.
-- More distinct values -> `text`.
-
-Empty cells are ignored during inference and become missing values in the
-stored table.
-
-## How should missing values be written?
-
-Leave the cell empty.
+Use one header row and one row per leaf.
 
 ```tsv
-leaf_id	habitat	abundance
-A	soil	0.42
-B	water	
-C	soil	0.08
+leaf_id	clade	habitat	abundance	present	note
+A	Alpha	soil	0.42	yes	reference
+B	Alpha	water	1.10	no	candidate
+C	Beta	soil	0.08	yes	candidate
 ```
 
-Missing values are stored as `null`.
+One column must identify the tree leaf. In the example above, `leaf_id` should
+match the leaf labels in the tree.
 
-## What do unmatched leaves and unmatched rows mean?
+## Row-Key Column
 
-- Unmatched leaves are tree leaves that did not find a metadata row.
-- Unmatched rows are metadata rows that did not bind to any leaf.
+The row-key column is the metadata column used to bind rows to tree leaves.
+Pass it explicitly when you can.
 
-A small number can be acceptable for partial metadata. Large counts usually
-mean the wrong row-key column or normalization settings were chosen.
+Python:
 
-## How do I configure metadata in `treeviz.toml`?
+```python
+session = build_session(
+    "(A,B,C);",
+    metadata=metadata,
+    row_key_column="leaf_id",
+)
+```
+
+Browser API:
+
+```js
+await api.execute('session.import-metadata', {
+  source: metadataText,
+  format: 'tsv',
+  rowKeyColumn: 'leaf_id'
+})
+```
+
+If the row-key column is omitted, TreeViz tries to choose the column with the
+most leaf-name matches. Explicit row keys are still preferred for reproducible
+workflows.
+
+## Matching Rules
+
+TreeViz tries exact matches first. During browser import, the metadata planner
+can suggest normalization when it improves binding:
+
+- trim leading and trailing whitespace;
+- ignore case;
+- strip underscores;
+- strip common quoted-label decorations.
+
+Unmatched leaves are tree leaves without metadata rows. Unmatched rows are
+metadata rows that do not bind to any tree leaf.
+
+## Duplicates And Missing Keys
+
+Row keys should be unique. Duplicate row keys are treated as a warning in the
+browser import review.
+
+Rows with blank row keys cannot be bound. In Python, a missing row key raises a
+`ValueError` so invalid sessions fail early.
+
+## Values And Types
+
+Cells may contain strings, numbers, booleans, or blanks. Blank cells are
+treated as missing values.
+
+TreeViz infers column types:
+
+| Column type | Typical values | Typical tracks |
+| --- | --- | --- |
+| `continuous` | `0.42`, `1.10`, `3` | gradient, heatmap, bar |
+| `binary` | `yes/no`, `true/false`, `1/0`, `present/absent` | binary dots |
+| `categorical` | `Alpha`, `Beta`, `soil`, `water` | color strip |
+| `text` | labels, notes, long identifiers | text |
+
+## Track Definitions In Python
+
+```python
+tracks = [
+    {"kind": "color_strip", "column_key": "clade", "title": "Clade"},
+    {"kind": "gradient", "column_key": "abundance", "title": "Abundance"},
+    {"kind": "bar", "column_key": "abundance", "title": "Abundance", "show_axis": True},
+    {"kind": "binary_dots", "column_key": "present", "title": "Present", "shape": "circle"},
+    {"kind": "text", "column_key": "note", "title": "Note"},
+]
+```
+
+`color_strip` and `binary_dots` may also be written as `color-strip` and
+`binary-dots`. The Python package normalizes underscores to hyphens.
+
+## Style Columns
+
+Metadata columns can drive terminal-node circles and terminal-branch styling:
+
+```tsv
+taxon	group	node_diameter	node_color	branch_width	branch_color
+A1	turquoise	11	#5eead4	2.6	#5eead4
+A2	turquoise	10	#67e8f9	2.3	#67e8f9
+C3	warm	11	#fb923c	2.0	#fb923c
+```
+
+Configure those columns in a `treeviz.toml` file:
 
 ```toml
-[metadata]
-file = "metadata.tsv"
-format = "tsv"
-row_key_column = "leaf_id"
-
-[binding]
-trim = true
-case_insensitive = false
-strip_underscores = false
-strip_quoted_label_decorations = false
-
-[[track]]
-kind = "color-strip"
-column = "phylum"
-
-[[track]]
-kind = "heatmap"
-columns = ["abundance"]
-
-[[track]]
-kind = "bar"
-column = "abundance"
-show_axis = true
-show_helper_lines = true
-helper_line_style = "dashed"
+[view]
+node_diameter_attribute = "node_diameter"
+node_color_attribute = "node_color"
+branch_width_attribute = "branch_width"
+branch_color_attribute = "branch_color"
+pretty_terminal_branches = true
 ```
 
-The CLI compiles this into a self-contained `.treeviz.json` session.
+Terminal leaves use tree node metadata first and then the bound metadata row.
+Internal nodes only use tree node metadata. Branch style values are keyed by
+the child node, so a row for `A1` styles the branch entering `A1`.
 
-## What should I export if I want to preserve metadata tracks?
+See [Tree styling](STYLING.md) for API and Python examples.
 
-Use **Export Session (JSON)**. Newick and Nexus exports preserve tree data but
-do not preserve metadata tables, bindings, tracks, view settings, or saved
-views.
+## File Formats
+
+- `.tsv` and `.tab`: tab-separated metadata.
+- `.csv`: CSV with quoted fields.
+- `.gz`: accepted by the browser when the filename ends in `.gz`.
+
+Use TSV for simple tables. Use CSV when values need commas, quotes, or embedded
+newlines.
+
+## Validation
+
+Python:
+
+```python
+from treeviz import binding_diagnostics, validate_session
+
+validate_session(session)
+binding_diagnostics(session)
+```
+
+Browser API:
+
+```js
+api.getDiagnostics()
+```
+
+Large unmatched counts usually mean the wrong row-key column or normalization
+settings were used.

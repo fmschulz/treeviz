@@ -1,95 +1,87 @@
 ---
 name: treeviz-agent
-description: Use for AI-agent-driven phylogenetic tree visualization in TreeViz: load Newick/Nexus/.treeviz.json sessions, import metadata, choose row keys and leaf identifiers, plan tracks, style clades, tune layouts, export figures, or control `window.__treeviz` in `?api=1` mode.
+description: Use for agent-driven phylogenetic tree visualization in TreeViz: load Newick/Nexus/.treeviz.json sessions, import metadata, choose row keys, plan tracks, style clades, tune rectangular/circular layouts, inspect diagnostics, and export figures through the hosted TreeViz browser API.
 ---
 
 # TreeViz Agent
 
-TreeViz is a deterministic rendering and editing engine. Keep the reasoning in
-the agent, and drive TreeViz through its command/API surface instead of brittle
-DOM gestures whenever `?api=1` is available. Use `?mode=headless&api=1` for
-render-only QA.
+TreeViz is a browser-based tree visualization tool. Keep biological reasoning,
+file preparation, and interpretation in the agent; use TreeViz for deterministic
+parsing, metadata binding, layout, styling, diagnostics, and export.
 
-Default hosted runtime:
+Default runtime:
 
 ```text
 https://treeviz.newlineages.com/?api=1
+```
+
+Headless runtime for browser automation:
+
+```text
 https://treeviz.newlineages.com/?mode=headless&api=1
 ```
 
-## Bundled App Launcher
-
-Launch the precompiled TreeViz browser app without starting Vite:
-
-```bash
-bun .agents/skills/treeviz-agent/scripts/launch-treeviz-app.ts --port 5174
-```
-
-To open a saved session directly:
-
-```bash
-bun .agents/skills/treeviz-agent/scripts/launch-treeviz-app.ts \
-  --session path/to/session.treeviz.json \
-  --port 5174
-```
-
-The launcher serves `assets/treeviz-app.tar.gz` over localhost and opens a
-`?api=1` URL. Use `--headless` for `?mode=headless&api=1`, and `--no-open`
-when another process will connect to the printed URL.
-
-Refresh the bundled app after source changes with:
-
-```bash
-bun run build
-bun run package:app
-```
+This public skill does not vendor the TreeViz browser app or frontend source.
+Use the hosted app unless the user explicitly provides another TreeViz runtime.
 
 ## Core Workflow
 
-1. Open or launch TreeViz with `?api=1`.
-2. Load or restore the tree/session before metadata, tracks, or styling.
-3. Inspect `getSession()`, `commands()`, and `getDiagnostics()` before each logical batch.
-4. For metadata, call `planMetadataImport(source, format, prompt)` before `session.import-metadata`.
-5. Execute exact command ids with stable keys through `execute(...)`.
-6. Apply changes in small awaited batches, then re-check diagnostics and layout metrics.
-7. Save durable work as `.treeviz.json` when tree edits, metadata, tracks, view settings, or saved views must persist.
+1. Open TreeViz with `?api=1` and wait for `window.__treeviz`.
+2. Import a tree or restore a `.treeviz.json` session.
+3. Inspect `getSession()`, `commands()`, and `getDiagnostics()`.
+4. For metadata, call `planMetadataImport(source, format, prompt)` before import.
+5. Import metadata with the suggested row key, flags, and leaf identifier source.
+6. Add or update tracks through `track.add`, `track.update`, and `track.reorder`.
+7. Tune layout with `view.set-layout`, spacing, scale, labels, and legend commands.
+8. Re-check diagnostics and layout metrics after each logical batch.
+9. Export evidence: `.treeviz.json` for state, SVG/PNG/PDF for figures, and screenshots when visual quality is the claim.
 
 ## Visualization Defaults
 
-- Prefer the metadata planner over re-deriving row-key, normalization, and track heuristics.
-- Treat high unmatched-leaf or unmatched-row counts as a binding problem to explain or fix.
-- Start dense metadata-heavy figures in rectangular layout. Try circular or radial only when the track stack and labels remain readable.
-- Reduce whitespace by tuning `branchScale`, `leafSpacing`, `metadataScale`, `metadataGap`, and label size before enlarging the canvas.
-- Keep metadata tracks contiguous; use `metadataGap: 0` or near-zero unless separation is explicitly useful.
-- Use `categoryColors` on `color-strip` tracks when exact category hex colors must survive hosted uploads. Match branch-rule colors to the same hex values.
-- For publication figures, put explanatory taxonomy or group colors into the figure legend with `view.set-figure-legend-section` and `view.set-panel-position`.
-- For Jupyter/Python wrapper examples, pass the same `tracks` and `view` config to `build_session(...)` and `view_tree(...)`, call `display(view)`, and render a static PNG/SVG artifact for visual QA. On `nb.newlineages.com`, use the `Python (Pixi)` kernel.
-- Keep manual control available: if the user asks for a plan before applying tracks, stop after presenting the plan.
+- Start metadata-heavy figures in rectangular layout.
+- Try circular or radial layout only when labels and metadata remain readable.
+- Keep metadata tracks contiguous; use `metadataGap: 0` unless separation is useful.
+- Reduce whitespace by tuning branch scale, leaf spacing, metadata scale, metadata gap, label size, and export cropping before enlarging the canvas.
+- Use `binary-dots` tracks for leaf symbols such as presence/absence markers.
+- Use support labels and internal-node markers for branch support when the tree carries numeric internal-node labels.
+- Use exact style attributes for data-defined node circles and branch
+  width/color; enable pretty terminal branches when the user asks for styled
+  leaf-facing terminal branches.
+- Use explicit legend titles and item labels when exporting publication figures.
+- Treat high unmatched-leaf or unmatched-row counts as a binding problem to fix or report.
 
 ## Reference Loading
 
-Load details only when the task needs them:
+Load only the reference needed for the task:
 
-- `references/browser-api.md`: exact API methods, command ids, JavaScript examples, and stable-key control.
-- `references/session-workflows.md`: metadata import, existing-session metadata review, rebinding, and clade resolution.
-- `references/render-qa.md`: visual polish, layout tuning, screenshots, exported PNG/SVG evidence, and post-processing.
-- `references/large-taxonomy-trees.md`: large taxonomy trees, query/reference strips, metadata-driven rerooting, and publication exports.
-- `references/release-deploy.md`: public artifacts, release checks, deployment smoke, and bundled app refresh.
-- `references/wrapper-api.md`: TreeViz-native Python/R wrappers, Jupyter/R usage, and session validation.
+- `references/browser-api.md`: hosted browser API methods, command ids, exact
+  node/branch style commands, and JavaScript examples.
+- `references/session-workflows.md`: metadata import, session review, clade resolution, and command mapping.
+- `references/render-qa.md`: layout tuning, whitespace checks, screenshots, and export QA.
+- `references/example-inputs.md`: deterministic 30-leaf and 100-leaf example recipes with metadata and support markers.
+- `references/large-taxonomy-trees.md`: large taxonomy-tree workflows, metadata-derived categories, rerooting, and dense exports.
+- `references/hosted-runtime.md`: hosted URLs, public machine-readable files, and live API smoke testing.
+- `references/wrapper-api.md`: Python package and notebook workflows.
+
+## Helper Scripts
+
+- `scripts/check-live-api-smoke.ts`: Playwright smoke test for the hosted browser API.
+- `scripts/postprocess-treeviz-export.py`: repeated SVG/PNG cleanup for exported figures.
+- `scripts/reroot-newick-by-metadata.py`: repeatable Newick rerooting from TSV/CSV metadata.
 
 ## QA Rules
 
-- Always `await` each API call before issuing the next one.
-- Inspect `getDiagnostics()` and `getLayoutMetrics()` after the latest visual change.
-- Capture a screenshot or exported PNG before claiming a layout or aesthetic improvement.
-- For file-driven CLI exports, render one session at a time; the render command writes a shared bootstrap file under `dist/`.
-- For broad feature audits, cover import, metadata, layouts, tracks, legends, diagnostics, saved views, selection/search/inspector, tree edits, exports, light/dark modes, and responsive states.
+- Always `await` API calls before issuing dependent commands.
+- Check `getDiagnostics()` after import and after major edits.
+- Check `getLayoutMetrics()` after layout changes.
+- Do not claim visual quality from configuration alone; inspect a recent screenshot, SVG, PNG, or PDF.
+- For Python-generated sessions, run `validate_session(session)` and inspect `binding_diagnostics(session)`.
+- Save final state as `.treeviz.json` when a user may need to reopen or revise the visualization.
 
 ## Read Next
 
 - `references/session-workflows.md`
-- `references/large-taxonomy-trees.md`
 - `references/browser-api.md`
 - `references/render-qa.md`
-- `references/release-deploy.md`
+- `references/example-inputs.md`
 - `references/wrapper-api.md`

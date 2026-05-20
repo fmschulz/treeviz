@@ -19,9 +19,13 @@ tmp/
 test-results/
 playwright-report/
 coverage/
+site/
 *.log
 *.treeviz.json
 *.png
 *.svg
 *.pdf
 *.metrics.json
+
+# Public skill policy: do not vendor the browser app build in this repo.
+.agents/skills/treeviz-agent/assets/

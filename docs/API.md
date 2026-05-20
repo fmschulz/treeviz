@@ -1,8 +1,8 @@
-# Agent API
+# Browser API
 
 TreeViz exposes a typed command surface on `window.__treeviz`. In production
-builds, open the app with `?api=1`; in local development the API is bound by
-default. Use `?mode=headless&api=1` for render-only automation.
+open the app with `?api=1`. Use `?mode=headless&api=1` for render-only
+automation.
 
 ## Surface
 
@@ -83,6 +83,8 @@ Command mutability has three values:
 | `view.set-tip-alignment`            | `{ alignment: 'tip' \| 'label' }`                                                                          | Set rectangular label alignment.                                               |
 | `view.set-branch-colour-attribute`  | `{ attribute: string \| null }`                                                                            | Color branches by a numeric metadata column or disable the mapping.            |
 | `view.set-internal-node-marker`     | `{ attribute?, encoding?, color?, categories? }`                                                           | Map support or internal-node metadata to split markers.                        |
+| `view.set-tree-style-attributes`    | `{ nodeDiameterAttribute?, nodeColorAttribute?, branchWidthAttribute?, branchColorAttribute? }`             | Map exact node-circle and branch style values to data attributes.              |
+| `view.set-pretty-terminal-branches` | `{ enabled }`                                                                                              | Decorate branches entering terminal leaves.                                    |
 | `view.toggle-labels`                | `{}`                                                                                                       | Toggle leaf labels.                                                            |
 | `view.toggle-support-labels`        | `{}`                                                                                                       | Toggle support labels.                                                         |
 | `view.set-show-support`             | `{ visible }`                                                                                              | Set support-label visibility.                                                  |
@@ -180,6 +182,45 @@ await api.execute('view.set-internal-node-marker', {
   ]
 })
 ```
+
+## Data-Defined Node And Branch Styling
+
+Use `view.set-tree-style-attributes` when the tree or metadata table already
+contains exact visual values. Diameter and width values are interpreted as
+pixels. Color values are CSS color strings.
+
+For internal nodes, attributes are read from tree node metadata such as
+Newick/Nexus comments. For terminal nodes, TreeViz reads tree node metadata
+first and then falls back to the bound metadata row. Branch style attributes are
+keyed by the child node, meaning they style the branch entering that node. The
+root node has no incoming branch.
+
+```js
+await api.execute('view.set-tree-style-attributes', {
+  nodeDiameterAttribute: 'node_diameter',
+  nodeColorAttribute: 'node_color',
+  branchWidthAttribute: 'branch_width',
+  branchColorAttribute: 'branch_color'
+})
+
+await api.execute('view.set-pretty-terminal-branches', { enabled: true })
+```
+
+Pass `null` for one attribute to clear that mapping without changing the other
+mappings:
+
+```js
+await api.execute('view.set-tree-style-attributes', {
+  nodeColorAttribute: null,
+  branchColorAttribute: null
+})
+```
+
+The pretty terminal branch option works in rectangular, circular, and radial
+layouts. It thickens and rounds only the branch stubs entering terminal leaves
+and preserves each branch's current color and mapped width.
+
+See [Tree styling](STYLING.md) for TOML, metadata, and Python examples.
 
 ## Track Commands
 

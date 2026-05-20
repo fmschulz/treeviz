@@ -1,85 +1,113 @@
 # TreeViz Session Workflows
 
-Use this reference for metadata import, metadata-aware session review, clade resolution, and translating user intent into TreeViz commands.
+Use this reference for metadata import, metadata-aware session review, clade
+resolution, and translating user intent into TreeViz commands.
 
 ## New Session With Metadata
 
-1. Open TreeViz with `?api=1` so `window.__treeviz` is available.
-2. Import or restore the tree first.
-3. Inspect the current session:
-   - `getSession()` for current tree, view, tracks, and metadata state.
-   - `commands()` when you need exact command ids or argument shapes.
-   - `getDiagnostics()` to catch parse, binding, edit, or render issues early.
-4. If the user provided metadata or taxonomy files, call `window.__treeviz.planMetadataImport(source, format, prompt)` before importing.
-5. Review the returned plan:
-   - `suggestedBinding` is the best row-key, leaf-identifier, and normalization combo found automatically.
-   - `bindingSummary` shows exact/normalized matches plus unmatched leaves/rows.
-   - `checks` are consistency warnings to surface or fix.
-   - `recommendedTracks` are track suggestions derived from the prompt and column profiles.
-6. If the binding is acceptable, execute `session.import-metadata` with:
-   - `source`
-   - `format`
-   - `rowKeyColumn`
-   - `flags`
-   - `leafIdentifierSource`
-7. If the user wants the agent to set up the view, call `applyTrackRecommendations(plan.recommendedTracks)` after import.
-8. Continue with structural, track, or view edits through `execute(...)`.
+1. Open TreeViz with `?api=1`.
+2. Import the tree first.
+3. Inspect:
+   - `getSession()` for current tree, view, tracks, and metadata state;
+   - `commands()` for exact command ids and argument schemas;
+   - `getDiagnostics()` for parse, binding, edit, or render issues.
+4. Call `planMetadataImport(source, format, prompt)` before metadata import.
+5. Review:
+   - `suggestedBinding` for row key, leaf identifier, and normalization;
+   - `bindingSummary` for matched and unmatched leaves/rows;
+   - `checks` for consistency warnings;
+   - `recommendedTracks` for prompt-derived track suggestions.
+6. Import metadata with `session.import-metadata`.
+7. Apply planner tracks with `applyTrackRecommendations(...)` when the user
+   wants TreeViz to set up the view.
+8. Continue with track, clade, or layout edits through `execute(...)`.
 
-## Existing Sessions
+## Existing Session
 
 For a loaded session that already has metadata:
 
-1. Call `window.__treeviz.analyzeSessionMetadata(prompt)`.
-2. Review `checks` and `recommendedTracks`.
-3. If the binding is wrong or incomplete, rebind with `session.rebind`.
+1. Call `analyzeSessionMetadata(prompt)`.
+2. Review checks and recommended tracks.
+3. Rebind with `session.rebind` if matching is wrong or incomplete.
 4. Apply or adjust tracks.
-5. Continue with structural or view edits through `execute(...)`.
+5. Save the revised session as `.treeviz.json`.
 
-## Metadata Files
+## Metadata Rules
 
-TreeViz metadata is TSV or CSV with one header row. One column must be selected as the row key; its values are matched to tree leaf labels by default.
+TreeViz metadata is TSV or CSV with one header row. One column must be selected
+as the row key; its values are matched to tree leaf labels by default.
 
-Rules to remember:
+Remember:
 
-- Empty cells become missing values.
-- Duplicate row keys are accepted with last-value-wins semantics and should be surfaced as warnings.
-- Use CSV when values need quoting, commas, or embedded newlines.
-- TSV parsing is intentionally simple: tabs and newlines separate cells and rows.
+- empty cells become missing values;
+- duplicate row keys should be surfaced as warnings;
+- CSV is safer for quoted fields, commas, or embedded newlines;
+- TSV is best for simple tabular metadata.
 
-For full user-facing guidance, read `docs/METADATA.md`.
+For user-facing details, read `docs/METADATA.md`.
 
 ## Clade Resolution
 
-When the user names a clade indirectly, do not rely on screen picking if you can avoid it.
+When the user names a clade indirectly, avoid screen picking.
 
-- If the user provides taxonomy metadata, bind/import that first and derive the target leaves from metadata.
-- Prefer `window.__treeviz.resolveClade(...)` once the tree and relevant metadata are loaded.
-- If the user names leaves or an outgroup, resolve the relevant stable key from `getSession().tree`.
-- Use stable keys for all tree-edit commands.
-- Prefer data-driven clade resolution over pixel-driven clicking.
-- Before rerooting on a named taxon, test whether the selected leaves are monophyletic. If their MRCA is the whole tree or pulls in many unrelated leaves, report that and choose the largest concentrated clade only when that matches the user's intent.
-- Exclude ambiguous taxonomy terms explicitly when requested, for example rows containing `incertae_sedis`, `incertae sedis`, `uncultured`, or local placeholder values.
+- If taxonomy metadata is available, bind it before resolving the clade.
+- Prefer `resolveClade(...)` for metadata predicates and named leaf sets.
+- Use stable keys from `getSession().tree` for tree-edit commands.
+- Before rerooting on a named taxon, check whether the selected leaves are
+  monophyletic.
+- If the MRCA is the whole tree or pulls in many unrelated leaves, report that
+  before applying the edit.
+- Exclude ambiguous taxonomy terms explicitly when requested, such as
+  `incertae_sedis`, `incertae sedis`, `uncultured`, or local placeholders.
 
-For repeatable file-based rerooting from TSV/CSV metadata, use `scripts/reroot-newick-by-metadata.py` instead of rewriting a one-off parser.
+For repeatable file-based rerooting from metadata, use
+`scripts/reroot-newick-by-metadata.py`.
 
 ## Intent To Command Map
 
-- Metadata tracks: `track.add`, `track.update`, `track.reorder`
-- Categorical branch/clade emphasis on expanded or collapsed clades:
-  `tree.style-clade`
+- Metadata tracks: `track.add`, `track.update`, `track.reorder`.
+- Categorical clade emphasis: `tree.style-clade`.
 - Clade annotation labels: `tree.style-clade` with `patch.label`,
   `cladeLabelColor`, `cladeLabelBold`, `cladeLabelFontSize`, or
-  `cladeBackground`
-- TOML clade annotation labels: `[[branch_rule]]` with `clade_label`,
-  `clade_label_color`, `clade_label_bold`, `clade_label_font_size`, and
-  `clade_background`
-- Clade labels reserve measured white backing before metadata tracks:
-  a column in rectangular layout and a radial lane in circular/radial layouts.
-  Larger `cladeLabelFontSize` / `clade_label_font_size` values move tracks
-  outward automatically.
-- Bootstrap/support display: `view.set-show-support` for labels and
-  `view.set-internal-node-marker` for split-circle markers
-- Numeric branch colouring: `view.set-branch-colour-attribute`
-- Rerooting: `tree.reroot`, `tree.reroot-at-outgroup`, `tree.midpoint-reroot`
-- Collapsing, expanding, hiding, pruning: `tree.collapse-clade`, `tree.expand-clade`, `tree.hide-clade`, `tree.prune-clade`
-- Layout and density: `view.set-layout`, `view.set-branch-scale`, `view.set-leaf-spacing`, `view.set-metadata-gap`, `view.set-metadata-row-scale`, `view.toggle-label-overlap`, `view.set-scale-bar-position`
+  `cladeBackground`.
+- Bootstrap/support labels: `view.set-show-support`.
+- Internal-node support markers: `view.set-internal-node-marker`.
+- Exact node/branch style values: `view.set-tree-style-attributes`.
+- Pretty terminal branches: `view.set-pretty-terminal-branches`.
+- Numeric branch coloring: `view.set-branch-colour-attribute`.
+- Rerooting: `tree.reroot`, `tree.reroot-at-outgroup`, `tree.midpoint-reroot`.
+- Collapsing, expanding, hiding, pruning: `tree.collapse-clade`,
+  `tree.expand-clade`, `tree.hide-clade`, `tree.prune-clade`.
+- Layout and density: `view.set-layout`, `view.set-branch-scale`,
+  `view.set-leaf-spacing`, `view.set-metadata-gap`,
+  `view.set-metadata-row-scale`, `view.toggle-label-overlap`,
+  `view.set-scale-bar-position`.
+
+## Exact Style Workflow
+
+When the user asks for fixed node-circle diameters, fixed node colors, branch
+widths, or branch colors, prefer exact style attributes over clade styling.
+
+1. Bind metadata for terminal leaves, or inspect tree node metadata for
+   internal-node annotations.
+2. Set the style mappings:
+
+   ```js
+   await api.execute('view.set-tree-style-attributes', {
+     nodeDiameterAttribute: 'node_diameter',
+     nodeColorAttribute: 'node_color',
+     branchWidthAttribute: 'branch_width',
+     branchColorAttribute: 'branch_color'
+   })
+   ```
+
+3. Enable pretty terminal branches when the user wants rounded, emphasized
+   terminal branch stubs:
+
+   ```js
+   await api.execute('view.set-pretty-terminal-branches', { enabled: true })
+   ```
+
+4. Check `getDiagnostics()` and `getLayoutMetrics()` after switching layouts,
+   because heavy terminal strokes may need lower branch-width or leaf-spacing
+   settings in dense trees.
