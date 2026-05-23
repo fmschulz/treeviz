@@ -1,34 +1,98 @@
-site_name: TreeViz Wiki
+site_name: TreeViz
+site_description: Client-side phylogenetic tree viewer and editor — browser app, Python package, and agent automation
 site_url: https://fmschulz.github.io/treeviz/
 repo_url: https://github.com/fmschulz/treeviz
+repo_name: fmschulz/treeviz
 edit_uri: edit/main/docs/
+
 exclude_docs: |
   _Sidebar.md
+
 theme:
   name: material
   features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
     - navigation.sections
     - navigation.indexes
     - navigation.top
+    - search.suggest
     - search.highlight
+    - content.code.copy
+    - content.action.edit
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: green
+      accent: green
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: green
+      accent: green
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+  font:
+    text: Inter
+    code: JetBrains Mono
+
 markdown_extensions:
   - admonition
-  - pymdownx.superfences
-  - pymdownx.tabbed:
-      alternate_style: true
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
   - toc:
       permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search
+
 nav:
   - Home: index.md
-  - Getting Started: GETTING_STARTED.md
-  - Browser: BROWSER.md
-  - Python: PYTHON.md
-  - Metadata: METADATA.md
-  - Tree Styling: STYLING.md
-  - Exports: EXPORTS.md
-  - Browser API: API.md
-  - Agent Automation: AGENTS.md
+  - Getting started: GETTING_STARTED.md
+  - Guides:
+      - Browser app: BROWSER.md
+      - Python package: PYTHON.md
+      - Metadata: METADATA.md
+      - Tree styling: STYLING.md
+      - Exports: EXPORTS.md
+  - Automation:
+      - Agent automation: AGENTS.md
+      - Browser API: API.md
+      - Agent-first styling goal: AGENT_FIRST_STYLING_GOAL.md
   - Examples:
-      - EXAMPLES.md
-      - Example Notes: examples/README.md
+      - Overview: EXAMPLES.md
+      - Example notes: examples/README.md
   - Troubleshooting: TROUBLESHOOTING.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/fmschulz/treeviz
+    - icon: material/web
+      link: https://treeviz.newlineages.com

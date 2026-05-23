@@ -27,6 +27,7 @@ The documentation is organized as a small wiki:
 - [Exports](docs/EXPORTS.md)
 - [Browser API](docs/API.md)
 - [Agent automation](docs/AGENTS.md)
+- [Agent-first styling goal](docs/AGENT_FIRST_STYLING_GOAL.md)
 - [Examples](docs/EXAMPLES.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 

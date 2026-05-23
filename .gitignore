@@ -27,5 +27,10 @@ site/
 *.pdf
 *.metrics.json
 
+# Documentation screenshots are source artifacts for the public wiki.
+!docs/assets/
+!docs/assets/styling/
+!docs/assets/styling/*.png
+
 # Public skill policy: do not vendor the browser app build in this repo.
 .agents/skills/treeviz-agent/assets/

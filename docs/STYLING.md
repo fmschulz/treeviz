@@ -1,55 +1,155 @@
-# Styling Trees
+# Styling
 
-TreeViz can style tree geometry from metadata, tree node annotations, manual
-clade edits, or view-wide switches. This page covers node circles, branch
-widths, branch colors, and the pretty terminal branch option.
+TreeViz styling is data-first. Browser controls, `.treeviz.json` sessions,
+TOML configs, Python, R, and `window.__treeviz` should describe the same visual
+state with the same palette ids and style fields.
 
-## What Can Be Styled
+## Palette Registry
 
-TreeViz supports these tree-level visual channels:
+The web app ships a small static palette registry. Inspect it from the browser
+API:
 
-| Channel | Data type | Applies to |
-| --- | --- | --- |
-| Node circle diameter | numeric pixels | internal nodes and terminal leaves |
-| Node circle color | CSS color string | internal nodes and terminal leaves |
-| Branch width | numeric pixels | branch entering a node |
-| Branch color | CSS color string | branch entering a node |
-| Pretty terminal branches | boolean view option | branches entering terminal leaves |
-
-Branch style values are keyed by the child node: a row or tree annotation for
-leaf `A` styles the branch leading into `A`. The root has no incoming branch.
-
-## Browser Controls
-
-The browser Controls panel includes **Exact styling** selectors for node-circle
-diameter, node-circle color, branch width, and branch color attributes. These
-selectors use columns or tree node metadata already present in the loaded
-session.
-
-The same Controls panel includes **Pretty terminal branches**. Enable it to
-thicken and round only the branch stubs leading into terminal leaves. The option
-works in rectangular, circular, and radial layouts, and it keeps the branch's
-current color and mapped width.
-
-For manual edits, right-click a clade and choose **Style clade** to set branch
-color, line width, line dash pattern, label color, label style, label font size,
-clade annotation, and clade underlay. Select a single leaf or internal node and
-open the **Inspector** to directly edit that node's branch color/width and
-circle diameter/color.
-
-This is a view setting. It is saved in `.treeviz.json` as:
-
-```json
-{
-  "view": {
-    "prettyTerminalBranches": true
-  }
-}
+```js
+window.__treeviz.palettes()
 ```
 
-## TOML Configuration
+Each palette record contains:
 
-Use `[view]` fields when building sessions from `treeviz.toml`:
+- `id`: stable palette id accepted by sessions, commands, TOML, Python, and R.
+- `label`: display label for UI controls.
+- `role`: `categorical`, `sequential`, `diverging`, or `neutral`.
+- `colors`: deterministic hex stops.
+- `recommendedUse`: when to use the palette.
+- `warnings`: limits such as category count or contrast caveats.
+- `colorblindFriendly`: whether the palette is appropriate for common CVD use.
+- `source`: source or inspiration note.
+
+Current palette ids:
+
+| Role          | IDs                                                                                 | Typical use                                                                        |
+| ------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `categorical` | `okabe-ito`, `Set2`, `Tableau10`, `Dark2`, `Paired`, `Muted`, `ncldv-order-special` | unordered groups such as clade class, phenotype, environment, host, or domain      |
+| `sequential`  | `Viridis`, `Magma`, `Cividis`, `Blues`                                              | ordered positive values such as abundance, support, load, or intensity             |
+| `diverging`   | `RdBu`, `blue-orange`, `RdYlBu`, `PurpleGreen`, `BrBG`, `coolwarm`                  | centered signed values such as effects, residuals, contrasts, or score differences |
+| `neutral`     | `gray`, `slate`, `soft-mono`                                                        | context, hidden branches, secondary tracks, and de-emphasized labels               |
+
+Legacy spellings such as `viridis`, `tableau10`, `category10`, and
+`diverging-rdbu` are accepted as aliases. New examples should use the ids in
+the table.
+
+## Track Palettes
+
+TOML:
+
+```toml
+[[tracks]]
+kind = "color-strip"
+column = "phylum"
+palette = "okabe-ito"
+
+[[tracks]]
+kind = "heatmap"
+columns = ["log_fc", "effect"]
+palette = "blue-orange"
+domain = [-3, 3]
+```
+
+Browser API:
+
+```js
+await window.__treeviz.execute('track.update', {
+  trackId: 'track-effect',
+  patch: { palette: 'blue-orange', domain: [-3, 3] }
+})
+```
+
+Python:
+
+```python
+tracks = [
+    {"kind": "color_strip", "column_key": "phylum", "palette": "okabe-ito"},
+    {"kind": "heatmap", "column_keys": ["log_fc", "effect"], "palette": "blue-orange"},
+]
+```
+
+R:
+
+```r
+tracks <- list(
+  list(kind = "color_strip", column_key = "phylum", palette = "okabe-ito"),
+  list(kind = "heatmap", column_keys = c("log_fc", "effect"), palette = "blue-orange")
+)
+```
+
+For exact category colors, prefer `category_colors` in TOML or
+`categoryColors` in a session/command patch. Exact colors are preserved in
+saved sessions and legends.
+
+## Compact Track Symbols And Wedges
+
+Categorical `color-strip` tracks can keep their default strip display or render
+each category as compact symbols or wedges:
+
+```toml
+[[track]]
+kind = "color-strip"
+column = "host"
+display_mode = "wedge"
+width = 16
+
+[[track]]
+kind = "color-strip"
+column = "quality_tier"
+display_mode = "symbol"
+symbol_shape = "diamond"
+width = 18
+```
+
+Numeric `bar` tracks can be converted into interval symbols or wedges. Manual
+bins are evaluated in order; `min_inclusive` defaults to true and
+`max_inclusive` defaults to false unless set explicitly. `auto_bins` creates
+equal-width bins across the track domain.
+
+```toml
+[[track]]
+kind = "bar"
+column = "support"
+display_mode = "symbol"
+symbol_shape = "circle"
+width = 18
+
+[[track.bins]]
+label = "Low support"
+max = 60
+color = "#d7191c"
+shape = "dash"
+
+[[track.bins]]
+label = "High support"
+min = 90
+max = 100
+max_inclusive = true
+color = "#1a9641"
+shape = "plus"
+
+[[track]]
+kind = "bar"
+column = "abundance"
+display_mode = "wedge"
+auto_bins = 3
+palette = "Viridis"
+width = 18
+```
+
+Browser API fields use camelCase: `displayMode`, `symbolShape`, `autoBins`,
+and `maxInclusive`. Supported symbols are `circle`, `square`, `triangle`,
+`diamond`, `plus`, and `dash`; legends preserve category labels and interval
+labels for symbols and wedges.
+
+## Exact Node And Branch Styling
+
+Use `[view]` in TOML or view fields in wrapper code to map data attributes to
+node circles and branch strokes:
 
 ```toml
 [view]
@@ -60,67 +160,10 @@ branch_color_attribute = "branch_color"
 pretty_terminal_branches = true
 ```
 
-Diameter and width values are interpreted as pixels. Color values should be CSS
-color strings such as `#14b8a6` or `rgba(20, 184, 166, 0.8)`.
-
-## Metadata Columns
-
-For terminal leaves, style values can come from bound metadata rows:
-
-```tsv
-taxon	group	node_diameter	node_color	branch_width	branch_color
-A1	turquoise	11	#5eead4	2.6	#5eead4
-A2	turquoise	10	#67e8f9	2.3	#67e8f9
-C3	warm	11	#fb923c	2.0	#fb923c
-```
-
-This is useful for a gradient from an ancestral clade toward its leaves: put
-related colors and decreasing branch widths on the descendant terminal rows,
-then enable `pretty_terminal_branches`.
-
-## Tree Node Metadata
-
-Internal nodes do not have metadata table rows. To style internal split circles
-or internal branch segments, put values in Newick or Nexus node comments:
-
-```text
-((A1:0.1,A2:0.1)[&node_diameter=12,node_color=#14b8a6,branch_width=4,branch_color=#14b8a6]:0.2,C:0.3);
-```
-
-For leaves, TreeViz reads tree node metadata first and then falls back to the
-bound metadata row. For internal nodes, only tree node metadata is used.
-
-## Ancestral-To-Tip Gradient Example
-
-Use tree node comments for the ancestral split and metadata rows for the
-terminal leaves. This example makes one descendant group turquoise with a
-broader internal branch that narrows toward the tips, and one terminal path
-warm red/orange:
-
-```text
-((A1[&node_diameter=10,node_color=#2dd4bf,branch_width=2.8,branch_color=#2dd4bf]:0.08,A2[&node_diameter=9,node_color=#5eead4,branch_width=2.1,branch_color=#5eead4]:0.09)[&node_diameter=13,node_color=#0f766e,branch_width=5,branch_color=#0f766e]:0.20,(B1[&node_diameter=11,node_color=#b91c1c,branch_width=3.6,branch_color=#b91c1c]:0.07,B2[&node_diameter=8,node_color=#fdba74,branch_width=1.8,branch_color=#fdba74]:0.10)[&node_diameter=12,node_color=#ea580c,branch_width=4,branch_color=#ea580c]:0.16,Other:0.30);
-```
-
-The same terminal values can also live in metadata:
-
-```tsv
-taxon	node_diameter	node_color	branch_width	branch_color
-A1	10	#2dd4bf	2.8	#2dd4bf
-A2	9	#5eead4	2.1	#5eead4
-B1	11	#b91c1c	3.6	#b91c1c
-B2	8	#fdba74	1.8	#fdba74
-```
-
-Then select the columns with `view.set-tree-style-attributes` or the matching
-Python `view` dictionary, and enable `prettyTerminalBranches` when the terminal
-branch stubs should be rounded.
-
-## Browser API
-
-Exact style attributes are set with `view.set-tree-style-attributes`:
+The browser equivalent is:
 
 ```js
-await api.execute('view.set-tree-style-attributes', {
+await window.__treeviz.execute('view.set-tree-style-attributes', {
   nodeDiameterAttribute: 'node_diameter',
   nodeColorAttribute: 'node_color',
   branchWidthAttribute: 'branch_width',
@@ -128,73 +171,185 @@ await api.execute('view.set-tree-style-attributes', {
 })
 ```
 
-Pretty terminal branches can be switched independently:
+Diameter and branch-width values are pixels. Internal nodes read tree metadata
+such as Newick/Nexus annotations; terminal leaves read tree metadata first and
+then the bound metadata row.
 
-```js
-await api.execute('view.set-pretty-terminal-branches', { enabled: true })
+## Conditional Style Rules
+
+Use conditional style rules when metadata values need thresholds, bins, or
+category logic instead of exact visual values. Rules are ordered; later rules
+win for the same node or branch target.
+
+```toml
+[[style_rule]]
+id = "high-abundance-branch"
+source = "abundance"
+condition = { kind = "interval", min = 10 }
+target = "branch-width"
+value = 4
+
+[[style_rule]]
+id = "soil-labels"
+source = "host"
+condition = { kind = "exact", value = "soil" }
+target = "label-color"
+value = "#1d4ed8"
+
+[[style_rule]]
+id = "top-abundance-symbol"
+source = "abundance"
+condition = { kind = "rank", top = 1 }
+target = "symbol"
+value = { shape = "diamond", color = "#7b3294", size = 9, label = "Top abundance" }
 ```
 
-Pass `null` for an attribute to clear only that mapping:
+Browser API:
 
 ```js
-await api.execute('view.set-tree-style-attributes', {
-  nodeColorAttribute: null,
-  branchColorAttribute: null
+await window.__treeviz.execute('view.set-conditional-style-rules', {
+  rules: [
+    {
+      id: 'high-abundance-branch',
+      source: 'abundance',
+      condition: { kind: 'interval', min: 10 },
+      target: 'branch-width',
+      value: 4
+    }
+  ]
 })
 ```
 
-`view.set-branch-colour-attribute` remains available for numeric branch-color
-gradients. Exact branch colors from `view.set-tree-style-attributes` take
-precedence when both are active.
+Supported conditions:
 
-## Python Package
+- `exact`: match a string, number, boolean, or missing value.
+- `interval`: numeric range with optional `minInclusive` and `maxInclusive`.
+- `quantile`: numeric quantile fraction range from 0 to 1.
+- `rank`: top or bottom numeric ranks.
+- `missing`: missing, null, undefined, or blank string.
+- `boolean`: boolean values; string forms such as `true`, `false`, `yes`, and
+  `no` are accepted.
+- `contains`: text contains; case-insensitive by default.
+- `regex`: JavaScript regular expression pattern and optional flags.
 
-The Python package accepts the same saved-session view keys through the `view`
-dictionary:
+Rendered targets are `branch-color`, `branch-width`, `node-color`, `node-size`,
+`internal-marker-color`, `internal-marker-size`, `label-color`,
+`label-weight`, and `label-visibility`. `symbol`, `wedge`, and
+`track-bar-color` are saved in sessions and resolved for compact track
+workflows; compact track display itself is controlled by `displayMode` on the
+track.
 
-```python
-from treeviz import build_session, validate_session
+## Prompt-To-Figure Recipes
 
-metadata = [
-    {
-        "id": "A",
-        "node_diameter": 10,
-        "node_color": "#5eead4",
-        "branch_width": 2.6,
-        "branch_color": "#5eead4",
-    },
-    {
-        "id": "B",
-        "node_diameter": 8,
-        "node_color": "#fb923c",
-        "branch_width": 1.8,
-        "branch_color": "#fb923c",
-    },
-]
+TreeViz does not run a language model in the browser. The expected agent
+workflow is: translate a natural-language request into TOML, browser commands,
+or wrapper code; validate the session; render a tight export; then inspect
+diagnostics and layout metrics.
 
-view = {
-    "nodeCircleDiameterAttribute": "node_diameter",
-    "nodeCircleColorAttribute": "node_color",
-    "branchWidthAttribute": "branch_width",
-    "branchColorAttribute": "branch_color",
-    "prettyTerminalBranches": True,
-}
+### Circular Taxonomy Wedges
 
-session = build_session("(A:0.2,B:0.2);", metadata=metadata, row_key_column="id", view=view)
-validate_session(session)
+Prompt:
+
+> Create a circular tree using a colorblind-safe categorical palette for
+> taxonomy, show compact wedge tracks and a diverging trait heatmap, and export
+> a tight PNG.
+
+Deterministic recipe:
+
+```bash
+bun run treeviz validate tests/fixtures/datasets/mock-bootstrap-heatmap-taxonomy/treeviz.toml
+bun run treeviz render public/examples/bootstrap-heatmap-taxonomy/session.treeviz.json \
+  -o docs/assets/styling/bootstrap-heatmap-wedges.png \
+  --format png --width 1400 --height 1400 \
+  --auto-crop --crop-padding 18
 ```
 
-The package validates against the same session schema used by the browser. That
-means new view fields such as `prettyTerminalBranches` should be preserved in
-saved sessions and notebook views.
+Visual intent: circular 100-tip taxonomy tree, bootstrap labels, two compact
+categorical wedge rings, and a signed trait heatmap using the shared diverging
+palette registry.
 
-## Practical Notes
+![Circular taxonomy tree with bootstrap labels, wedge tracks, and diverging heatmap rings.](assets/styling/bootstrap-heatmap-wedges.png)
 
-- Use metadata table columns for terminal leaves and tree node comments for
-  internal nodes.
-- Keep widths modest when labels or metadata tracks are dense; very large
-  terminal strokes can cover nearby tips.
-- Pretty terminal branches are view-wide. Use branch color and branch width
-  attributes to decide which terminal paths are visually emphasized.
-- Save a `.treeviz.json` session after styling so the exact mappings and the
-  checkbox state can be reopened later.
+### Diverging Heatmap And Bar Axis
+
+Prompt:
+
+> Use a blue-red diverging palette centered at zero for signed response scores,
+> include a module strip, retain the oxidative-response bar axis, and export a
+> compact rectangular figure.
+
+Deterministic recipe:
+
+```bash
+bun run treeviz validate tests/fixtures/datasets/mock-differential-expression/treeviz.toml
+bun run treeviz render public/examples/differential-expression/session.treeviz.json \
+  -o docs/assets/styling/differential-expression-heatmap.png \
+  --format png --width 1600 --height 560 \
+  --auto-crop --crop-padding 18
+```
+
+Visual intent: a small rectangular tree with a categorical module strip, dense
+30-column heatmap centered on zero, and a labeled quantitative bar axis.
+
+![Rectangular differential-expression tree with categorical strip, diverging heatmap, and bar axis.](assets/styling/differential-expression-heatmap.png)
+
+### Compact Symbol And Wedge Lanes
+
+Prompt:
+
+> Convert genome size into three symbol bins, render GC content as compact
+> wedges, keep the binary marker lanes, and minimize whitespace.
+
+Deterministic recipe:
+
+```bash
+bun run treeviz validate tests/fixtures/datasets/mock-genome-symbol-lanes/treeviz.toml
+bun run treeviz render public/examples/genome-symbol-lanes/session.treeviz.json \
+  -o docs/assets/styling/genome-symbol-wedge-lanes.png \
+  --format png --width 1500 --height 460 \
+  --auto-crop --crop-padding 18
+```
+
+Visual intent: a compact rectangular example that shows manual bar interval
+symbols, automatic bar wedges, categorical strips, binary marker lanes, and a
+text fallback lane in one reproducible session.
+
+![Compact genome example with symbol bins, wedge bins, binary marker lanes, and a text marker lane.](assets/styling/genome-symbol-wedge-lanes.png)
+
+### Node And Branch Styling
+
+Prompt:
+
+> Use metadata-defined node circles and branch strokes, draw a turquoise
+> ancestor-to-tip gradient plus one warm root-to-tip path, and export a
+> manuscript-ready figure.
+
+Deterministic recipe:
+
+```bash
+bun run treeviz validate tests/fixtures/datasets/mock-gradient-node-branch-styling/treeviz.toml
+bun run treeviz render public/examples/gradient-node-branch-styling/session.treeviz.json \
+  -o docs/assets/styling/gradient-node-branch-styling.png \
+  --format png --width 1600 --height 560 \
+  --auto-crop --crop-padding 18
+```
+
+Visual intent: exact data-defined node sizes, node colors, branch widths, and
+branch colors, with metadata tracks explaining terminal roles.
+
+![Rectangular tree with metadata-defined node circles, branch colors, and tapered branch widths.](assets/styling/gradient-node-branch-styling.png)
+
+## Screenshot Gallery
+
+All screenshots below are generated from checked-in sessions under
+`public/examples/` using `bun run treeviz render --auto-crop --crop-padding 18`.
+The source TOML files live under `tests/fixtures/datasets/`.
+
+| Screenshot | Reproducibility note |
+| ---------- | -------------------- |
+| ![Differential-expression heatmap](assets/styling/differential-expression-heatmap.png) | `public/examples/differential-expression/session.treeviz.json`; 1600 x 560 viewport; selected for compact rectangular heatmap and bar-axis clarity. |
+| ![Genome symbol and wedge lanes](assets/styling/genome-symbol-wedge-lanes.png) | `public/examples/genome-symbol-lanes/session.treeviz.json`; 1500 x 460 viewport; selected for explicit bar-to-symbol bins and automatic bar-to-wedge bins. |
+| ![Agent clade playground](assets/styling/agent-clade-playground.png) | `public/examples/agent-clade-playground/session.treeviz.json`; 1800 x 1400 viewport; selected for clade labels, underlays, compact symbol bins, and GC wedges on a 100-tip tree. |
+| ![Bootstrap heatmap wedges](assets/styling/bootstrap-heatmap-wedges.png) | `public/examples/bootstrap-heatmap-taxonomy/session.treeviz.json`; 1400 x 1400 viewport; selected for circular labels, bootstrap support, categorical wedges, and heatmap rings. |
+| ![Gradient node and branch styling](assets/styling/gradient-node-branch-styling.png) | `public/examples/gradient-node-branch-styling/session.treeviz.json`; 1600 x 560 viewport; selected for exact node/branch styling with readable role tracks. |
+| ![Large bacterial tree](assets/styling/large-bacterial-tree.png) | `public/examples/large-bacterial-tree/session.treeviz.json`; 1800 x 1400 viewport; selected as a 6000-tip stress view with dense categorical and quantitative metadata rings. |
