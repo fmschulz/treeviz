@@ -1,8 +1,8 @@
 # Browser API
 
 TreeViz exposes a typed command surface on `window.__treeviz`. In production
-open the app with `?api=1`. Use `?mode=headless&api=1` for render-only
-automation.
+builds, open the app with `?api=1`; in local development the API is bound by
+default. Use `?mode=headless&api=1` for render-only automation.
 
 ## Surface
 
@@ -15,6 +15,7 @@ interface TreevizAPI {
   commands(): CommandDescriptor[]
   execute(id: string, args: unknown): Promise<ExecuteResult>
   getDiagnostics(): readonly Diagnostic[]
+  palettes(): PaletteRecord[]
   parseMetadata(source: string, format: 'tsv' | 'csv', rowKeyColumn: string): MetadataTable
   bindMetadata(tree: TreeDocument, metadata: MetadataTable, flags?: NormalizationFlags): LeafBinding
   planMetadataImport(
@@ -42,11 +43,21 @@ interface TreevizAPI {
 command's id, category, mutability, and argument schema. Use it as the source
 of truth when building an external tool.
 
+Underscored properties on `window.__treeviz` are internal integration hooks
+and are not stable. External tools should use `commands()`, `execute(...)`,
+diagnostics, metadata planning, layout metrics, palettes, and export methods.
+
+`palettes()` returns the curated palette records used by the web app, TOML
+compiler, wrappers, and examples. Each record includes `id`, `label`, `role`,
+`colors`, `recommendedUse`, `warnings`, `colorblindFriendly`, `source`, and
+accepted aliases.
+
 Command mutability has three values:
 
 - `document`: persistent session edit; emits `document.changed` and enters
   autosave/history paths.
-- `view`: view navigation/bookkeeping; does not enter the undo ring.
+- `view`: view-only navigation that does not enter the undo ring (currently
+  unused — applying a saved view is a `document` edit, so it can be undone).
 - `ephemeral`: transient interaction or export command.
 
 ## Session Commands
@@ -58,54 +69,57 @@ Command mutability has three values:
 | `session.rebind`          | `{ flags?, leafIdentifierSource? }`                               | Rebind the current metadata table.                      |
 | `session.restore`         | `{ snapshot, skipAutoApplyDefault? }`                             | Restore a `.treeviz.json` session payload.              |
 | `session.save`            | `{}`                                                              | Download the current session as `.treeviz.json`.        |
+| `session.import-node-metadata` | `{ tsv, rowKeyColumn? }`                                     | Parse TSV keyed to internal nodes and bind it. Rows key on the internal node label, or on an `mrca_of` column holding `|`-separated leaf names. |
 
 ## View Commands
 
-| Command                             | Args                                                                                                       | Effect                                                                         |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `view.pan`                          | `{ dx, dy }`                                                                                               | Pan the camera.                                                                |
-| `view.zoom`                         | `{ factor, panX?, panY? }`                                                                                 | Zoom the camera.                                                               |
-| `view.set-layout`                   | `{ layout, branchScale?, leafSpacing?, metadataScale?, metadataGap?, labelFontSize?, allowLabelOverlap? }` | Change layout and optional density settings.                                   |
-| `view.set-scale-bar-position`       | `{ x, y }`                                                                                                 | Move the scale bar.                                                            |
-| `view.set-panel-position`           | `{ panel, x, y }`                                                                                          | Move `treeHud`, `viewControls`, `inspector`, `figureLegend`, or `utilityDock`. |
-| `view.set-panel-size`               | `{ panel, width, height }`                                                                                 | Resize `viewControls`, `inspector`, or `utilityDock`.                          |
-| `view.toggle-branch-lengths`        | `{ enabled }`                                                                                              | Set phylogram/cladogram branch-length mode.                                    |
-| `view.set-branch-scale`             | `{ scale }`                                                                                                | Set branch-depth scale.                                                        |
-| `view.set-branch-width-scale`       | `{ scale }`                                                                                                | Set branch width scale.                                                        |
-| `view.set-leaf-spacing`             | `{ spacing }`                                                                                              | Set leaf row spacing.                                                          |
-| `view.set-auto-collapse-threshold`  | `{ threshold }`                                                                                            | Set the automatic collapse threshold.                                          |
-| `view.set-metadata-scale`           | `{ scale }`                                                                                                | Set metadata track width scale.                                                |
-| `view.set-metadata-gap`             | `{ gap }`                                                                                                  | Set gap between metadata tracks.                                               |
-| `view.set-metadata-row-scale`       | `{ scale }`                                                                                                | Set metadata row height scale.                                                 |
-| `view.set-label-font-size`          | `{ size }`                                                                                                 | Set label font size.                                                           |
-| `view.set-label-font-family`        | `{ family }`                                                                                               | Set label font family.                                                         |
-| `view.set-clade-annotation-font-size` | `{ size }`                                                                                               | Set font size for all clade annotation labels.                                 |
-| `view.set-tip-alignment`            | `{ alignment: 'tip' \| 'label' }`                                                                          | Set rectangular label alignment.                                               |
-| `view.set-branch-colour-attribute`  | `{ attribute: string \| null }`                                                                            | Color branches by a numeric metadata column or disable the mapping.            |
-| `view.set-internal-node-marker`     | `{ attribute?, encoding?, color?, categories? }`                                                           | Map support or internal-node metadata to split markers.                        |
-| `view.set-tree-style-attributes`    | `{ nodeDiameterAttribute?, nodeColorAttribute?, branchWidthAttribute?, branchColorAttribute? }`             | Map exact node-circle and branch style values to data attributes.              |
-| `view.set-pretty-terminal-branches` | `{ enabled }`                                                                                              | Decorate branches entering terminal leaves.                                    |
-| `view.toggle-labels`                | `{}`                                                                                                       | Toggle leaf labels.                                                            |
-| `view.toggle-support-labels`        | `{}`                                                                                                       | Toggle support labels.                                                         |
-| `view.set-show-support`             | `{ visible }`                                                                                              | Set support-label visibility.                                                  |
-| `view.set-highlighted-path`         | `{ path }`                                                                                                 | Highlight a path by stable keys.                                               |
-| `view.clear-highlighted-path`       | `{}`                                                                                                       | Clear the highlighted path.                                                    |
-| `view.toggle-label-overlap`         | `{}`                                                                                                       | Toggle label-overlap allowance.                                                |
-| `view.toggle-metadata`              | `{}`                                                                                                       | Toggle metadata track visibility.                                              |
-| `view.set-metadata-visibility`      | `{ visible }`                                                                                              | Set metadata track visibility.                                                 |
-| `view.toggle-figure-legend`         | `{}`                                                                                                       | Toggle the compact in-figure legend overlay.                                   |
-| `view.set-figure-legend-visibility` | `{ visible }`                                                                                              | Set in-figure legend overlay visibility.                                       |
-| `view.set-figure-legend-section`    | `{ sectionIndex }`                                                                                         | Display one legend section in the figure; use `null` for all sections.         |
-| `view.set-figure-legend-placement`  | `{ sectionKey, visible?, x?, y? }`                                                                         | Set per-section figure legend visibility and position.                         |
-| `view.set-figure-legend-title`      | `{ sectionKey, title }`                                                                                    | Rename a displayed figure legend title.                                        |
-| `view.set-figure-legend-item-label` | `{ sectionKey, itemKey, label }`                                                                           | Rename a displayed figure legend item label.                                   |
-| `view.reset-controls`               | `{}`                                                                                                       | Reset density control values.                                                  |
-| `view.reset-panel-geometry`         | `{}`                                                                                                       | Reset persisted stage panel geometry.                                          |
-| `view.save`                         | `{ name, setAsDefault? }`                                                                                  | Save the current view as a named session view.                                 |
-| `view.rename`                       | `{ id, name }`                                                                                             | Rename a saved view.                                                           |
-| `view.delete`                       | `{ id }`                                                                                                   | Delete a saved view.                                                           |
-| `view.set-default`                  | `{ id: string \| null }`                                                                                   | Set or clear the default saved view.                                           |
-| `view.apply`                        | `{ id }`                                                                                                   | Apply a saved view.                                                            |
+| Command                               | Args                                                                                                       | Effect                                                                         |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `view.pan`                            | `{ dx, dy }`                                                                                               | Pan the camera.                                                                |
+| `view.zoom`                           | `{ factor, panX?, panY? }`                                                                                 | Zoom the camera.                                                               |
+| `view.set-layout`                     | `{ layout, branchScale?, branchScaleMode?, leafSpacing?, metadataScale?, metadataGap?, labelFontSize?, allowLabelOverlap? }` | Change layout and optional density settings.                         |
+| `view.set-scale-bar-position`         | `{ x, y }`                                                                                                 | Move the scale bar.                                                            |
+| `view.set-panel-position`             | `{ panel, x, y }`                                                                                          | Move `treeHud`, `viewControls`, `inspector`, `figureLegend`, or `utilityDock`. |
+| `view.set-panel-size`                 | `{ panel, width, height }`                                                                                 | Resize `viewControls`, `inspector`, or `utilityDock`.                          |
+| `view.toggle-branch-lengths`          | `{ enabled }`                                                                                              | Set phylogram/cladogram branch-length mode.                                    |
+| `view.set-branch-scale`               | `{ scale }`                                                                                                | Set branch-depth scale.                                                        |
+| `view.set-branch-scale-mode`          | `{ mode: 'auto' \| 'manual' }`                                                                             | Allocate topology width automatically or use `branchScale`.                    |
+| `view.set-branch-width-scale`         | `{ scale }`                                                                                                | Set branch width scale.                                                        |
+| `view.set-leaf-spacing`               | `{ spacing }`                                                                                              | Set leaf row spacing.                                                          |
+| `view.set-auto-collapse-threshold`    | `{ threshold }`                                                                                            | Set the automatic collapse threshold.                                          |
+| `view.set-metadata-scale`             | `{ scale }`                                                                                                | Set metadata track width scale.                                                |
+| `view.set-metadata-gap`               | `{ gap }`                                                                                                  | Set gap between metadata tracks.                                               |
+| `view.set-metadata-row-scale`         | `{ scale }`                                                                                                | Set metadata row height scale.                                                 |
+| `view.set-label-font-size`            | `{ size }`                                                                                                 | Set label font size.                                                           |
+| `view.set-label-font-family`          | `{ family }`                                                                                               | Set label font family.                                                         |
+| `view.set-clade-annotation-font-size` | `{ size }`                                                                                                 | Set font size for all clade annotation labels.                                 |
+| `view.set-tip-alignment`              | `{ alignment: 'tip' \| 'label' }`                                                                          | Set rectangular label alignment.                                               |
+| `view.set-branch-colour-attribute`    | `{ attribute: string \| null }`                                                                            | Color branches by a numeric metadata column or disable the mapping.            |
+| `view.set-internal-node-marker`       | `{ attribute?, encoding?, color?, categories? }`                                                           | Map support or internal-node metadata to split markers.                        |
+| `view.set-tree-style-attributes`      | `{ nodeDiameterAttribute?, nodeColorAttribute?, branchWidthAttribute?, branchColorAttribute? }`            | Map exact node-circle and branch style values to data attributes.              |
+| `view.set-pretty-terminal-branches`   | `{ enabled }`                                                                                              | Decorate branches entering terminal leaves.                                    |
+| `view.set-conditional-style-rules`    | `{ rules }`                                                                                                | Replace ordered metadata-driven style rules.                                   |
+| `view.toggle-labels`                  | `{}`                                                                                                       | Toggle leaf labels.                                                            |
+| `view.toggle-support-labels`          | `{}`                                                                                                       | Toggle support labels.                                                         |
+| `view.set-show-support`               | `{ visible }`                                                                                              | Set support-label visibility.                                                  |
+| `view.set-highlighted-path`           | `{ path }`                                                                                                 | Highlight a path by stable keys.                                               |
+| `view.clear-highlighted-path`         | `{}`                                                                                                       | Clear the highlighted path.                                                    |
+| `view.toggle-label-overlap`           | `{}`                                                                                                       | Toggle label-overlap allowance.                                                |
+| `view.toggle-metadata`                | `{}`                                                                                                       | Toggle metadata track visibility.                                              |
+| `view.set-metadata-visibility`        | `{ visible }`                                                                                              | Set metadata track visibility.                                                 |
+| `view.toggle-figure-legend`           | `{}`                                                                                                       | Toggle the compact in-figure legend overlay.                                   |
+| `view.set-figure-legend-visibility`   | `{ visible }`                                                                                              | Set in-figure legend overlay visibility.                                       |
+| `view.set-figure-legend-section`      | `{ sectionIndex }`                                                                                         | Display one legend section in the figure; use `null` for all sections.         |
+| `view.set-figure-legend-placement`    | `{ sectionKey, visible?, x?, y? }`                                                                         | Set per-section figure legend visibility and position.                         |
+| `view.set-figure-legend-title`        | `{ sectionKey, title }`                                                                                    | Rename a displayed figure legend title.                                        |
+| `view.set-figure-legend-item-label`   | `{ sectionKey, itemKey, label }`                                                                           | Rename a displayed figure legend item label.                                   |
+| `view.reset-controls`                 | `{}`                                                                                                       | Reset density control values.                                                  |
+| `view.reset-panel-geometry`           | `{}`                                                                                                       | Reset persisted stage panel geometry.                                          |
+| `view.save`                           | `{ name, setAsDefault? }`                                                                                  | Save the current view as a named session view.                                 |
+| `view.rename`                         | `{ id, name }`                                                                                             | Rename a saved view.                                                           |
+| `view.delete`                         | `{ id }`                                                                                                   | Delete a saved view.                                                           |
+| `view.set-default`                    | `{ id: string \| null }`                                                                                   | Set or clear the default saved view.                                           |
+| `view.apply`                          | `{ id }`                                                                                                   | Apply a saved view.                                                            |
 
 ## Tree Commands
 
@@ -189,7 +203,7 @@ await api.execute('view.set-internal-node-marker', {
 
 Use `view.set-tree-style-attributes` when the tree or metadata table already
 contains exact visual values. Diameter and width values are interpreted as
-pixels. Color values are CSS color strings.
+pixels. Color values are used as CSS color strings.
 
 For internal nodes, attributes are read from tree node metadata such as
 Newick/Nexus comments. For terminal nodes, TreeViz reads tree node metadata
@@ -205,22 +219,57 @@ await api.execute('view.set-tree-style-attributes', {
   branchColorAttribute: 'branch_color'
 })
 
-await api.execute('view.set-pretty-terminal-branches', { enabled: true })
-```
-
-Pass `null` for one attribute to clear that mapping without changing the other
-mappings:
-
-```js
 await api.execute('view.set-tree-style-attributes', {
   nodeColorAttribute: null,
   branchColorAttribute: null
 })
 ```
 
-The pretty terminal branch option works in rectangular, circular, and radial
-layouts. It thickens and rounds only the branch stubs entering terminal leaves
-and preserves each branch's current color and mapped width.
+The older `view.set-branch-colour-attribute` command remains for numeric branch
+gradients derived from a metadata column. Exact branch color values from
+`view.set-tree-style-attributes` take precedence when both mappings are active.
+
+Use `view.set-pretty-terminal-branches` to thicken and cap only the branch
+stubs entering terminal leaves. It works in rectangular, circular, and radial
+layouts and preserves each branch's current color and mapped width.
+
+```js
+await api.execute('view.set-pretty-terminal-branches', { enabled: true })
+```
+
+Use `view.set-conditional-style-rules` for threshold, category, missing-value,
+boolean, text, regex, quantile, or rank styling. Source values resolve like
+exact styling attributes: `support`, `meta:<key>`, tree node metadata, then
+bound leaf metadata rows. Later rules win for the same target.
+
+Rendered targets are `branch-color`, `branch-width`, `node-color`,
+`node-size`, `internal-marker-color`, `internal-marker-size`, `label-color`,
+`label-weight`, and `label-visibility`. The same rule model also persists
+`symbol`, `wedge`, and `track-bar-color` outputs for compact track rendering
+workflows.
+
+```js
+await api.execute('view.set-conditional-style-rules', {
+  rules: [
+    {
+      id: 'high-abundance-branch',
+      source: 'abundance',
+      condition: { kind: 'interval', min: 10 },
+      target: 'branch-width',
+      value: 4
+    },
+    {
+      id: 'host-symbol',
+      source: 'host',
+      condition: { kind: 'exact', value: 'soil' },
+      target: 'symbol',
+      value: { shape: 'diamond', color: '#7b3294', size: 9, label: 'Soil host' }
+    }
+  ]
+})
+
+const activeRules = api.getSession().view.conditionalStyleRules
+```
 
 In the webapp, open **Controls** to select exact node-circle diameter/color and
 branch width/color attributes. Right-click a clade and choose **Style clade**
@@ -240,14 +289,81 @@ See [Tree styling](STYLING.md) for TOML, metadata, and Python examples.
 | `track.update`  | `{ trackId, patch }`                  | Update a track config. |
 | `track.reorder` | `{ order }`                           | Reorder tracks by id.  |
 
-Supported track kinds are `color-strip`, `gradient`, `heatmap`, `bar`, `text`,
-and `binary-dots`.
+Supported track kinds are `color-strip`, `gradient`, `heatmap`, `bar`,
+`stacked-bar`, `text`, and `binary-dots`. Use `stacked-bar` for composition per
+tip: it takes `columnKeys` and splits one bar per leaf into a segment per
+column, with `normalize: true` rescaling each row to fill the track.
+
+### Connections
+
+Tip-to-tip links for horizontal transfer, recombination, host-parasite pairs and
+gene duplication. Stored on the session as
+`connections: [{ id, title, visible, pairs }]`, where each pair is
+`{ from, to, color?, width?, opacity? }` naming two leaves.
+
+One geometry: a quadratic curve whose control point sits toward the plot centre,
+so a link reads as a chord inside a circular tree and as a bundled arc under a
+rectangular one. The layer is named `connections`, so an export carries
+`data-tv-layer="connections"`.
+
+An endpoint that matches no leaf produces a diagnostic naming it and the pair is
+not drawn. An endpoint inside a collapsed or hidden clade drops its curve with a
+diagnostic rather than drawing to a stale position.
+
+### Node Marks
+
+Marks drawn at internal nodes rather than in the metadata band. They read from
+`session.import-node-metadata`, not from the leaf binding.
+
+| Command            | Args                                              | Effect                          |
+| ------------------ | ------------------------------------------------- | ------------------------------- |
+| `nodemark.add`     | `{ kind: 'pie', columnKeys, palette?, sizeBy?, maxRadius? }` | Add a mark at bound nodes. |
+| `nodemark.remove`  | `{ index }`                                       | Remove a node mark.             |
+| `nodemark.update`  | `{ index, patch }`                                | Update a node mark.             |
+
+Slice angles come from each column's share of its row total. A node whose
+columns are all zero or missing draws nothing rather than an empty circle. When
+an edit destroys a clade, its mark is dropped with a diagnostic rather than
+reattached to a different clade.
 
 For `bar` tracks, `track.update` patches may include `showAxis`,
 `axisPosition: "top" | "bottom"`, `showHelperLines`,
 `helperLineStyle: "solid" | "dashed"`, `helperLineColor`, and
 `helperLineWidth`. Helper lines use the bar-axis tick positions and extend
 through the plotted rows in rectangular layout.
+
+`color-strip` tracks can be rendered as compact symbols or wedges by patching
+`displayMode: "symbol" | "wedge"` and, for symbols, `symbolShape`.
+Supported symbol shapes are `circle`, `square`, `triangle`, `diamond`, `plus`,
+and `dash`.
+
+```js
+await api.execute('track.update', {
+  trackId: 'track:host',
+  patch: { displayMode: 'wedge', width: 16 }
+})
+```
+
+`bar` tracks can keep the normal bar display or use compact interval bins with
+`displayMode: "symbol" | "wedge"`. Use `bins` for explicit intervals or
+`autoBins` plus a sequential/diverging/neutral `palette` for automatic equal
+intervals. Manual bin fields are `label`, `color`, optional `min`/`max`,
+optional `minInclusive`/`maxInclusive`, and optional per-bin `shape`.
+
+```js
+await api.execute('track.update', {
+  trackId: 'track:support',
+  patch: {
+    displayMode: 'symbol',
+    width: 18,
+    symbolShape: 'circle',
+    bins: [
+      { label: 'Low support', max: 60, color: '#d7191c', shape: 'dash' },
+      { label: 'High support', min: 90, max: 100, maxInclusive: true, color: '#1a9641' }
+    ]
+  }
+})
+```
 
 ## Selection And Search Commands
 

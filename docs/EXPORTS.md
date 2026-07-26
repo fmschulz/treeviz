@@ -35,6 +35,10 @@ metadata TSV export when downstream tools need the current metadata table.
 Newick, Nexus, and metadata exports do not preserve the full TreeViz visual
 state. Use `.treeviz.json` when visual state matters.
 
+Cells in CSV and TSV exports (leaf names and metadata values) that begin with
+`=`, `+`, `-`, or `@` are prefixed with an apostrophe so spreadsheet apps
+display them literally instead of running them as formulas.
+
 ## Python Static Export
 
 The Python package can call an external TreeViz renderer command:
