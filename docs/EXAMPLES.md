@@ -2,8 +2,8 @@
 
 The public examples show how to build TreeViz sessions from Python with
 metadata, leaf symbols, branch-support markers, and layout presets.
-The example script also demonstrates passing TreeViz view settings from Python,
-including exact node/branch styling fields and `prettyTerminalBranches`.
+The script stays within the schema bundled with the published
+`treeviz-phylo` 0.1.0 package.
 
 ## Python Script
 
@@ -27,13 +27,13 @@ The script writes:
 - `clade_100_bare.treeviz.json`: the same tree without metadata;
 - `summary.json`: leaf counts, tree statistics, binding diagnostics, and hosted URLs.
 
-To render SVG, PNG, or PDF files, provide a renderer command:
+If the environment already provides a compatible renderer, pass its path:
 
 ```bash
 python examples/plot_treeviz_examples.py \
   --out treeviz-example-output \
   --render \
-  --renderer-command treeviz render
+  --renderer-command /path/to/treeviz-renderer
 ```
 
 If no local renderer is available, open the generated `.treeviz.json` files in
@@ -51,7 +51,7 @@ The metadata examples include:
 - binary dot tracks for leaf symbols;
 - text tracks;
 - internal-node support labels and support markers;
-- exact terminal-node circles, branch width/color, and pretty terminal branches;
+- numeric branch coloring;
 - rectangular and circular layouts.
 
 ## Agent Skill Examples

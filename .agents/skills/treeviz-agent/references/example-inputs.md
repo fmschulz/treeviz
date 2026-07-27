@@ -62,13 +62,14 @@ Use the bare variants to compare tree layout with and without metadata tracks.
 
 ## Static Rendering
 
-Static rendering is disabled by default. If a renderer command is available:
+Static rendering is disabled by default. If the environment provides a
+compatible renderer:
 
 ```bash
 python examples/plot_treeviz_examples.py \
   --out treeviz-example-output \
   --render \
-  --renderer-command treeviz render
+  --renderer-command /path/to/treeviz-renderer
 ```
 
 The script writes SVG, PNG, PDF, crop metrics, and `summary.json`.

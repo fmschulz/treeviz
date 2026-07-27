@@ -7,7 +7,7 @@ Run after installing the package:
 
 The script writes two metadata-rich sessions, two matching bare sessions, and a
 summary JSON file. Static SVG/PNG/PDF export is optional and requires an
-external TreeViz renderer command.
+compatible external renderer command.
 """
 
 from __future__ import annotations
@@ -54,26 +54,8 @@ def make_balanced_newick(labels: list[str], offset: int = 0) -> str:
 def make_metadata(labels: list[str]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     block = max(1, len(labels) // len(CLADES))
-    turquoise = ["#0f766e", "#14b8a6", "#2dd4bf", "#5eead4"]
-    warm = ["#b91c1c", "#ea580c", "#f97316", "#fdba74"]
     for index, label in enumerate(labels):
         clade = CLADES[min(index // block, len(CLADES) - 1)]
-        clade_offset = index % block
-        if clade == "Alpha":
-            node_color = turquoise[min(clade_offset, len(turquoise) - 1)]
-            branch_color = node_color
-            node_diameter = max(7, 12 - clade_offset)
-            branch_width = max(1.8, 4.2 - clade_offset * 0.45)
-        elif clade == "Gamma":
-            node_color = warm[min(clade_offset, len(warm) - 1)]
-            branch_color = node_color
-            node_diameter = max(6, 11 - clade_offset)
-            branch_width = max(1.6, 3.6 - clade_offset * 0.4)
-        else:
-            node_color = "#94a3b8"
-            branch_color = "#cbd5e1"
-            node_diameter = 5
-            branch_width = 1.1
         rows.append(
             {
                 "leaf_id": label,
@@ -87,10 +69,6 @@ def make_metadata(labels: list[str]) -> list[dict[str, Any]]:
                 "gc": round(0.32 + ((index * 7) % 31) / 100, 3),
                 "marker_present": index % 4 in {0, 1},
                 "status": "reference" if index % 10 == 0 else "candidate",
-                "node_diameter": node_diameter,
-                "node_color": node_color,
-                "branch_width": round(branch_width, 2),
-                "branch_color": branch_color,
             }
         )
     return rows
@@ -133,11 +111,6 @@ def make_view(layout: str, leaves: int) -> dict[str, Any]:
         "allowLabelOverlap": False,
         "tipAlignment": "tip",
         "branchColourAttribute": "gc",
-        "nodeCircleDiameterAttribute": "node_diameter",
-        "nodeCircleColorAttribute": "node_color",
-        "branchWidthAttribute": "branch_width",
-        "branchColorAttribute": "branch_color",
-        "prettyTerminalBranches": True,
         "internalNodeMarkerAttribute": "support",
         "internalNodeMarkerEncoding": "shade",
         "internalNodeMarkerColor": "#0f766e",
@@ -255,7 +228,10 @@ def main() -> None:
         "--renderer-command",
         nargs="+",
         default=None,
-        help="External renderer command, for example: --renderer-command treeviz render",
+        help=(
+            "Compatible renderer command, for example: "
+            "--renderer-command /path/to/treeviz-renderer"
+        ),
     )
     parser.add_argument(
         "--skip-static",
@@ -265,7 +241,10 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.render and not args.renderer_command:
-        parser.error("--render requires --renderer-command, for example: --renderer-command treeviz render")
+        parser.error(
+            "--render requires --renderer-command, for example: "
+            "--renderer-command /path/to/treeviz-renderer"
+        )
 
     args.out.mkdir(parents=True, exist_ok=True)
     specs = example_specs()

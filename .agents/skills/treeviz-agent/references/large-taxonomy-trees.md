@@ -28,8 +28,8 @@ When query tips must share branch and track colors:
 
 - use a dedicated visual column such as `order_or_query`;
 - set all query rows to one explicit category such as `query_metabat`;
-- use the same hex color for query branch styling and the query metadata
-  category when exact color matching is required.
+- set `categoryColors.query_metabat` on the color-strip track;
+- use the same hex color for query branch styling.
 
 Do not leave query rows blank when the user expects query wedges to be colored.
 Use an explicit category instead.
@@ -92,11 +92,14 @@ Rectangular:
 
 - usually best for metadata-heavy figures;
 - supports compact labels and track comparison;
-- often benefits from lower branch scale and tight leaf spacing.
+- should keep `branchScaleMode: "auto"` unless fixed geometry is required;
+- often benefits from tight leaf spacing.
 
 ## Final Checks
 
 - no unresolved diagnostics;
+- `contentOccupancyX` and `contentOccupancyY` use the available canvas without
+  clipping labels;
 - expected query and focus categories are present;
 - metadata tracks are readable;
 - legends have concise titles and item labels;

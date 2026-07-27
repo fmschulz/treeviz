@@ -1,32 +1,50 @@
 # TreeViz Browser API
 
-Use `window.__treeviz` when TreeViz is opened with `?api=1`.
+Use `window.__treeviz` when TreeViz is open with `?api=1`.
 
 ```text
 https://treeviz.newlineages.com/?api=1
-```
-
-For render-only automation:
-
-```text
 https://treeviz.newlineages.com/?mode=headless&api=1
 ```
 
+## Sources Of Truth
+
+Do not keep a separate full command list in agent notes. Read the live surface:
+
+- `window.__treeviz.commands()` returns command ids and argument schemas.
+- `https://treeviz.newlineages.com/treeviz-command-schema.json` is the
+  machine-readable command schema.
+- `https://fmschulz.github.io/treeviz/API/` documents the API and command
+  behavior.
+- `window.__treeviz.version()` and `/version.json` identify the running app.
+
+Use the live schema when an exact argument name matters.
+
+Restore a complete session document with:
+
+```js
+await window.__treeviz.execute('session.restore', { snapshot: sessionDocument })
+```
+
+Pass `skipAutoApplyDefault: true` only when the restored snapshot must not apply
+its saved default view.
+
 ## Core Methods
 
-- `version()`: return app and session-version information.
-- `onReady(cb)`: run a callback when the current render state is ready.
+- `version()`: app and session-version information.
+- `onReady(cb)`: run a callback when the current render is ready.
 - `onChange(cb)`: subscribe to state changes.
-- `getSession()`: return the current session or `null`.
-- `commands()`: return command descriptors and argument schemas.
+- `getSession()`: current session or `null`.
+- `commands()`: command descriptors and argument schemas.
+- `palettes()`: palette ids, colors, roles, aliases, and usage notes.
 - `execute(id, args)`: run a command.
-- `getDiagnostics()`: return parse, binding, edit, and render diagnostics.
-- `planMetadataImport(source, format, prompt?)`: infer row-key binding and track suggestions.
-- `analyzeSessionMetadata(prompt?)`: plan tracks for an existing metadata table.
-- `applyTrackRecommendations(recommendations)`: add planner-recommended tracks.
-- `resolveClade(query)`: resolve a clade by leaf names or metadata predicates.
-- `getLayoutMetrics()`: return render metrics such as clipping and collisions.
-- `exportSvg()`: return the current figure as SVG text.
+- `getDiagnostics()`: parse, binding, edit, and render diagnostics.
+- `planMetadataImport(source, format, prompt?)`: plan row-key binding and tracks.
+- `analyzeSessionMetadata(prompt?)`: plan tracks for loaded metadata.
+- `applyTrackRecommendations(recommendations)`: add planned tracks.
+- `resolveClade(query)`: resolve leaves or metadata predicates to a stable key.
+- `getLayoutMetrics()`: clipping, collision, density, branch, and occupancy metrics.
+- `exportSvg()`: current figure as SVG text.
 
 ## Import Tree And Metadata
 
@@ -47,7 +65,11 @@ const metadata = [
   'D\tbeta\t1.6\tno'
 ].join('\n')
 
-const plan = api.planMetadataImport(metadata, 'tsv', 'color by group, show value as bars')
+const plan = api.planMetadataImport(
+  metadata,
+  'tsv',
+  'color by group and show value as bars'
+)
 if (!plan) throw new Error('metadata planning failed')
 
 await api.execute('session.import-metadata', {
@@ -61,81 +83,123 @@ await api.execute('session.import-metadata', {
 await api.applyTrackRecommendations(plan.recommendedTracks)
 ```
 
-## Important Commands
+Current track kinds are `color-strip`, `gradient`, `heatmap`, `bar`, `text`,
+`binary-dots`, and `stacked-bar`.
 
-### Session
+## Palettes And Compact Tracks
 
-- `session.import-tree`
-- `session.import-metadata`
-- `session.rebind`
-- `session.restore`
-- `session.save`
+Read palette ids from `palettes()`. Use `categoryColors` when exact category
+colors must persist in an uploaded session. Read track ids from
+`getSession().tracks` before calling `track.update`.
 
-### Tracks
+```js
+const palette = api.palettes().find((entry) => entry.id === 'okabe-ito')
+if (!palette) throw new Error('palette not found')
 
-- `track.add`
-- `track.update`
-- `track.remove`
-- `track.reorder`
+await api.execute('track.update', {
+  trackId: 'track-host',
+  patch: {
+    palette: palette.id,
+    displayMode: 'wedge',
+    categoryColors: {
+      soil: '#0072b2',
+      water: '#e69f00'
+    }
+  }
+})
+```
 
-Supported track kinds are `color-strip`, `gradient`, `heatmap`, `bar`, `text`,
-and `binary-dots`.
+Color-strip tracks support `strip`, `symbol`, and `wedge` display modes. Bar
+tracks support `bar`, `symbol`, and `wedge`; use ordered `bins` or `autoBins`
+for numeric intervals.
 
-### View And Layout
+## Exact And Conditional Styling
 
-- `view.set-layout`
-- `view.set-branch-scale`
-- `view.set-leaf-spacing`
-- `view.set-metadata-scale`
-- `view.set-metadata-gap`
-- `view.set-metadata-row-scale`
-- `view.set-label-font-size`
-- `view.set-label-font-family`
-- `view.set-tip-alignment`
-- `view.toggle-label-overlap`
-- `view.set-branch-colour-attribute`
-- `view.set-show-support`
-- `view.set-internal-node-marker`
-- `view.set-tree-style-attributes`
-- `view.set-pretty-terminal-branches`
-- `view.set-scale-bar-position`
-- `view.set-figure-legend-visibility`
-- `view.set-figure-legend-section`
-- `view.set-figure-legend-placement`
-- `view.set-figure-legend-title`
-- `view.set-figure-legend-item-label`
-- `view.set-panel-position`
+Map visual values already present in node or leaf metadata:
 
-### Tree
+```js
+await api.execute('view.set-tree-style-attributes', {
+  nodeDiameterAttribute: 'node_diameter',
+  nodeColorAttribute: 'node_color',
+  branchWidthAttribute: 'branch_width',
+  branchColorAttribute: 'branch_color'
+})
 
-- `tree.style-clade`
-- `tree.reset-clade-style`
-- `tree.collapse-clade`
-- `tree.expand-clade`
-- `tree.hide-clade`
-- `tree.unhide-clade`
-- `tree.rotate-clade`
-- `tree.reroot`
-- `tree.reroot-at-outgroup`
-- `tree.midpoint-reroot`
-- `tree.prune-clade`
-- `tree.extract-subtree`
-- `tree.ladderize`
-- `tree.sort-by-branch-length`
-- `tree.collapse-by-support`
+await api.execute('view.set-pretty-terminal-branches', { enabled: true })
+```
 
-### Export
+Apply ordered conditions when the source data holds measurements or classes:
 
-- `export.newick`
-- `export.nexus`
-- `export.leaf-names`
-- `export.metadata-tsv`
+```js
+await api.execute('view.set-conditional-style-rules', {
+  rules: [
+    {
+      id: 'high-abundance-branch',
+      source: 'abundance',
+      condition: { kind: 'interval', min: 10 },
+      target: 'branch-width',
+      value: 4
+    },
+    {
+      id: 'missing-host-label',
+      source: 'host',
+      condition: { kind: 'missing' },
+      target: 'label-visibility',
+      value: false
+    }
+  ]
+})
+```
 
-Use `session.save` for a full `.treeviz.json` session.
+Conditions include `exact`, `interval`, `quantile`, `rank`, `missing`,
+`boolean`, `contains`, and `regex`. Read the live command schema for target and
+value types.
 
-## Clade Styling
+## Internal Node Marks
 
-Resolve clades by metadata or leaf names, then style by stable key:
+Import metadata keyed to named internal nodes with
+`session.import-node-metadata`. Add, update, or remove marks with
+`nodemark.add`, `nodemark.update`, and `nodemark.remove`.
+
+`nodemark.add` uses `kind: 'pie'`; `style` selects `pie`, `donut`, or `bar`.
+`columnKeys` names the component columns, and `palette` selects their colors.
+One mark definition applies to every bound internal-node row. Optional `sizeBy`
+and `maxRadius` control size.
+
+## Tip Connections
+
+Tip-to-tip links live in the session:
+
+```js
+{
+  connections: [
+    {
+      id: 'hgt',
+      title: 'Transfer',
+      visible: true,
+      pairs: [
+        {
+          from: 'A',
+          to: 'D',
+          label: 'putative transfer',
+          color: '#0072b2',
+          width: 2,
+          opacity: 0.45
+        }
+      ]
+    }
+  ]
+}
+```
+
+Add connections to a `.treeviz.json` document, then call
+`session.restore` with `{ snapshot: sessionDocument }`.
+Diagnostics report unresolved endpoints, same-leaf pairs, and endpoints hidden
+inside collapsed or hidden clades.
+
+## Clade Resolution And Styling
+
+Resolve clades from metadata instead of selecting pixels:
 
 ```js
 const result = api.resolveClade({
@@ -147,72 +211,33 @@ if (result?.exact && result.mrcaStableKey) {
   await api.execute('tree.style-clade', {
     stableKey: result.mrcaStableKey,
     patch: {
-      color: '#2563eb',
+      color: '#0072b2',
       label: 'alpha',
-      cladeLabelColor: '#2563eb',
+      cladeLabelColor: '#0072b2',
       cladeLabelBold: true,
-      cladeBackground: 'rgba(37, 99, 235, 0.12)'
+      cladeBackground: 'rgba(0, 114, 178, 0.12)'
     }
   })
 }
 ```
 
-## Support Markers
+Use stable keys for tree edits.
 
-Numeric internal-node labels in Newick are parsed as support values.
+## Layout And Evidence
 
-```js
-await api.execute('view.set-show-support', { visible: true })
-await api.execute('view.set-internal-node-marker', {
-  attribute: 'support',
-  encoding: 'shade',
-  color: '#0f766e'
-})
-```
-
-## Exact Node And Branch Styling
-
-Use exact style attributes when metadata or tree node comments already contain
-visual values. Terminal leaves can read values from bound metadata rows;
-internal nodes require tree node metadata.
-
-```js
-await api.execute('view.set-tree-style-attributes', {
-  nodeDiameterAttribute: 'node_diameter',
-  nodeColorAttribute: 'node_color',
-  branchWidthAttribute: 'branch_width',
-  branchColorAttribute: 'branch_color'
-})
-
-await api.execute('view.set-pretty-terminal-branches', {
-  enabled: true
-})
-```
-
-Pretty terminal branches are view-wide and work in rectangular, circular, and
-radial layouts. They preserve each branch's current color and mapped width.
-
-Visible UI equivalents:
-
-- **Controls** > **Exact styling** selects node-circle diameter/color and branch
-  width/color attributes.
-- Right-click **Style clade** uses visual line-style buttons and includes label
-  color/style/size.
-- **Inspector** on one leaf or internal node edits branch color/width and direct
-  node-circle diameter/color for that stable key.
-
-## Layout Pass
+Keep automatic topology sizing unless fixed geometry is part of the request:
 
 ```js
 await api.execute('view.set-layout', { layout: 'rectangular' })
+await api.execute('view.set-branch-scale-mode', { mode: 'auto' })
 await api.execute('view.set-metadata-gap', { gap: 0 })
-await api.execute('view.set-branch-scale', { scale: 0.18 })
 await api.execute('view.set-leaf-spacing', { spacing: 0.8 })
-await api.execute('view.set-label-font-size', { size: 11 })
 
-const metrics = api.getLayoutMetrics()
 const diagnostics = api.getDiagnostics()
+const metrics = api.getLayoutMetrics()
 const svg = api.exportSvg()
 ```
 
-Inspect the exported SVG or a screenshot after the final layout change.
+Calling `view.set-branch-scale` selects manual scale. After the final layout
+change, inspect diagnostics, layout metrics, and a screenshot or exported
+figure.

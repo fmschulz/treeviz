@@ -1,77 +1,92 @@
-# Render QA
+# TreeViz Render QA
 
-Use this reference when the user asks for visual polish, dense tree layout,
-exported figures, or proof that edits display correctly.
+Use this reference for dense layouts, visual polish, and exported figures.
 
 ## QA Loop
-
-Do not assume the first layout is good.
 
 1. Apply one logical batch of changes.
 2. Read `getDiagnostics()`.
 3. Read `getLayoutMetrics()`.
-4. Export SVG or capture a screenshot.
-5. Inspect the latest output for clipping, collisions, whitespace, legend
-   placement, and metadata readability.
-6. Adjust and render again if needed.
+4. Capture a screenshot or export SVG, PNG, or PDF.
+5. Inspect clipping, collisions, whitespace, legend placement, and track
+   readability.
+6. Adjust and render again when the evidence still shows a problem.
 
-Do not report that a figure looks good unless the latest rendered evidence was
-inspected after the final layout change.
+Do not claim visual quality from configuration alone.
 
-## Layout Heuristics
+## Current Layout Metrics
 
-- Minimize whitespace first; dense, readable trees are usually preferable to
-  wide empty margins.
-- Keep metadata tracks contiguous with `metadataGap: 0` unless separation is
-  useful.
-- In rectangular layout, reduce branch scale before widening the canvas.
-- Keep leaf spacing as tight as readability allows.
-- If metadata dominates the figure, start in rectangular layout.
-- Try circular or radial layout only when labels, metadata wedges, and legends
-  remain readable.
-- Keep the scale bar close to the tree but away from labels, tracks, and
-  branches.
-- Avoid solving clip or collision issues by adding large empty margins. Try
-  font size, overlap policy, branch scale, leaf spacing, and track density
-  first.
+Start with:
 
-## Whitespace And Cropping
+- `contentOccupancyX` and `contentOccupancyY`: fraction of usable canvas covered
+  by painted content. Values below about 0.7 can indicate recoverable whitespace.
+- `labelsClipped`: labels that cross a viewport edge. The target is zero.
+- `labelCollisions`: pairs of labels whose glyphs overlap, even when overlap is
+  allowed.
+- `trackDensity`: metadata-lane density.
+- `p75BranchPx`: branch-length measure that is less sensitive to one long
+  branch. More than 160 px on an 8-to-100-tip tree often means the topology is
+  stretched.
+- `warnings`: metric warnings such as low occupancy or heavy label overlap.
 
-For Python static export, use:
+Rectangular occupancy uses each viewport axis. Circular and radial occupancy
+uses the shorter viewport side for both axes because the figure is round.
 
-```python
-render_tree(
-    tree,
-    metadata=metadata,
-    tracks=tracks,
-    format="png",
-    output="tree.png",
-    command=["treeviz", "render"],
-    auto_crop=True,
-    crop_padding=24,
-    metrics="tree.metrics.json",
-)
+## Layout Rules
+
+- Keep `branchScaleMode` on `auto` unless the user needs fixed geometry.
+- Calling `view.set-branch-scale` switches the view to manual scale.
+- Keep metadata tracks contiguous with `metadataGap: 0` unless separation has a
+  clear purpose.
+- Start metadata-heavy figures in rectangular layout.
+- Try circular or radial layout only when labels, wedges, and legends remain
+  readable.
+- Tighten leaf spacing only while labels and symbols remain distinct.
+- Fix clipping with layout, font size, overlap policy, and track density before
+  adding large margins.
+- Keep scale bars clear of labels, branches, and tracks.
+- Use `categoryColors` when exact categorical colors must survive upload.
+
+## Hosted Browser Evidence
+
+Open the app with `?api=1`, make the final change, then collect:
+
+```js
+const evidence = {
+  diagnostics: window.__treeviz.getDiagnostics(),
+  metrics: window.__treeviz.getLayoutMetrics(),
+  svg: window.__treeviz.exportSvg()
+}
 ```
 
-Check the metrics JSON for large whitespace margins, low fill ratios, or crop
-warnings.
+Capture a screenshot after this call. If the user will reopen the result, save
+the same state as `.treeviz.json`.
 
-For repeated SVG/PNG cleanup:
+## Export Cleanup
+
+For repeated SVG and PNG cleanup:
 
 ```bash
-python .agents/skills/treeviz-agent/scripts/postprocess-treeviz-export.py \
+uv run --with pillow python \
+  .agents/skills/treeviz-agent/scripts/postprocess-treeviz-export.py \
   --svg results/tree.svg \
   --png results/tree.png \
   --layout circular
 ```
 
-## Validation Checklist
+The helper also requires `rsvg-convert` on `PATH`.
 
-- `getDiagnostics()` has no unresolved parse, binding, edit, or render errors.
-- `getLayoutMetrics()` has no unresolved density, clipping, or collision issue
-  relevant to the user request.
-- The latest screenshot, SVG, PNG, or PDF was inspected after the most recent
-  tuning pass.
-- The saved `.treeviz.json` contains the tree edits, metadata, bindings,
-  tracks, view settings, and saved views the user asked to preserve.
-- Exported figure margins are tight enough and the figure is not clipped.
+The helper can remove a scale-bar layer, crop to rendered content, regenerate
+an opaque PNG, and create dark copies. Use only the options needed by the
+requested output.
+
+## Final Checklist
+
+- Diagnostics contain no unresolved errors relevant to the requested figure.
+- `labelsClipped` is zero.
+- Occupancy uses the available canvas; any remaining gap has a named cause.
+- Label collisions and track density are acceptable for the requested layout.
+- The latest screenshot or export was inspected after the final change.
+- The saved session contains the requested tree edits, metadata, bindings,
+  tracks, node marks, connections, view settings, and saved views.
+- The exact `.treeviz.json` intended for upload opens in the hosted app.

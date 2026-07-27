@@ -71,14 +71,30 @@ failed automation step unless the task intentionally tests invalid input.
 
 - Load or restore a session before metadata, tracks, or styling.
 - Use `commands()` when exact command ids or argument schemas matter.
+- Use `palettes()` for palette ids and exact color sets.
 - Use `planMetadataImport(...)` before importing metadata from text.
 - Use stable keys from the session tree for clade edits.
+- Use `categoryColors` when categorical colors must remain exact across uploads.
+- Use `displayMode: 'symbol'` or `'wedge'` on color-strip and bar tracks for
+  compact lanes. Bar tracks can use explicit `bins` or `autoBins`.
 - Use `view.set-tree-style-attributes` for exact node-circle and branch
   width/color values, and `view.set-pretty-terminal-branches` for styled
   terminal leaf branches.
+- Use `view.set-conditional-style-rules` for metadata thresholds, ranks,
+  missing values, and category conditions.
+- Use `nodemark.add` for pie, donut, or bar marks on bound internal nodes.
+- Store tip-to-tip links in `session.connections`; validate unresolved,
+  collapsed, hidden, and same-leaf endpoints through diagnostics.
+- Keep `branchScaleMode` on `auto` unless fixed geometry is required. Calling
+  `view.set-branch-scale` switches the view to manual scale.
 - Re-check `getDiagnostics()` and `getLayoutMetrics()` after visual changes.
 - Capture or export a figure after the final layout change before reporting that the figure is ready.
 - Save durable work as `.treeviz.json`.
+
+Layout QA should start with `contentOccupancyX`, `contentOccupancyY`,
+`labelsClipped`, `labelCollisions`, `trackDensity`, and `p75BranchPx`.
+For circular and radial layouts, occupancy is measured against the shorter
+viewport side because the figure is round.
 
 ## References
 
