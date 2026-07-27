@@ -3,8 +3,8 @@
 TreeViz metadata is a TSV or CSV table that attaches values to tree leaves.
 Those values can drive color strips, gradients, heatmaps, bars, text tracks,
 binary dots, branch coloring, clade resolution, and legends.
-Metadata can also provide exact terminal-node circle and terminal-branch style
-values when those columns are selected in the view.
+The hosted browser can also map metadata columns to exact terminal-node circles
+and terminal-branch styles.
 
 ## Table Shape
 
@@ -45,9 +45,12 @@ await api.execute('session.import-metadata', {
 })
 ```
 
-If the row-key column is omitted, TreeViz tries to choose the column with the
-most leaf-name matches. Explicit row keys are still preferred for reproducible
-workflows.
+Row-key inference depends on the interface. In Python, omitting
+`row_key_column` makes the builder choose the metadata column with the most
+exact leaf-name matches. In the browser API, call
+`planMetadataImport(source, format, prompt)` first, then pass
+`suggestedBinding.rowKeyColumn` to `session.import-metadata`. Explicit row keys
+keep workflows reproducible.
 
 ## Matching Rules
 
@@ -64,11 +67,12 @@ metadata rows that do not bind to any tree leaf.
 
 ## Duplicates And Missing Keys
 
-Row keys should be unique. Duplicate row keys are treated as a warning in the
-browser import review.
+Row keys should be unique. Duplicate row keys are warnings in the browser
+import review, and the last row wins.
 
-Rows with blank row keys cannot be bound. In Python, a missing row key raises a
-`ValueError` so invalid sessions fail early.
+Rows with blank row keys cannot be bound. The browser skips them and reports a
+warning. In Python, a missing or blank row key raises a `ValueError` so invalid
+sessions fail early.
 
 ## Values And Types
 
@@ -110,31 +114,33 @@ A2	turquoise	10	#67e8f9	2.3	#67e8f9
 C3	warm	11	#fb923c	2.0	#fb923c
 ```
 
-Configure those columns in a `treeviz.toml` file:
+Map those columns through the hosted browser API:
 
-```toml
-[view]
-node_diameter_attribute = "node_diameter"
-node_color_attribute = "node_color"
-branch_width_attribute = "branch_width"
-branch_color_attribute = "branch_color"
-pretty_terminal_branches = true
+```js
+await api.execute('view.set-tree-style-attributes', {
+  nodeDiameterAttribute: 'node_diameter',
+  nodeColorAttribute: 'node_color',
+  branchWidthAttribute: 'branch_width',
+  branchColorAttribute: 'branch_color'
+})
+
+await api.execute('view.set-pretty-terminal-branches', { enabled: true })
 ```
 
 Terminal leaves use tree node metadata first and then the bound metadata row.
 Internal nodes only use tree node metadata. Branch style values are keyed by
 the child node, so a row for `A1` styles the branch entering `A1`.
 
-See [Tree styling](STYLING.md) for API and Python examples.
+See [Tree styling](STYLING.md) for current browser examples.
 
 ## File Formats
 
-- `.tsv` and `.tab`: tab-separated metadata.
+- `.tsv` and `.tab`: simple tab-separated metadata. Tabs and newlines always
+  separate cells and rows.
 - `.csv`: CSV with quoted fields.
 - `.gz`: accepted by the browser when the filename ends in `.gz`.
 
-Use TSV for simple tables. Use CSV when values need commas, quotes, or embedded
-newlines.
+Use CSV when fields need quoting, commas, or embedded newlines.
 
 ## Validation
 

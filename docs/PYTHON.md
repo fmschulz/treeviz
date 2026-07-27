@@ -8,6 +8,12 @@ through an external renderer command.
 The package does not vendor the TreeViz browser app or frontend source. It
 ships Python helpers and the TreeViz session schema.
 
+!!! note "Published package compatibility"
+    The examples on this page target `treeviz-phylo` 0.1.0, the current PyPI
+    release. The hosted browser app migrates these sessions when it loads them
+    and supports additional track and view fields. Its browser-only features
+    are documented in [Tree styling](STYLING.md) and [Browser API](API.md).
+
 ## Install
 
 ```bash
@@ -42,9 +48,7 @@ tracks = [
     {"kind": "color_strip", "column_key": "group", "title": "Group"},
     {"kind": "gradient", "column_key": "value", "title": "Value"},
 ]
-view = {"prettyTerminalBranches": True}
-
-session = build_session(tree, metadata=metadata, tracks=tracks, row_key_column="id", view=view)
+session = build_session(tree, metadata=metadata, tracks=tracks, row_key_column="id")
 validate_session(session)
 save_session(session, "example.treeviz.json")
 
@@ -158,7 +162,6 @@ view = {
     "labelFontSize": 11,
     "internalNodeMarkerAttribute": "support",
     "internalNodeMarkerEncoding": "shade",
-    "prettyTerminalBranches": True,
 }
 
 session = build_session(tree, metadata=metadata, tracks=tracks, view=view)
@@ -166,49 +169,15 @@ session = build_session(tree, metadata=metadata, tracks=tracks, view=view)
 
 The browser can further adjust and save view settings.
 
-### Data-Defined Node And Branch Styling
+### Newer Browser Styling
 
-The Python package preserves TreeViz view fields for exact node and branch
-styling. Put terminal-node style values in metadata columns and select those
-columns in `view`:
-
-```python
-metadata = [
-    {
-        "id": "A",
-        "node_diameter": 10,
-        "node_color": "#5eead4",
-        "branch_width": 2.6,
-        "branch_color": "#5eead4",
-    },
-    {
-        "id": "B",
-        "node_diameter": 8,
-        "node_color": "#fb923c",
-        "branch_width": 1.8,
-        "branch_color": "#fb923c",
-    },
-]
-
-view = {
-    "nodeCircleDiameterAttribute": "node_diameter",
-    "nodeCircleColorAttribute": "node_color",
-    "branchWidthAttribute": "branch_width",
-    "branchColorAttribute": "branch_color",
-    "prettyTerminalBranches": True,
-}
-
-session = build_session("(A:0.2,B:0.2);", metadata=metadata, row_key_column="id", view=view)
-validate_session(session)
-```
-
-`prettyTerminalBranches` is the same setting as the browser checkbox. It
-decorates branches entering terminal leaves in rectangular, circular, and
-radial layouts while preserving branch color and branch width mappings.
-Direct per-node overrides can be stored under `view["cladeStyles"][stable_key]`
-with fields such as `labelFontSize`, `nodeCircleDiameter`, and
-`nodeCircleColor`; the browser Inspector is the easiest way to create those
-stable-keyed entries.
+The hosted app can map metadata to exact node circles and branch width/color,
+apply conditional rules, draw compact symbol or wedge lanes, and style terminal
+branches. These fields are not in the schema bundled with
+`treeviz-phylo` 0.1.0. Build and validate the base session in Python. The hosted
+app migrates it on load and preserves its legacy branch scale in manual mode.
+Apply newer changes through `window.__treeviz`; select automatic sizing with
+`view.set-branch-scale-mode`.
 
 ## Tree Inspection
 
@@ -225,8 +194,9 @@ duplicate row keys.
 
 ## Static Export
 
-`render_tree(...)` writes a temporary `.treeviz.json` session and calls an
-external TreeViz renderer command. It supports `svg`, `png`, and `pdf`.
+`render_tree(...)` writes a temporary `.treeviz.json` session and calls a
+compatible external renderer command. It supports `svg`, `png`, and `pdf`.
+Neither the PyPI package nor this public repository installs that renderer.
 
 ```python
 from treeviz import render_tree
@@ -237,7 +207,7 @@ render_tree(
     tracks=tracks,
     format="pdf",
     output="example.pdf",
-    command=["treeviz", "render"],
+    command=["/path/to/treeviz-renderer"],
     width=1400,
     height=700,
     auto_crop=True,

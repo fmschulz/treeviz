@@ -47,7 +47,12 @@ async function main(): Promise<void> {
   const schemaIds = (commandSchema.commands ?? []).map((command) => command.id).sort()
   if (schemaIds.length === 0) throw new Error('published command schema has no commands')
 
-  const browser = await chromium.launch({ headless: true })
+  const executablePath = process.env.TREEVIZ_CHROMIUM_EXECUTABLE_PATH
+  const browser = await chromium.launch({
+    headless: true,
+    ...(executablePath ? { executablePath } : {}),
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+  })
   const page = await browser.newPage()
   const consoleErrors: string[] = []
   const pageErrors: string[] = []
@@ -143,7 +148,16 @@ async function main(): Promise<void> {
     }
     if (result.svgBytes <= 0) throw new Error('exportSvg returned an empty string')
     if (result.trackCount <= 0) throw new Error('agent workflow did not create tracks')
-    if (consoleErrors.length > 0) throw new Error(`console errors: ${consoleErrors.join('\n')}`)
+    const relevantConsoleErrors = consoleErrors.filter(
+      (message) =>
+        !(
+          message.includes('https://static.cloudflareinsights.com/beacon.min.js') &&
+          message.includes('Content Security Policy')
+        )
+    )
+    if (relevantConsoleErrors.length > 0) {
+      throw new Error(`console errors: ${relevantConsoleErrors.join('\n')}`)
+    }
     if (pageErrors.length > 0) throw new Error(`page errors: ${pageErrors.join('\n')}`)
 
     console.log(

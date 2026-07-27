@@ -7,10 +7,14 @@
 **TreeViz is a client-side phylogenetic tree viewer and editor.** It imports
 Newick, CONTree, Nexus, metadata tables, and `.treeviz.json` sessions; renders
 metadata tracks; supports common tree edits; and exports SVG, PNG, PDF, and
-data files — all in the browser, with no server and no account.
+data files. Everything runs in the browser, with no server and no account.
 
 This site covers the public browser app, the Python package, metadata
 structure, tree styling, and agent automation.
+
+The hosted app currently reports version 0.3.0. Public Python examples target
+the released `treeviz-phylo` 0.1.0 package, whose bundled schema covers fewer
+view fields than the browser app.
 
 ```
                                           ┌─ recA ████░░██░░░░░░██
@@ -48,18 +52,18 @@ structure, tree styling, and agent automation.
 
 ## Start here
 
-- [**Getting started**](GETTING_STARTED.md) — choose the browser, Python, or agent workflow.
-- [**Browser app**](BROWSER.md) — load trees, add metadata, save sessions, export figures.
-- [**Python package**](PYTHON.md) — build `.treeviz.json` sessions from scripts and notebooks.
-- [**Metadata**](METADATA.md) — prepare TSV/CSV metadata and track definitions.
-- [**Tree styling**](STYLING.md) — node circles, branch width/color, pretty terminal branches.
+- [**Getting started**](GETTING_STARTED.md): choose the browser, Python, or agent workflow.
+- [**Browser app**](BROWSER.md): load trees, add metadata, save sessions, export figures.
+- [**Python package**](PYTHON.md): build `.treeviz.json` sessions from scripts and notebooks.
+- [**Metadata**](METADATA.md): prepare TSV/CSV metadata and track definitions.
+- [**Tree styling**](STYLING.md): node circles, branch width/color, pretty terminal branches.
 
 ## More
 
-- [Agent-first styling goal](AGENT_FIRST_STYLING_GOAL.md) — planned palette, compact color,
-  conditional styling, prompt, screenshot, and manuscript workflow.
-- [Examples](EXAMPLES.md) — run the package example script and inspect generated sessions.
-- [Troubleshooting](TROUBLESHOOTING.md) — resolve binding, display, and export issues.
+- [Examples](EXAMPLES.md): run the package example script and inspect generated sessions.
+- [Hosted examples](https://treeviz.newlineages.com/): open current biological,
+  feature, and stress-test sessions.
+- [Troubleshooting](TROUBLESHOOTING.md): resolve binding, display, and export issues.
 - [GitHub repo](https://github.com/fmschulz/treeviz) · [Live app](https://treeviz.newlineages.com)
 
 !!! note "Public scope"

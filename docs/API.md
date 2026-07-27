@@ -1,8 +1,7 @@
 # Browser API
 
-TreeViz exposes a typed command surface on `window.__treeviz`. In production
-builds, open the app with `?api=1`; in local development the API is bound by
-default. Use `?mode=headless&api=1` for render-only automation.
+TreeViz exposes a typed command surface on `window.__treeviz`. Open the hosted
+app with `?api=1`. Use `?mode=headless&api=1` for render-only automation.
 
 ## Surface
 
@@ -47,8 +46,8 @@ Underscored properties on `window.__treeviz` are internal integration hooks
 and are not stable. External tools should use `commands()`, `execute(...)`,
 diagnostics, metadata planning, layout metrics, palettes, and export methods.
 
-`palettes()` returns the curated palette records used by the web app, TOML
-compiler, wrappers, and examples. Each record includes `id`, `label`, `role`,
+`palettes()` returns the curated palette records used by the web app, saved
+sessions, and examples. Each record includes `id`, `label`, `role`,
 `colors`, `recommendedUse`, `warnings`, `colorblindFriendly`, `source`, and
 accepted aliases.
 
@@ -57,7 +56,7 @@ Command mutability has three values:
 - `document`: persistent session edit; emits `document.changed` and enters
   autosave/history paths.
 - `view`: view-only navigation that does not enter the undo ring (currently
-  unused — applying a saved view is a `document` edit, so it can be undone).
+  unused; applying a saved view is a `document` edit, so it can be undone).
 - `ephemeral`: transient interaction or export command.
 
 ## Session Commands
@@ -278,7 +277,7 @@ clade annotation styling. Open the **Inspector** on a single leaf or internal
 node to edit branch color/width and direct node-circle diameter/color without
 writing an API call.
 
-See [Tree styling](STYLING.md) for TOML, metadata, and Python examples.
+See [Tree styling](STYLING.md) for metadata and browser examples.
 
 ## Track Commands
 
@@ -296,19 +295,27 @@ column, with `normalize: true` rescaling each row to fill the track.
 
 ### Connections
 
-Tip-to-tip links for horizontal transfer, recombination, host-parasite pairs and
-gene duplication. Stored on the session as
+Connections draw tip-to-tip links for horizontal transfer, recombination,
+host-parasite pairs, and gene duplication. They are stored on the session as
 `connections: [{ id, title, visible, pairs }]`, where each pair is
-`{ from, to, color?, width?, opacity? }` naming two leaves.
+`{ from, to, label?, color?, width?, opacity? }` naming two leaves. Connection
+TSV files may include a `label` column. The figure legend groups pairs by color.
+It names each group with the first non-empty label for that color, or with the
+color value when no label is present.
 
-One geometry: a quadratic curve whose control point sits toward the plot centre,
-so a link reads as a chord inside a circular tree and as a bundled arc under a
-rectangular one. The layer is named `connections`, so an export carries
-`data-tv-layer="connections"`.
+Each link is a quadratic curve. Its control point lies on the left-hand
+`(-dy, dx)` perpendicular from source to target, and its offset scales with the
+chord length. Short links use a 3 px minimum sagitta. Reciprocal links bow to
+opposite sides of their shared chord.
+
+For `#rgb` and `#rrggbb` colors, opacity below 1 is encoded as `rgba(...)`; the
+default opacity is 0.45. Other color syntaxes pass through unchanged. The layer
+is named `connections`, so an export carries `data-tv-layer="connections"`.
 
 An endpoint that matches no leaf produces a diagnostic naming it and the pair is
-not drawn. An endpoint inside a collapsed or hidden clade drops its curve with a
-diagnostic rather than drawing to a stale position.
+not drawn. A pair whose endpoints resolve to the same leaf produces a diagnostic
+and is not drawn. An endpoint inside a collapsed or hidden clade drops its curve
+with a diagnostic rather than drawing to a stale position.
 
 ### Node Marks
 
@@ -317,7 +324,7 @@ Marks drawn at internal nodes rather than in the metadata band. They read from
 
 | Command            | Args                                              | Effect                          |
 | ------------------ | ------------------------------------------------- | ------------------------------- |
-| `nodemark.add`     | `{ kind: 'pie', columnKeys, palette?, sizeBy?, maxRadius? }` | Add a mark at bound nodes. |
+| `nodemark.add`     | `{ kind: 'pie', columnKeys, style?, palette?, sizeBy?, maxRadius? }` | Add a node mark; `style` is `pie` (default), `donut`, or `bar`. |
 | `nodemark.remove`  | `{ index }`                                       | Remove a node mark.             |
 | `nodemark.update`  | `{ index, patch }`                                | Update a node mark.             |
 

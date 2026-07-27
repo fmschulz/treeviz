@@ -14,11 +14,21 @@ This repository contains the public documentation, examples, issue tracker, and
 agent skill for TreeViz. It does not contain the browser app source code or a
 vendored browser build.
 
+Current compatibility:
+
+- The hosted browser app reports version 0.3.0 through
+  [`version.json`](https://treeviz.newlineages.com/version.json). The browser
+  API docs and hosted agent skill target that deployment.
+- The Python examples target the published
+  [`treeviz-phylo` 0.1.0 package](https://pypi.org/project/treeviz-phylo/).
+  The hosted app migrates those sessions when it loads them. The package's
+  bundled schema does not expose every browser feature.
+
 ## Documentation
 
-The documentation is organized as a small wiki:
+The documentation is organized as a small site:
 
-- [Wiki home](docs/index.md)
+- [Documentation home](docs/index.md)
 - [Getting started](docs/GETTING_STARTED.md)
 - [Browser usage](docs/BROWSER.md)
 - [Python package](docs/PYTHON.md)
@@ -27,7 +37,6 @@ The documentation is organized as a small wiki:
 - [Exports](docs/EXPORTS.md)
 - [Browser API](docs/API.md)
 - [Agent automation](docs/AGENTS.md)
-- [Agent-first styling goal](docs/AGENT_FIRST_STYLING_GOAL.md)
 - [Examples](docs/EXAMPLES.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 
@@ -53,56 +62,17 @@ from treeviz import build_session, save_session, validate_session, view_session
 
 tree = "(A:0.1,B:0.2,(C:0.3,D:0.4):0.5);"
 metadata = [
-    {
-        "id": "A",
-        "group": "alpha",
-        "value": 1.2,
-        "node_diameter": 10,
-        "node_color": "#5eead4",
-        "branch_width": 2.6,
-        "branch_color": "#5eead4",
-    },
-    {
-        "id": "B",
-        "group": "alpha",
-        "value": 0.8,
-        "node_diameter": 9,
-        "node_color": "#67e8f9",
-        "branch_width": 2.3,
-        "branch_color": "#67e8f9",
-    },
-    {
-        "id": "C",
-        "group": "beta",
-        "value": 2.1,
-        "node_diameter": 9,
-        "node_color": "#fb923c",
-        "branch_width": 2.0,
-        "branch_color": "#fb923c",
-    },
-    {
-        "id": "D",
-        "group": "beta",
-        "value": 1.6,
-        "node_diameter": 8,
-        "node_color": "#fdba74",
-        "branch_width": 1.7,
-        "branch_color": "#fdba74",
-    },
+    {"id": "A", "group": "alpha", "value": 1.2},
+    {"id": "B", "group": "alpha", "value": 0.8},
+    {"id": "C", "group": "beta", "value": 2.1},
+    {"id": "D", "group": "beta", "value": 1.6},
 ]
 tracks = [
     {"kind": "color_strip", "column_key": "group", "title": "Group"},
     {"kind": "gradient", "column_key": "value", "title": "Value"},
 ]
-view = {
-    "nodeCircleDiameterAttribute": "node_diameter",
-    "nodeCircleColorAttribute": "node_color",
-    "branchWidthAttribute": "branch_width",
-    "branchColorAttribute": "branch_color",
-    "prettyTerminalBranches": True,
-}
 
-session = build_session(tree, metadata=metadata, tracks=tracks, row_key_column="id", view=view)
+session = build_session(tree, metadata=metadata, tracks=tracks, row_key_column="id")
 validate_session(session)
 save_session(session, "example.treeviz.json")
 view = view_session(session, open_browser=False)

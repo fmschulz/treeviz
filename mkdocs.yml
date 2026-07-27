@@ -1,12 +1,9 @@
 site_name: TreeViz
-site_description: Client-side phylogenetic tree viewer and editor — browser app, Python package, and agent automation
+site_description: "Client-side phylogenetic tree viewer and editor: browser app, Python package, and agent automation"
 site_url: https://fmschulz.github.io/treeviz/
 repo_url: https://github.com/fmschulz/treeviz
 repo_name: fmschulz/treeviz
 edit_uri: edit/main/docs/
-
-exclude_docs: |
-  _Sidebar.md
 
 theme:
   name: material
@@ -84,7 +81,6 @@ nav:
   - Automation:
       - Agent automation: AGENTS.md
       - Browser API: API.md
-      - Agent-first styling goal: AGENT_FIRST_STYLING_GOAL.md
   - Examples:
       - Overview: EXAMPLES.md
       - Example notes: examples/README.md

@@ -11,21 +11,21 @@ python examples/plot_treeviz_examples.py --out treeviz-example-output
 
 The script generates two deterministic trees:
 
-- `lineage_30`: 30 leaves, rectangular layout, metadata tracks, binary leaf symbols, support markers, exact node/branch styles, and pretty terminal branches.
-- `clade_100`: 100 leaves, circular layout, metadata tracks, binary leaf symbols, support markers, exact node/branch styles, and pretty terminal branches.
+- `lineage_30`: 30 leaves, rectangular layout, metadata tracks, binary leaf symbols, support markers, and numeric branch coloring.
+- `clade_100`: 100 leaves, circular layout, metadata tracks, binary leaf symbols, support markers, and numeric branch coloring.
 
 For each tree, the script also writes a `_bare` session without metadata. This
-makes it easy to compare the same topology with and without tracks.
+lets you compare the same topology with and without tracks.
 
 ## Static Rendering
 
-If an external TreeViz renderer command is available, add `--render`:
+If the environment already provides a compatible renderer, add `--render`:
 
 ```bash
 python examples/plot_treeviz_examples.py \
   --out treeviz-example-output \
   --render \
-  --renderer-command treeviz render
+  --renderer-command /path/to/treeviz-renderer
 ```
 
 Outputs include `.treeviz.json`, optional SVG/PNG/PDF files, optional crop

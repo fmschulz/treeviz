@@ -18,7 +18,11 @@ discover public machine-readable files.
 
 Use the command schema to compare expected browser command ids with
 `window.__treeviz.commands()`. Use the session schema to validate generated
-`.treeviz.json` files.
+`.treeviz.json` files. The example manifest lists current sessions, source
+files, thumbnails, provenance, and synthetic-data labels.
+
+Do not infer browser support from the published Python package. The hosted app
+and its schemas can be newer than `treeviz-phylo`.
 
 ## Live API Smoke
 
@@ -29,6 +33,18 @@ bun .agents/skills/treeviz-agent/scripts/check-live-api-smoke.ts \
   --url https://treeviz.newlineages.com/
 ```
 
+When Playwright's bundled Chromium is unavailable, point the smoke at an
+installed Chromium build:
+
+```bash
+TREEVIZ_CHROMIUM_EXECUTABLE_PATH=/path/to/chromium \
+  bun .agents/skills/treeviz-agent/scripts/check-live-api-smoke.ts \
+  --url https://treeviz.newlineages.com/
+```
+
 The smoke test opens the hosted app with `?api=1`, imports a small Newick tree,
 plans and imports metadata, creates tracks, checks diagnostics, and verifies
-that SVG export returns non-empty output.
+that SVG export returns non-empty output. The custom domain injects a Cloudflare
+Analytics beacon that TreeViz's self-only content security policy blocks. The
+smoke ignores only that exact blocked-beacon message; other console errors
+still fail the run.

@@ -40,7 +40,8 @@ as the row key; its values are matched to tree leaf labels by default.
 Remember:
 
 - empty cells become missing values;
-- duplicate row keys should be surfaced as warnings;
+- duplicate row keys are warnings and use last-value-wins semantics;
+- blank row keys are skipped and reported by the browser;
 - CSV is safer for quoted fields, commas, or embedded newlines;
 - TSV is best for simple tabular metadata.
 
@@ -74,6 +75,12 @@ For repeatable file-based rerooting from metadata, use
 - Internal-node support markers: `view.set-internal-node-marker`.
 - Exact node/branch style values: `view.set-tree-style-attributes`.
 - Pretty terminal branches: `view.set-pretty-terminal-branches`.
+- Conditional metadata styles: `view.set-conditional-style-rules`.
+- Compact category or interval lanes: `track.update` with `displayMode` set to
+  `symbol` or `wedge`; bar tracks use `bins` or `autoBins`.
+- Internal-node metadata and marks: `session.import-node-metadata`, followed by
+  `nodemark.add`, `nodemark.update`, or `nodemark.remove`.
+- Tip-to-tip links: add `connections` to the session before `session.restore`.
 - Manual single-node webapp edits: Inspector controls backed by
   `tree.style-clade` patch fields `color`, `lineWidth`, `labelColor`,
   `labelFontSize`, `nodeCircleDiameter`, and `nodeCircleColor`.
@@ -81,7 +88,8 @@ For repeatable file-based rerooting from metadata, use
 - Rerooting: `tree.reroot`, `tree.reroot-at-outgroup`, `tree.midpoint-reroot`.
 - Collapsing, expanding, hiding, pruning: `tree.collapse-clade`,
   `tree.expand-clade`, `tree.hide-clade`, `tree.prune-clade`.
-- Layout and density: `view.set-layout`, `view.set-branch-scale`,
+- Layout and density: `view.set-layout`, `view.set-branch-scale-mode`,
+  `view.set-branch-scale`,
   `view.set-leaf-spacing`, `view.set-metadata-gap`,
   `view.set-metadata-row-scale`, `view.toggle-label-overlap`,
   `view.set-scale-bar-position`.
@@ -114,3 +122,30 @@ widths, or branch colors, prefer exact style attributes over clade styling.
 4. Check `getDiagnostics()` and `getLayoutMetrics()` after switching layouts,
    because heavy terminal strokes may need lower branch-width or leaf-spacing
    settings in dense trees.
+
+## Internal Node Marks
+
+Import a TSV keyed to internal-node labels, then add a pie-family mark:
+
+```js
+await api.execute('session.import-node-metadata', {
+  tsv: [
+    'node_id\tstate_a\tstate_b\tstate_c',
+    'ancestor_1\t0.6\t0.3\t0.1'
+  ].join('\n'),
+  rowKeyColumn: 'node_id'
+})
+
+await api.execute('nodemark.add', {
+  kind: 'pie',
+  style: 'donut',
+  columnKeys: ['state_a', 'state_b', 'state_c'],
+  palette: 'okabe-ito',
+  maxRadius: 10
+})
+```
+
+`session.import-node-metadata` uses a `tsv` argument, unlike leaf metadata
+import, which uses `source` plus `format`. The node names must match internal
+labels in the tree. One node-mark definition renders at every bound internal
+node whose component columns contain a nonzero value.

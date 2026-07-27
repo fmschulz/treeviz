@@ -41,7 +41,8 @@ display them literally instead of running them as formulas.
 
 ## Python Static Export
 
-The Python package can call an external TreeViz renderer command:
+The Python package can call a compatible external renderer. Neither the PyPI
+package nor this public repository installs one.
 
 ```python
 from treeviz import render_tree
@@ -50,7 +51,7 @@ render_tree(
     "(A,B,(C,D));",
     format="svg",
     output="tree.svg",
-    command=["treeviz", "render"],
+    command=["/path/to/treeviz-renderer"],
     width=1400,
     height=700,
     auto_crop=True,
