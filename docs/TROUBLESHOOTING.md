@@ -29,8 +29,11 @@ window.__treeviz.getDiagnostics()
 
 ## The Inline Notebook View Is Missing
 
-Small sessions can be embedded in a URL fragment. Large sessions are too large
-for inline display and should be saved as `.treeviz.json` instead.
+Sessions up to 256 KB of encoded URL fragment (roughly 1,500 tips with a few
+tracks) are embedded inline. Larger sessions are too large for inline display
+and should be saved as `.treeviz.json` instead. The hosted app allows framing
+(`frame-ancestors *`); a blank iframe on a self-hosted copy usually means a
+`X-Frame-Options` or `frame-ancestors` header on that server.
 
 ```python
 view = view_session(session, open_browser=False)

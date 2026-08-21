@@ -1,8 +1,8 @@
 # Styling
 
 TreeViz styling is data-first. The hosted browser, `.treeviz.json` sessions,
-and `window.__treeviz` use the same palette ids and style fields. The current
-hosted browser has fields that are not yet in `treeviz-phylo` 0.1.0.
+and `window.__treeviz` use the same palette ids and style fields, and
+`treeviz-phylo` 0.3.1 bundles the same session schema.
 
 ## Palette Registry
 
@@ -140,6 +140,14 @@ such as Newick/Nexus annotations; terminal leaves read tree metadata first and
 then the bound metadata row. `view.set-tree-style-attributes` sets the four
 attribute mappings. Pretty terminal branches are a separate view command.
 
+Branch colours extend upward. An internal node whose children all resolve to
+the same colour takes that colour, so a monophyletic group is painted up to and
+including the stem of its last common ancestor, and a group that is not
+monophyletic is painted up to each of its largest monophyletic parts. A child
+without a colour stops the extension. Internal nodes with their own colour value
+keep it, and that value counts as the colour of their subtree. On these internal
+branches the metadata colour wins over a clade style, as it does on the leaves.
+
 ## Conditional Style Rules
 
 Use conditional style rules when metadata values need thresholds, bins, or
@@ -190,6 +198,9 @@ Supported conditions:
   `no` are accepted.
 - `contains`: text contains; case-insensitive by default.
 - `regex`: JavaScript regular expression pattern and optional flags.
+
+`branch-color` rules extend to ancestors the same way `branch_color_attribute`
+does (see "Exact Node And Branch Styling").
 
 Rendered targets are `branch-color`, `branch-width`, `node-color`, `node-size`,
 `internal-marker-color`, `internal-marker-size`, `label-color`,

@@ -3,38 +3,28 @@
 Use this reference for the published Python package, Jupyter, or a Python
 pipeline.
 
-## Compatibility Boundary
+## Compatibility
 
-The current PyPI release is `treeviz-phylo` 0.1.0. It builds and validates
-TreeViz sessions, but its bundled schema predates several hosted browser
-features. The hosted app migrates 0.1.0 sessions when it loads them. Do not pass
-newer browser-only view fields into `validate_session(...)`.
-
-Browser-only fields in the current hosted app include exact node-circle
-attribute mappings, exact branch width/color attribute mappings, pretty
-terminal branches, conditional style rules, automatic branch-scale mode, node
-marks, and tip connections. Build the base session in Python, then apply these
-features through `window.__treeviz` or a current browser-authored session.
-
-The 0.1.0 builder also drops `category_colors`, `display_mode`, `bins`, and
-`auto_bins` from track dictionaries. Apply `categoryColors`, `displayMode`,
-`bins`, or `autoBins` through `track.update` after the hosted app loads the
-session.
-
-The hosted migration preserves the legacy branch scale by selecting manual
+The current PyPI release is `treeviz-phylo` 0.3.1. It builds and validates
+TreeViz sessions against the same session schema the hosted app (0.3.1) uses,
+so view fields such as `conditionalStyleRules`, `branchColorAttribute`,
+`nodeCircleDiameterAttribute`, and `prettyTerminalBranches` validate in Python.
+Track dictionaries accept `category_colors`, `display_mode`, `bins`, and
+`auto_bins` (or their camelCase forms). Sessions written by the 0.1.0 package
+still load; the hosted app migrates them and keeps their branch scale in manual
 mode. Call `view.set-branch-scale-mode` with `{ mode: 'auto' }` after load when
-the figure should follow current automatic sizing.
+such a figure should follow automatic sizing.
 
 ## Install
 
 ```bash
-pip install treeviz-phylo==0.1.0
+pip install treeviz-phylo==0.3.1
 ```
 
 Notebook support:
 
 ```bash
-pip install "treeviz-phylo[notebook]==0.1.0"
+pip install "treeviz-phylo[notebook]==0.3.1"
 ```
 
 Import:
@@ -68,9 +58,15 @@ tracks = [
 view = {
     "layout": "rectangular",
     "showSupport": True,
-    "branchScale": 0.8,
-    "leafSpacing": 0.9,
-    "metadataGap": 0,
+    "conditionalStyleRules": [
+        {
+            "id": "alpha-branches",
+            "source": "group",
+            "condition": {"kind": "exact", "value": "alpha"},
+            "target": "branch-color",
+            "value": "#1d4ed8",
+        }
+    ],
 }
 
 session = build_session(
@@ -87,9 +83,10 @@ print(binding_diagnostics(session))
 view_object = view_session(session, open_browser=False)
 ```
 
-Supported 0.1.0 track kinds are `color-strip`, `gradient`, `heatmap`, `bar`,
-`text`, and `binary-dots`. Underscore spellings such as `color_strip` are also
-accepted.
+The `branch-color` rule paints the alpha tips and, because they form a
+monophyletic group, the branches up to and including their MRCA stem. Track
+kinds are `color-strip`, `gradient`, `heatmap`, `bar`, `stacked-bar`, `text`,
+and `binary-dots`; underscore spellings such as `color_strip` are accepted.
 
 ## Notebook Display
 
@@ -99,8 +96,10 @@ from IPython.display import display
 display(view_object)
 ```
 
-Small sessions use a hosted TreeViz iframe. Large sessions should be saved as
-`.treeviz.json` and opened in the browser.
+The view is an iframe of the hosted app with the session in the URL fragment.
+Sessions up to 256 KB encoded (roughly 1,500 tips with a few tracks) display
+inline. Larger sessions show a message instead; save them with `save_session`
+and open the file in the browser. `view_object.fragment` is `None` in that case.
 
 ## Static Export
 
@@ -117,7 +116,6 @@ render_tree(
     format="png",
     output="example.png",
     command=["/path/to/treeviz-renderer"],
-    auto_crop=True,
     crop_padding=24,
 )
 ```

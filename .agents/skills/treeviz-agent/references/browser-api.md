@@ -128,6 +128,9 @@ await api.execute('view.set-tree-style-attributes', {
 await api.execute('view.set-pretty-terminal-branches', { enabled: true })
 ```
 
+Branch colours from `branchColorAttribute` and `branch-color` rules extend up to
+the MRCA stem of each same-coloured clade and win over clade styles there.
+
 Apply ordered conditions when the source data holds measurements or classes:
 
 ```js

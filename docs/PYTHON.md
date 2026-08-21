@@ -9,10 +9,11 @@ The package does not vendor the TreeViz browser app or frontend source. It
 ships Python helpers and the TreeViz session schema.
 
 !!! note "Published package compatibility"
-    The examples on this page target `treeviz-phylo` 0.1.0, the current PyPI
-    release. The hosted browser app migrates these sessions when it loads them
-    and supports additional track and view fields. Its browser-only features
-    are documented in [Tree styling](STYLING.md) and [Browser API](API.md).
+    The examples on this page target `treeviz-phylo` 0.3.1, the current PyPI
+    release. Its bundled session schema matches the hosted app, so view fields
+    such as `conditionalStyleRules` and `branchColorAttribute` validate in
+    Python. Browser-side styling is documented in [Tree styling](STYLING.md)
+    and [Browser API](API.md).
 
 ## Install
 
@@ -74,9 +75,10 @@ view = view_tree(
 display(view)
 ```
 
-Small sessions are embedded in a TreeViz URL fragment. Large sessions are too
-large for inline display; save them as `.treeviz.json` and open the file in the
-browser.
+The session travels in the iframe URL fragment (gzip + base64). Sessions up to
+256 KB encoded, roughly 1,500 tips with a few tracks, display inline. Larger
+sessions are too large for inline display; save them as `.treeviz.json` and
+open the file in the browser.
 
 ```python
 if view.fragment is None:
@@ -173,11 +175,10 @@ The browser can further adjust and save view settings.
 
 The hosted app can map metadata to exact node circles and branch width/color,
 apply conditional rules, draw compact symbol or wedge lanes, and style terminal
-branches. These fields are not in the schema bundled with
-`treeviz-phylo` 0.1.0. Build and validate the base session in Python. The hosted
-app migrates it on load and preserves its legacy branch scale in manual mode.
-Apply newer changes through `window.__treeviz`; select automatic sizing with
-`view.set-branch-scale-mode`.
+branches. `treeviz-phylo` 0.3.1 bundles the same session schema, so these view
+fields validate in Python; pass them through the `view` argument or apply them
+later through `window.__treeviz`. Metadata branch colours extend to the MRCA
+stem of each same-coloured clade (see [Tree styling](STYLING.md)).
 
 ## Tree Inspection
 

@@ -2,8 +2,8 @@
 
 The public examples show how to build TreeViz sessions from Python with
 metadata, leaf symbols, branch-support markers, and layout presets.
-The script stays within the schema bundled with the published
-`treeviz-phylo` 0.1.0 package.
+The script uses the schema bundled with the published `treeviz-phylo` 0.3.1
+package, which matches the hosted app.
 
 ## Python Script
 

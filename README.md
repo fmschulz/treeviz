@@ -16,13 +16,12 @@ vendored browser build.
 
 Current compatibility:
 
-- The hosted browser app reports version 0.3.0 through
+- The hosted browser app reports version 0.3.1 through
   [`version.json`](https://treeviz.newlineages.com/version.json). The browser
   API docs and hosted agent skill target that deployment.
 - The Python examples target the published
-  [`treeviz-phylo` 0.1.0 package](https://pypi.org/project/treeviz-phylo/).
-  The hosted app migrates those sessions when it loads them. The package's
-  bundled schema does not expose every browser feature.
+  [`treeviz-phylo` 0.3.1 package](https://pypi.org/project/treeviz-phylo/),
+  whose bundled session schema matches the hosted app.
 
 ## Documentation
 

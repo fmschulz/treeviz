@@ -81,7 +81,7 @@ Load only the reference needed for the task:
 - `references/example-inputs.md`: deterministic 30-leaf and 100-leaf example recipes with metadata and support markers.
 - `references/large-taxonomy-trees.md`: large taxonomy-tree workflows, metadata-derived categories, rerooting, and dense exports.
 - `references/hosted-runtime.md`: hosted URLs, public machine-readable files, and live API smoke testing.
-- `references/wrapper-api.md`: published Python 0.1.0 package and notebook workflows.
+- `references/wrapper-api.md`: published Python 0.3.1 package and notebook workflows.
 
 ## Helper Scripts
 
