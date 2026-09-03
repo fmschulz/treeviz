@@ -20,12 +20,12 @@ Current compatibility:
   [`version.json`](https://treeviz.newlineages.com/version.json). The browser
   API docs and hosted agent skill target that deployment.
 - The Python examples target the published
-  [`treeviz-phylo` 0.3.1 package](https://pypi.org/project/treeviz-phylo/).
-  It writes schema-1 sessions; the hosted app migrates them on load, so the
-  examples keep working. One change to know: `layout: "radial"` in a 0.3.1
-  session opens as `circular` with straight connectors, which is what the
-  0.3.1 app drew under that name. The 0.5.0 `radial` is the unrooted
-  equal-daylight layout.
+  [`treeviz-phylo` 0.5.0 package](https://pypi.org/project/treeviz-phylo/),
+  whose bundled session schema matches the hosted app. Sessions written by
+  0.3.1 still load: the app migrates them, and a 0.3.1 `layout: "radial"`
+  opens as `circular` with straight connectors, which is what that release
+  drew under the name. The current `radial` is the unrooted equal-daylight
+  layout.
 
 ## Documentation
 

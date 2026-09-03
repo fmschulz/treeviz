@@ -2,8 +2,8 @@
 
 TreeViz styling is data-first. The hosted browser, `.treeviz.json` sessions,
 and `window.__treeviz` use the same palette ids and style fields.
-`treeviz-phylo` 0.3.1 writes the previous session schema; the hosted app
-migrates it on load.
+`treeviz-phylo` 0.5.0 bundles the same session schema; sessions written by
+0.3.1 are migrated on load.
 
 ## Palette Registry
 
