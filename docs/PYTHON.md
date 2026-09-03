@@ -9,7 +9,7 @@ The package does not vendor the TreeViz browser app or frontend source. It
 ships Python helpers and the TreeViz session schema.
 
 !!! note "Published package compatibility"
-    The examples on this page target `treeviz-phylo` 0.5.0, the current PyPI
+    The examples on this page target `treeviz-phylo` 0.6.0, the current PyPI
     release. Its bundled session schema matches the hosted app, so view fields
     such as `conditionalStyleRules` and `branchColorAttribute` validate in
     Python. Browser-side styling is documented in [Tree styling](STYLING.md)
@@ -175,7 +175,7 @@ The browser can further adjust and save view settings.
 
 The hosted app can map metadata to exact node circles and branch width/color,
 apply conditional rules, draw compact symbol or wedge lanes, and style terminal
-branches. `treeviz-phylo` 0.5.0 validates these view fields in Python; pass
+branches. `treeviz-phylo` 0.6.0 validates these view fields in Python; pass
 them through the `view` argument or apply them
 later through `window.__treeviz`. Metadata branch colours extend to the MRCA
 stem of each same-coloured clade (see [Tree styling](STYLING.md)).

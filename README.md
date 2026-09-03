@@ -20,7 +20,7 @@ Current compatibility:
   [`version.json`](https://treeviz.newlineages.com/version.json). The browser
   API docs and hosted agent skill target that deployment.
 - The Python examples target the published
-  [`treeviz-phylo` 0.5.0 package](https://pypi.org/project/treeviz-phylo/),
+  [`treeviz-phylo` 0.6.0 package](https://pypi.org/project/treeviz-phylo/),
   whose bundled session schema matches the hosted app. Sessions written by
   0.3.1 still load: the app migrates them, and a 0.3.1 `layout: "radial"`
   opens as `circular` with straight connectors, which is what that release

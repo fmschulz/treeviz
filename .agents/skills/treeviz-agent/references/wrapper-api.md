@@ -5,7 +5,7 @@ pipeline.
 
 ## Compatibility
 
-The current PyPI release is `treeviz-phylo` 0.5.0. It builds and validates
+The current PyPI release is `treeviz-phylo` 0.6.0. It builds and validates
 TreeViz sessions against the same session schema the hosted app (0.6.0) uses.
 Sessions written by 0.3.1 still load, and a 0.3.1 `radial` layout opens as
 `circular` with straight connectors. The package validates the current view
@@ -21,13 +21,13 @@ such a figure should follow automatic sizing.
 ## Install
 
 ```bash
-pip install treeviz-phylo==0.5.0
+pip install treeviz-phylo==0.6.0
 ```
 
 Notebook support:
 
 ```bash
-pip install "treeviz-phylo[notebook]==0.5.0"
+pip install "treeviz-phylo[notebook]==0.6.0"
 ```
 
 Import:

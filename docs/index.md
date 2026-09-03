@@ -13,7 +13,7 @@ This site covers the public browser app, the Python package, metadata
 structure, tree styling, and agent automation.
 
 The hosted app reports version 0.6.0. Public Python examples target the
-released `treeviz-phylo` 0.5.0 package, whose bundled schema matches the
+released `treeviz-phylo` 0.6.0 package, whose bundled schema matches the
 browser app. Older 0.3.1 sessions still load and are migrated (see the layout
 note in [Styling](STYLING.md#layouts)).
 
