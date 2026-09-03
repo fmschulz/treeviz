@@ -121,6 +121,15 @@ labels and interval labels for symbols and wedges.
 
 ## Exact Node And Branch Styling
 
+Two Controls entries colour branches. **Colour branches by** lists both the
+numeric metadata columns, which map onto a colour scale, and any tree-node
+metadata key whose values are colours (Newick `[&key=#rrggbb]` comments), which
+apply as exact colours; a session that ships several colourings, such as one by
+domain and one by a measured quantity, switches between them here. **Exact
+styling** exposes the same exact-colour attribute alongside the width and node
+circle attributes. Setting one clears the other, so a scale and an exact
+colouring never compete.
+
 Map data attributes to node circles and branch strokes through the browser API:
 
 ```js
