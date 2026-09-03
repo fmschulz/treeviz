@@ -185,36 +185,48 @@ or `"false"`) compiles to a collapsed clade. This reaches nodes that name-based
 ```toml
 [view]
 collapse_attribute = "collapse"
-```
-
-Collapsed clades draw as wedges. The outline uses the clade's effective branch
-colour and width, and the fill uses the nearest enclosing `clade_background`
-when one is set. In rectangular and circular layouts the wedge is the classic
-triangle or annulus sector. In the radial layout the wedge follows the space
-the expanded subtree occupies, and these `[view]` keys control its form:
-
-```toml
-[view]
-collapse_attribute = "collapse"
 collapsed_wedge_shape = "rounded"      # or "triangle"
+collapsed_wedge_fill = "background"    # or "branch" to fill from the branch colour
 collapsed_wedge_gap = 6                # px kept between neighbouring wedges
 collapsed_wedge_min_body = 5           # px half-width floor, on top of the stroke
+collapsed_wedge_allow_overlap = false  # true keeps crowded wedges as first shaped
 collapsed_wedge_size_attribute = "pd"  # size wedges from node metadata instead
 collapsed_wedge_size_scale = "log"     # "linear" or "log" (log10)
-collapsed_wedge_size_range = [10, 80]  # outer-edge width in px (default)
+collapsed_wedge_size_target = "width"  # or "length" to size the wedge's reach
+collapsed_wedge_size_range = [10, 80]  # px, outer-edge width or length
+clade_background_outline = "hull"      # or "fitted"
 ```
 
 - `rounded` (default) insets each wedge by half the gap plus half the stroke so
   neighbours stay apart, thickens footprints thinner than the minimum body so a
   two-tip clade reads as a rod rather than a line, rounds the outline, and
-  shrinks any pair that would still overlap. `triangle` draws the plain cartoon
-  triangle from the clade root to the extreme tips, with none of that shaping.
+  shrinks any pair that would still overlap. `triangle` draws the plain
+  triangle from the clade root to the extreme tips; it still gets the minimum
+  body where a two-tip clade would otherwise be a hairline.
+- `collapsed_wedge_fill` picks the fill. `background` (default) takes the
+  nearest enclosing `clade_background`, or the branch colour where there is
+  none. `branch` takes the wedge's own branch colour at 28% opacity, which
+  tells wedges apart when several sit on one painted clade.
 - `collapsed_wedge_size_attribute` replaces the footprint width with a data
-  value: the wedge keeps its depth but its outer-edge width is the value mapped
-  (as-is, or after `log10`) from the range of values across the collapsed clades
-  onto `collapsed_wedge_size_range`. Sized wedges are not inset, thickened, or
-  shrunk, so their widths stay comparable. Clades without a numeric value, and
-  values of zero or below under `log`, keep the footprint wedge.
+  value: the wedge runs out to its footprint depth and its outer-edge width is
+  the value mapped (as-is, or after `log10`) from the range of values across
+  the collapsed clades onto `collapsed_wedge_size_range`. Clades without a
+  numeric value, and values of zero or below under `log`, keep the footprint
+  wedge.
+- `collapsed_wedge_size_target` chooses the dimension. `width` (default) puts
+  the value in the outer edge. A radial fan constrains that: the angular room
+  around each clade belongs to its neighbours, so widths that collide are all
+  scaled down by one shared factor, keeping their proportions exact while the
+  absolute pixel mapping shrinks. `length` puts the value in the reach from the
+  clade root to the base and keeps each clade's own angular slot, so a
+  colliding wedge is pulled back on its own and the mapping is left alone.
+  `collapsed_wedge_allow_overlap = true` keeps the mapped sizes and permits the
+  overlap.
+- `clade_background_outline` picks how a `clade_background` is outlined in the
+  radial layout. `hull` (default) draws the convex hull of the clade with a
+  faint outline. `fitted` draws a soft buffer that follows the branches and
+  wedges themselves, with no outline: the buffer is several overlapping shapes
+  in one path, and a stroke would draw the seams where they cross.
 
 The same fields exist on the session view (`collapsedWedgeShape`,
 `collapsedWedgeGap`, `collapsedWedgeMinBody`, `collapsedWedgeSizeAttribute`,

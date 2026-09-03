@@ -16,7 +16,7 @@ vendored browser build.
 
 Current compatibility:
 
-- The hosted browser app reports version 0.5.0 through
+- The hosted browser app reports version 0.6.0 through
   [`version.json`](https://treeviz.newlineages.com/version.json). The browser
   API docs and hosted agent skill target that deployment.
 - The Python examples target the published
