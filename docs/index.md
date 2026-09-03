@@ -12,9 +12,9 @@ data files. Everything runs in the browser, with no server and no account.
 This site covers the public browser app, the Python package, metadata
 structure, tree styling, and agent automation.
 
-The hosted app reports version 0.3.1. Public Python examples target the
-released `treeviz-phylo` 0.3.1 package, whose bundled schema matches the
-browser app.
+The hosted app reports version 0.5.0. Public Python examples target the
+released `treeviz-phylo` 0.3.1 package. It writes schema-1 sessions, which the
+browser app migrates on load (see the layout note in [Styling](STYLING.md#layouts)).
 
 ```
                                           ┌─ recA ████░░██░░░░░░██

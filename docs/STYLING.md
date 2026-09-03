@@ -1,8 +1,9 @@
 # Styling
 
 TreeViz styling is data-first. The hosted browser, `.treeviz.json` sessions,
-and `window.__treeviz` use the same palette ids and style fields, and
-`treeviz-phylo` 0.3.1 bundles the same session schema.
+and `window.__treeviz` use the same palette ids and style fields.
+`treeviz-phylo` 0.3.1 writes the previous session schema; the hosted app
+migrates it on load.
 
 ## Palette Registry
 
@@ -147,6 +148,79 @@ monophyletic is painted up to each of its largest monophyletic parts. A child
 without a colour stops the extension. Internal nodes with their own colour value
 keep it, and that value counts as the colour of their subtree. On these internal
 branches the metadata colour wins over a clade style, as it does on the leaves.
+
+## Layouts
+
+`rectangular`, `circular`, and `radial`. `radial` is the unrooted presentation:
+equal-angle placement followed by equal-daylight sweeps, so each branch is drawn
+at its own length in its own direction and no point is privileged as the root.
+
+`circular` takes a connector style. `arc` (the default) draws the polar elbow,
+an arc across each node's children with a radial spoke out to each one.
+`straight` joins parent to child directly and is the layout TreeViz offered as
+`radial` through 0.3.1; sessions saved before that release are migrated onto it
+automatically.
+
+```toml
+[view]
+layout = "circular"
+connectors = "straight"
+```
+
+```js
+await window.__treeviz.execute('view.set-layout', {
+  layout: 'circular',
+  connectors: 'straight'
+})
+```
+
+## Collapsed Clades
+
+Collapse a clade from the browser (`tree.collapse-clade`) or from a config
+attribute. With `collapse_attribute`, every non-root internal node whose
+tree-node metadata value for that key is truthy (present and not `""`, `"0"`,
+or `"false"`) compiles to a collapsed clade. This reaches nodes that name-based
+`[[branch_rule]]` selectors cannot, such as many clades sharing one name.
+
+```toml
+[view]
+collapse_attribute = "collapse"
+```
+
+Collapsed clades draw as wedges. The outline uses the clade's effective branch
+colour and width, and the fill uses the nearest enclosing `clade_background`
+when one is set. In rectangular and circular layouts the wedge is the classic
+triangle or annulus sector. In the radial layout the wedge follows the space
+the expanded subtree occupies, and these `[view]` keys control its form:
+
+```toml
+[view]
+collapse_attribute = "collapse"
+collapsed_wedge_shape = "rounded"      # or "triangle"
+collapsed_wedge_gap = 6                # px kept between neighbouring wedges
+collapsed_wedge_min_body = 5           # px half-width floor, on top of the stroke
+collapsed_wedge_size_attribute = "pd"  # size wedges from node metadata instead
+collapsed_wedge_size_scale = "log"     # "linear" or "log" (log10)
+collapsed_wedge_size_range = [10, 80]  # outer-edge width in px (default)
+```
+
+- `rounded` (default) insets each wedge by half the gap plus half the stroke so
+  neighbours stay apart, thickens footprints thinner than the minimum body so a
+  two-tip clade reads as a rod rather than a line, rounds the outline, and
+  shrinks any pair that would still overlap. `triangle` draws the plain cartoon
+  triangle from the clade root to the extreme tips, with none of that shaping.
+- `collapsed_wedge_size_attribute` replaces the footprint width with a data
+  value: the wedge keeps its depth but its outer-edge width is the value mapped
+  (as-is, or after `log10`) from the range of values across the collapsed clades
+  onto `collapsed_wedge_size_range`. Sized wedges are not inset, thickened, or
+  shrunk, so their widths stay comparable. Clades without a numeric value, and
+  values of zero or below under `log`, keep the footprint wedge.
+
+The same fields exist on the session view (`collapsedWedgeShape`,
+`collapsedWedgeGap`, `collapsedWedgeMinBody`, `collapsedWedgeSizeAttribute`,
+`collapsedWedgeSizeScale`, `collapsedWedgeSizeRange`) for `session.restore`.
+A data-defined node circle (`node_diameter_attribute`) on a collapsed clade is
+drawn just past the wedge's outer edge.
 
 ## Conditional Style Rules
 

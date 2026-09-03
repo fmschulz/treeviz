@@ -6,7 +6,9 @@ pipeline.
 ## Compatibility
 
 The current PyPI release is `treeviz-phylo` 0.3.1. It builds and validates
-TreeViz sessions against the same session schema the hosted app (0.3.1) uses,
+TreeViz sessions against the previous session schema; the hosted app (0.5.0)
+migrates them on load, and a 0.3.1 `radial` layout opens as `circular` with
+straight connectors. The package still validates the current view fields,
 so view fields such as `conditionalStyleRules`, `branchColorAttribute`,
 `nodeCircleDiameterAttribute`, and `prettyTerminalBranches` validate in Python.
 Track dictionaries accept `category_colors`, `display_mode`, `bins`, and

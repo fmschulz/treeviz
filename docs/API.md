@@ -76,7 +76,7 @@ Command mutability has three values:
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `view.pan`                            | `{ dx, dy }`                                                                                               | Pan the camera.                                                                |
 | `view.zoom`                           | `{ factor, panX?, panY? }`                                                                                 | Zoom the camera.                                                               |
-| `view.set-layout`                     | `{ layout, branchScale?, branchScaleMode?, leafSpacing?, metadataScale?, metadataGap?, labelFontSize?, allowLabelOverlap? }` | Change layout and optional density settings.                         |
+| `view.set-layout`                     | `{ layout, connectors?, branchScale?, branchScaleMode?, leafSpacing?, metadataScale?, metadataGap?, labelFontSize?, allowLabelOverlap? }` | Change layout, circular connector style, and optional density settings. |
 | `view.set-scale-bar-position`         | `{ x, y }`                                                                                                 | Move the scale bar.                                                            |
 | `view.set-panel-position`             | `{ panel, x, y }`                                                                                          | Move `treeHud`, `viewControls`, `inspector`, `figureLegend`, or `utilityDock`. |
 | `view.set-panel-size`                 | `{ panel, width, height }`                                                                                 | Resize `viewControls`, `inspector`, or `utilityDock`.                          |
@@ -159,7 +159,8 @@ clade remains expanded; collapsing is not required to color the clade. A
 rectangular, circular, and radial layouts. If the same clade is collapsed,
 TreeViz uses that label text for the collapsed wedge label. `cladeBackground`
 draws a translucent region from the clade root to the descendant tips: a band in
-rectangular layout and a sector in circular/radial layouts. Clade-annotation
+rectangular layout, a sector in circular layout, and a hull around the clade's
+tips in radial layout, which has no centre to sweep a sector about. Clade-annotation
 labels reserve readable white backing before metadata tracks: a measured column
 in rectangular layout and a measured radial lane in circular/radial layouts. The
 reserved space follows the label text and `cladeLabelFontSize`, so tracks start
