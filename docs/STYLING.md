@@ -248,7 +248,13 @@ The same fields exist on the session view (`collapsedWedgeShape`,
 `collapsedWedgeGap`, `collapsedWedgeMinBody`, `collapsedWedgeSizeAttribute`,
 `collapsedWedgeSizeScale`, `collapsedWedgeSizeRange`) for `session.restore`.
 A data-defined node circle (`node_diameter_attribute`) on a collapsed clade is
-drawn just past the wedge's outer edge.
+drawn just past the wedge's outer edge; `show_node_circles = false` (Controls >
+Show node circles) hides every data-defined circle without unsetting the
+attribute. A collapsed clade whose root node is named is labelled just past the
+wedge tip, reading outward along the clade's axis, whenever labels are shown
+(Controls > Show labels). Leaf labels must stay unique, so a single-taxon clade
+drawn as a leaf gets a readable name through a `[[branch_rule]]` with a `label`
+selector and a `clade_label`, which replaces the leaf's displayed name.
 
 ## Conditional Style Rules
 
