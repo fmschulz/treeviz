@@ -195,7 +195,9 @@ or `"false"`) compiles to a collapsed clade. This reaches nodes that name-based
 [view]
 collapse_attribute = "collapse"
 collapsed_wedge_shape = "rounded"      # or "triangle"
-collapsed_wedge_fill = "background"    # or "branch" to fill from the branch colour
+collapsed_wedge_fill = "background"    # "branch", or "attribute" to fill from a node-meta colour key
+collapsed_wedge_fill_attribute = "fc"  # node-meta colour key the "attribute" fill reads
+collapsed_wedge_fill_opacity = 0.28    # branch/attribute fill opacity; raise it when the fill carries data
 collapsed_wedge_gap = 6                # px kept between neighbouring wedges
 collapsed_wedge_min_body = 5           # px half-width floor, on top of the stroke
 collapsed_wedge_allow_overlap = false  # true keeps crowded wedges as first shaped
@@ -214,8 +216,13 @@ clade_background_outline = "hull"      # or "fitted"
   body where a two-tip clade would otherwise be a hairline.
 - `collapsed_wedge_fill` picks the fill. `background` (default) takes the
   nearest enclosing `clade_background`, or the branch colour where there is
-  none. `branch` takes the wedge's own branch colour at 28% opacity, which
-  tells wedges apart when several sit on one painted clade.
+  none. `branch` takes the wedge's own branch colour, translucent, which tells
+  wedges apart when several sit on one painted clade. `attribute` reads the
+  fill from `collapsed_wedge_fill_attribute`, a node-meta colour key, so the
+  fill can encode something other than the outline; a clade without a value
+  under that key keeps the `background` fill. `collapsed_wedge_fill_opacity`
+  sets the translucency of the `branch` and `attribute` fills (default 0.28, a
+  tint); a fill that carries its own data reads better around 0.8.
 - `collapsed_wedge_size_attribute` replaces the footprint width with a data
   value: the wedge runs out to its footprint depth and its outer-edge width is
   the value mapped (as-is, or after `log10`) from the range of values across
