@@ -251,7 +251,9 @@ await api.execute('view.set-collapsed-wedge-options', {
   sizeScale: 'log',      // or 'linear'
   sizeTarget: 'length',  // or 'width'
   sizeRange: [40, 400],  // px [min, max]
-  outline: 'fitted'      // clade-background outline: 'hull' | 'fitted'
+  outline: 'fitted',     // clade-background outline: 'hull' | 'fitted'
+  labelDeclutter: true,  // push colliding labels outward on leader lines
+  labelOrientation: 'branch' // default; 'bearing' reads out from the centre
 })
 ```
 
@@ -266,8 +268,16 @@ for that key is truthy.
 
 `sizeTarget: 'length'` puts the value in the wedge's reach from clade root to
 base and keeps each clade's angular slot, so one colliding wedge is pulled back
-on its own. `sizeTarget: 'width'` puts the value in the outer edge; colliding
-widths in a crowded fan are scaled down by one shared factor.
+on its own: it gives up length against neighbouring wedges and branches of
+other lineages down to its footprint depth, then narrows its base to the
+minimum body. What it cannot clear is counted in `getLayoutMetrics()` as
+`wedgeOverlapPairs` and `wedgeBranchCrossings`. `sizeTarget: 'width'` puts the
+value in the outer edge; colliding widths in a crowded fan are scaled down by
+one shared factor. Wedge outlines, and the hover and selection outlines, are
+painted inside the fill and capped at 60% of the wedge's inradius, so a thin
+wedge keeps a visible fill at any branch width. A wedge keeps `gap` px from
+its neighbours and from the centre line of branches of other lineages; the
+branch stroke does not move it.
 
 Node circles and labels draw on top of wedges:
 
@@ -281,9 +291,11 @@ data-defined node circle without unsetting the style attributes.
 `view.toggle-labels` flips `showLabels`. A collapsed clade whose root node is
 named is labelled beyond its wedge tip in radial, and that label follows
 `showLabels`. `collapsedWedgeLabelDeclutter: true` pushes colliding labels
-outward with leader lines; `allowLabelOverlap: false` culls the ones that
-still collide, judged at their pushed seats. Hovering or selecting a collapsed
-clade outlines its wedge.
+outward with leader lines; `collapsedWedgeLabelOrientation` turns each label
+to the branch entering its clade (`'branch'`, the default) or out from the
+centre (`'bearing'`), with the seat at the wedge tip under both;
+`allowLabelOverlap: false` culls the ones that still collide, judged at their
+pushed seats. Hovering or selecting a collapsed clade outlines its wedge.
 
 ## Legends And Attribute Names
 

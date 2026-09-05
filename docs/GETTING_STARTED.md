@@ -41,6 +41,10 @@ Open **Controls** and find the collapsed-wedge settings:
   **Branch** (the outline colour) and **Attribute** (a separate colour
   attribute chosen under **Fill attribute**).
 - **Allow overlap** off, the default, keeps neighbouring wedges apart.
+- **Collapsed wedge labels** is on **Leader lines** and **Collapsed wedge
+  label direction** on **Along branch** in this session. Switch them to **At
+  wedge tip** and **Outward** to seat every label at its wedge tip, reading
+  out from the centre, then set them back.
 
 Untick **Show labels** and **Show node circles** in the same panel to see the
 figure without phylum names and isolate circles, then tick them again.

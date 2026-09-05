@@ -39,8 +39,9 @@ import treeviz
 `validate_session` checks a session against the schema bundled in the package.
 The 0.6.0 package schema does not include fields the hosted app (0.8.0)
 writes: the view fields `showNodeCircles`, `collapsedWedgeFillAttribute`,
-`collapsedWedgeFillOpacity` and `collapsedWedgeLabelDeclutter`, the
-`attribute` value of `collapsedWedgeFill`, and the top-level `legends` and
+`collapsedWedgeFillOpacity`, `collapsedWedgeLabelDeclutter` and
+`collapsedWedgeLabelOrientation`, the `attribute` value of
+`collapsedWedgeFill`, and the top-level `legends` and
 `attributeLabels`. A session saved from the app with any of them fails
 `validate_session` with an `additionalProperties` or `enum` error. Sessions
 built by the package itself validate. To check a saved app session, validate

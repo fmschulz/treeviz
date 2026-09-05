@@ -75,6 +75,8 @@ Use the hosted app unless the user explicitly provides another TreeViz runtime.
   should open with the legend shown.
 - On crowded radial figures set `collapsedWedgeLabelDeclutter: true` and
   `allowLabelOverlap: false`; culled labels return as the reader zooms in.
+  `collapsedWedgeLabelOrientation: 'branch'` reads each label along the
+  branch entering its clade.
 - Treat high unmatched-leaf or unmatched-row counts as a binding problem to fix or report.
 
 ## Reference Loading

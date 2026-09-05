@@ -92,12 +92,13 @@ collapsed_wedge_fill_opacity = 0.85
 The same figure with phylum names at the wedge tips and a fixed-size circle
 per phylum: black for no isolate genomes, dark brown for 1 to 10, orange for
 more than 10, grey where no count is available. Each domain colours its own
-labels. Labels that share a bearing are pushed outward and joined to their
-wedge by a leader line; labels that still collide are culled at the fitted
-zoom and return as you zoom in. Three hand-written legends (domain, isolate
-genomes per phylum, culturedness) sit in the figure. Any label can be dragged
-to a clearer spot. **Show labels** and **Show node circles** in Controls switch
-the two layers.
+labels. Each label sits at its wedge tip and reads along the branch that
+enters its phylum. Labels that share a bearing are pushed
+outward and joined to their wedge by a leader line; labels that still collide
+are culled at the fitted zoom and return as you zoom in. Three hand-written
+legends (domain, isolate genomes per phylum, culturedness) sit in the figure.
+Any label can be dragged to a clearer spot. **Show labels** and **Show node
+circles** in Controls switch the two layers.
 
 ![Radial tree of life with phylum labels, isolate circles and three legends](assets/gallery/tree-of-life-labelled-phyla.png)
 
@@ -113,6 +114,7 @@ leaf_spacing = 1.6                # more of the turn to the wide clades, so the
                                   # drawing stays compact and the crowded
                                   # bacterial phyla get room
 collapsed_wedge_label_declutter = true   # push colliding labels outward, with leader lines
+collapsed_wedge_label_orientation = "branch"  # read each label along the branch entering its phylum
 allow_label_overlap = false              # cull labels that still collide; zoom in to see them
 figure_legend = true                     # open the in-figure legend on load
 

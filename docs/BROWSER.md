@@ -63,8 +63,10 @@ The **Controls** panel holds the figure settings:
   **Fill** (Background, Branch, or Attribute) with **Fill attribute** and
   **Fill opacity**, **Gap** and **Min body** in px, **Allow overlap**,
   **Size by** a numeric attribute or **Tree shape** with a Linear or Log10
-  **Scale** and a Width or Length **Size target**, and the clade
-  **Background** outline (Hull or Fitted).
+  **Scale** and a Width or Length **Size target**, the clade
+  **Background** outline (Hull or Fitted), **Collapsed wedge labels** (At
+  wedge tip or Leader lines) and **Collapsed wedge label direction** (Along
+  branch or Outward).
 
 The Controls panel scrolls when it is taller than the stage; a thin scrollbar
 marks the rows below the fold.
@@ -97,7 +99,19 @@ layout the fitted view includes collapsed wedge tips and their labels.
 Hovering a leaf, an internal node or a collapsed wedge shows a tooltip: the
 label or name, `N leaves` for a wedge, `Branch length x`, `Support y`, then the
 node's attributes under their display names, with a swatch for colour values.
-Hovering or selecting a collapsed wedge outlines its polygon.
+Hovering or selecting a collapsed wedge outlines its polygon. The outline lies
+inside the wedge and takes the same width cap as the wedge's own outline, so
+it never crosses a neighbour and a thin wedge keeps its fill.
+
+A collapsed clade's label sits past its wedge tip and reads along the branch
+that enters the clade (**Collapsed wedge label direction**: **Along branch**,
+the default) or out from the centre of the drawing (**Outward**; TOML
+`collapsed_wedge_label_orientation = "bearing"`). With **Collapsed wedge
+labels** set to **Leader lines** (`collapsed_wedge_label_declutter`), a label
+that would land on another is pushed away from its wedge and joined to it by a
+thin leader line in the label's colour; **At wedge tip** seats every label at
+its tip. See
+[Tree styling](STYLING.md#label-colour-direction-and-position).
 
 The search field (**Search taxa and clades…**) matches leaf names, leaf labels
 and collapsed-clade labels. A hit inside a collapsed clade lands on that

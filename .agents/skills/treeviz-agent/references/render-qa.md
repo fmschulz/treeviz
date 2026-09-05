@@ -29,7 +29,11 @@ Start with:
 - `p75BranchPx`: branch-length measure that is less sensitive to one long
   branch. More than 160 px on an 8-to-100-tip tree often means the topology is
   stretched.
-- `warnings`: metric warnings such as low occupancy or heavy label overlap.
+- `wedgeOverlapPairs` and `wedgeBranchCrossings`: radial collapsed wedges
+  only; pairs of wedge fills that intersect, and branches of other lineages
+  that run through a wedge. Absent when the figure draws no such wedge.
+- `warnings`: metric warnings such as low occupancy, heavy label overlap, or
+  `metrics.wedge.overlap` when either wedge count is above zero.
 
 Rectangular occupancy uses each viewport axis. Circular and radial occupancy
 uses the shorter viewport side for both axes because the figure is round.
@@ -44,8 +48,10 @@ uses the shorter viewport side for both axes because the figure is round.
 - Try circular or radial layout only when labels, wedges, and legends remain
   readable.
 - In radial, after collapsing many clades, check that wedges do not overlap
-  (`collapsedWedgeAllowOverlap` is false by default) and that clade labels sit
-  outside the wedge tips. Prefer `sizeTarget: 'length'` for data-sized wedges
+  (`collapsedWedgeAllowOverlap` is false by default; read `wedgeOverlapPairs`
+  and `wedgeBranchCrossings` rather than judging by eye, since outlines lie
+  inside the fills) and that clade labels sit outside the wedge tips. Prefer
+  `sizeTarget: 'length'` for data-sized wedges
   in a crowded fan. The crowding pass compares every pair of collapsed
   wedges, so a figure with hundreds of them renders slower.
 - When wedge labels share a bearing, set `collapsedWedgeLabelDeclutter: true`

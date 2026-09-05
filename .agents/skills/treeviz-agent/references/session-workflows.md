@@ -108,10 +108,18 @@ For repeatable file-based rerooting from metadata, use
   survives saving and appears in exports. Set the same fields directly for a
   reproducible figure.
 - Labels colliding in a crowded radial fan: `collapsed_wedge_label_declutter`
-  in TOML (view `collapsedWedgeLabelDeclutter`) pushes a label that overlaps
+  in TOML (view `collapsedWedgeLabelDeclutter`; Controls **Collapsed wedge
+  labels**: **Leader lines**) pushes a label that overlaps
   one already placed further out along its own bearing and draws a leader
   line back to its wedge. Wedge length and Branch spacing do not fix this
   case: the labels share a bearing.
+- Wedge labels reading out from the centre instead of along the branch that
+  enters each clade: `collapsed_wedge_label_orientation = "bearing"` in TOML
+  (view `collapsedWedgeLabelOrientation`, default `"branch"`; Controls
+  **Collapsed wedge label direction**). Under `"branch"` the text turns to
+  that branch for every clade whose root has a parent; the seat is the wedge
+  tip under both values. A declutter push still moves the label out along its
+  bearing from the centre, with the leader back to its seat.
 - Labels that still collide: `allow_label_overlap = false` in TOML (view
   `allowLabelOverlap`, flipped by `view.toggle-label-overlap`; Controls
   **Auto-cull overlaps**) drops a label that would land on one already drawn.

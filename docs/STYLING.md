@@ -224,15 +224,26 @@ clade_background_outline = "hull"      # or "fitted"
 
 - `rounded` (default) insets each wedge by half the gap so neighbours stay
   apart, thickens footprints thinner than the minimum body so a two-tip clade
-  reads as a rod rather than a line, rounds the outline, and shrinks any pair
-  that would still overlap. `triangle` draws the plain triangle from the clade
-  root to the extreme tips; it still gets the minimum body where a two-tip
-  clade would otherwise be a hairline. The outline stroke is drawn over the
-  body and does not change it: a thicker branch stroke gives a thicker outline
-  on the same polygon.
+  reads as a rod rather than a line, rounds the outline, and shrinks a wedge
+  that still meets a neighbour or a branch of another lineage. `triangle`
+  draws the plain triangle from the clade root to the extreme tips; it still
+  gets the minimum body where a two-tip clade would otherwise be a hairline.
+  The outline is painted inside the fill's edge and never reaches into a
+  neighbouring wedge. Its width follows the branch stroke up to 60% of the
+  wedge's inradius (the radius of the largest circle that fits inside the
+  wedge), so a thin wedge keeps a visible fill at any stroke width; the
+  hover and selection outlines take the same cap. A short stem from the clade
+  root along the wedge axis continues the incoming branch in its colour and
+  width and closes the notch where the branch meets the wedge tip. It is
+  capped at four stroke widths, so it never covers a thin wedge, and keeps its
+  screen length as the view zooms. Circular sectors and rectangular wedges
+  have no stem.
 - Gap, minimum body and size range are pixels at full tree scale. When a larger
   label font takes more of the radius, the tree and every wedge, sized or
-  footprint-shaped, shrink by the same factor.
+  footprint-shaped, shrink by the same factor. A wedge keeps the gap from its
+  neighbours and from the centre line of any branch of another lineage. The
+  branch stroke plays no part. The body is the same at every branch width; a
+  wide stroke eats into the gap, not into the fill.
 - `collapsed_wedge_fill` picks the fill. `background` (default) takes the
   nearest enclosing `clade_background`, or the branch colour where there is
   none. `branch` takes the wedge's own branch colour, translucent, which tells
@@ -254,7 +265,12 @@ clade_background_outline = "hull"      # or "fitted"
   scaled down by one shared factor, keeping their proportions exact while the
   absolute pixel mapping shrinks. `length` puts the value in the reach from the
   clade root to the base and keeps each clade's own angular slot, so a
-  colliding wedge is pulled back on its own and the mapping is left alone.
+  colliding wedge is pulled back on its own and the mapping is left alone. It
+  gives up length against neighbouring wedges and branches of other lineages
+  down to its footprint depth, then narrows its base about the axis down to
+  the minimum body. An obstacle it cannot clear even then is left in place
+  and counted by `getLayoutMetrics()` as `wedgeOverlapPairs` and
+  `wedgeBranchCrossings`; see [Browser API](API.md#layout-qa-pattern).
   `collapsed_wedge_allow_overlap = true` keeps the mapped sizes and permits the
   overlap.
 - `clade_background_outline` picks how a `clade_background` is outlined in the
@@ -269,18 +285,20 @@ Each key has a camelCase counterpart on the session view for
 `collapsedWedgeGap`, `collapsedWedgeMinBody`, `collapsedWedgeAllowOverlap`,
 `collapsedWedgeSizeAttribute`, `collapsedWedgeSizeScale`,
 `collapsedWedgeSizeTarget`, `collapsedWedgeSizeRange`,
-`cladeBackgroundOutline`, `collapsedWedgeLabelDeclutter`, `allowLabelOverlap`,
-and `showNodeCircles`. The command
+`cladeBackgroundOutline`, `collapsedWedgeLabelDeclutter`,
+`collapsedWedgeLabelOrientation`, `allowLabelOverlap`, and `showNodeCircles`.
+The command
 `view.set-collapsed-wedge-options` patches the same settings under short
 names: `shape`, `fill`, `fillAttribute`, `fillOpacity`, `gap`, `minBody`,
 `allowOverlap`, `sizeAttribute`, `sizeScale`, `sizeTarget`, `sizeRange`,
-`outline`.
+`outline`, `labelDeclutter`, `labelOrientation`.
 A data-defined node circle (`node_diameter_attribute`) on a collapsed clade is
 drawn just past the wedge's outer edge; `show_node_circles = false` (Controls >
 Show node circles) hides every data-defined circle without unsetting the
 attribute. A collapsed clade whose root node is named is labelled just past the
-wedge tip, reading outward along the clade's axis, whenever labels are shown
-(Controls > Show labels). Leaf labels must stay unique, so a single-taxon clade
+wedge tip whenever labels are shown (Controls > Show labels); the section
+[Label Colour, Direction, And Position](#label-colour-direction-and-position)
+covers which way it reads. Leaf labels must stay unique, so a single-taxon clade
 drawn as a leaf gets a readable name through a `[[branch_rule]]` with a `label`
 selector and a `clade_label`, which replaces the leaf's displayed name.
 
@@ -296,21 +314,38 @@ clade = "Bacteria"
 label_color = "#163e8a"
 ```
 
-A collapsed clade's label sits past its own wedge and reads outward from the
-centre of the drawing, like a spoke. When several wedges share a bearing their
-labels land on each other, which no wedge length or angle setting can fix.
-`collapsed_wedge_label_declutter` pushes a label that overlaps one already
-placed further out along its own bearing until it clears, so crowded labels
-stack in rings. A pushed label gets a thin leader line back to its wedge, in
-the label's own colour:
+A collapsed clade's label sits just past its wedge tip, beyond any node
+circle, and by default reads along the branch that enters the clade. When
+several wedges share a bearing their labels land on each other, which no wedge
+length or angle setting can fix.
+`collapsed_wedge_label_declutter` (Controls: **Collapsed wedge labels** set to
+**Leader lines**) pushes a label that overlaps one already placed further out
+along its own bearing until it clears, so crowded labels stack in rings. A
+pushed label gets a thin leader line back to its wedge, in the label's own
+colour:
 
 ```toml
 [view]
 collapsed_wedge_label_declutter = true
 ```
 
-It is off by default and does nothing to a figure whose labels already clear
-each other.
+It is off by default (**At wedge tip**) and does nothing to a figure whose
+labels already clear each other.
+
+`collapsed_wedge_label_orientation` (Controls: **Collapsed wedge label
+direction**) sets which way the label reads; the seat is the wedge tip under
+either value. `branch` (default, **Along branch**) turns the text to the
+branch that enters the clade, for every clade whose root has a parent, so the
+labels of a figure read the way their branches run. `bearing` (**Outward**)
+turns it out from the centre of the drawing, like a spoke. A declutter push
+moves the label out along its bearing from the centre under either value,
+with the leader back to where it would have sat. A clade whose root has no
+parent reads outward under both.
+
+```toml
+[view]
+collapsed_wedge_label_orientation = "bearing"
+```
 
 `allow_label_overlap = false` (Controls: **Auto-cull overlaps**; view
 `allowLabelOverlap`) drops a label that would land on one already drawn. The

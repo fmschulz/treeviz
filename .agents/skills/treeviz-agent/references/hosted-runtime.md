@@ -44,7 +44,9 @@ https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla.treeviz.j
 - `rekhatree-tol-phyla-labelled`: phylum labels at the wedge tips and isolate
   circles, with `showLabels` and `showNodeCircles` on;
   `collapsedWedgeLabelDeclutter: true` with leader lines,
-  `allowLabelOverlap: false`, three hand-written `legends` (Domain; Isolate
+  `collapsedWedgeLabelOrientation: 'branch'` so each label reads along the
+  branch entering its phylum, `allowLabelOverlap: false`, three hand-written
+  `legends` (Domain; Isolate
   genomes per phylum; Culturedness), `attributeLabels` for every node-meta
   key, and `figureLegendVisible: true`.
 

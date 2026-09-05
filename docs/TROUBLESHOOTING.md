@@ -63,7 +63,10 @@ two reads worse.
 
 In the radial layout wedges do not overlap unless **Allow overlap** is on in
 the collapsed-wedge settings under **Controls**. Neighbouring wedges are shrunk
-until they clear each other by **Gap**.
+until they sit **Gap** px clear of each other and of the centre line of any
+branch of another lineage. Branch width does not move a wedge: a wide stroke
+eats into the gap, not into the fill. Outlines are painted inside the fill,
+capped so a thin wedge keeps its fill, and never cross into a neighbour.
 
 - A wedge shows as a thin sliver when its clade has almost no angular room.
   Raise **Min body**, or size wedges by an attribute with **Size by** and
@@ -72,15 +75,23 @@ until they clear each other by **Gap**.
   crowded fan. Set the target to **Length**.
 - A clade background that reaches past its branches is a convex hull. Set
   **Background** to **Fitted**.
+- Wedges that look like they overlap: read `wedgeOverlapPairs` and
+  `wedgeBranchCrossings` from `window.__treeviz.getLayoutMetrics()` (open the
+  app with `?api=1`). Zero for both means every fill is clear of its
+  neighbours and of branches from other lineages. A count above zero, with the
+  `metrics.wedge.overlap` warning, marks an obstacle the wedge could not clear
+  at its smallest; set **Size target** to **Length** or raise **Branch
+  spacing**.
 - For crowding across the whole figure rather than one wedge, raise **Branch
   spacing**. In the radial layout it shapes the angle split, so a higher value
   keeps the drawing compact and it renders larger, which spreads the crowded
   labels apart.
-- When it is the labels rather than the wedges that collide, set
-  `collapsed_wedge_label_declutter`. Wedges that share a bearing seat their
-  labels on top of each other, and no wedge length or spacing value separates
-  them; the declutter pass pushes each colliding label further out along its
-  own bearing until it clears and draws a leader line back to the wedge.
+- When it is the labels rather than the wedges that collide, set **Collapsed
+  wedge labels** to **Leader lines** (TOML `collapsed_wedge_label_declutter`).
+  Wedges that share a bearing seat their labels on top of each other, and no
+  wedge length or spacing value separates them; the declutter pass pushes each
+  colliding label further out along its own bearing until it clears and draws
+  a leader line back to the wedge.
 
 ## Labels Are Missing At The Fitted View
 
@@ -96,8 +107,9 @@ tree and read small at fit; zoom in, or export at a larger canvas.
 ## validate_session Rejects A Session Saved From The App
 
 The package schema is behind the hosted app: it lacks the view fields
-`showNodeCircles`, `collapsedWedgeFillAttribute`, `collapsedWedgeFillOpacity`
-and `collapsedWedgeLabelDeclutter`, the `attribute` value of
+`showNodeCircles`, `collapsedWedgeFillAttribute`, `collapsedWedgeFillOpacity`,
+`collapsedWedgeLabelDeclutter` and `collapsedWedgeLabelOrientation`, the
+`attribute` value of
 `collapsedWedgeFill`, and the top-level `legends` and `attributeLabels`. The
 error names them as unexpected properties or an invalid enum value. Validate
 the file against the live schema at

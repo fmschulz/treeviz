@@ -28,6 +28,13 @@ node marks are scaled so the file matches what the screen shows; at zoom 1 and
 below the SVG is the unzoomed figure. The in-figure legend, including
 hand-written `legends`, is part of the export when it is displayed.
 
+Inside the SVG one `<g data-tv-id="zoom-group">` carries the camera transform
+and holds a `<g data-tv-layer="…">` group per draw layer. A collapsed wedge
+outline in the radial layout lies inside the wedge fill. The path is stroked at
+twice the configured width and clipped to its own shape through a `<clipPath>`
+minted for that wedge, so the half of the stroke that would fall outside is
+cut away.
+
 For automated rendering, inspect the output after the final layout change.
 Whitespace, clipped labels, or unreadable metadata tracks should be fixed in
 the layout before the figure is considered final.

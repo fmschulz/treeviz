@@ -67,13 +67,14 @@ https://treeviz.newlineages.com/?mode=headless&api=1
 
 ## Compatibility
 
-The hosted app reports version 0.8.0 through
+The hosted app reports version 0.8.1 through
 [`version.json`](https://treeviz.newlineages.com/version.json). The
 [`treeviz-phylo` 0.6.0](https://pypi.org/project/treeviz-phylo/) package
 writes sessions the app opens. Its bundled schema lacks fields the app writes
 (the view fields `showNodeCircles`, `collapsedWedgeFillAttribute`,
-`collapsedWedgeFillOpacity`, `collapsedWedgeLabelDeclutter` and
-`collapsedWedgeFill = "attribute"`, and the top-level `legends` and
+`collapsedWedgeFillOpacity`, `collapsedWedgeLabelDeclutter`,
+`collapsedWedgeLabelOrientation` and `collapsedWedgeFill = "attribute"`, and
+the top-level `legends` and
 `attributeLabels`), so `validate_session` rejects app-saved sessions that use
 them; see [Schema Compatibility](docs/PYTHON.md#schema-compatibility).
 Sessions written by earlier releases load and are migrated on open.

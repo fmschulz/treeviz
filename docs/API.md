@@ -103,7 +103,7 @@ fields.
 | `view.set-tree-style-attributes`      | `{ nodeDiameterAttribute?, nodeColorAttribute?, branchWidthAttribute?, branchColorAttribute? }`            | Map exact node-circle and branch style values to data attributes.              |
 | `view.set-pretty-terminal-branches`   | `{ enabled }`                                                                                              | Decorate branches entering terminal leaves.                                    |
 | `view.set-conditional-style-rules`    | `{ rules }`                                                                                                | Replace ordered metadata-driven style rules.                                   |
-| `view.set-collapsed-wedge-options`    | `{ shape?, fill?, fillAttribute?, fillOpacity?, gap?, minBody?, allowOverlap?, sizeAttribute?, sizeScale?, sizeTarget?, sizeRange?, outline? }` | Patch how collapsed clades draw in radial: wedge shape, fill source and opacity, spacing, metadata sizing, clade-background outline. |
+| `view.set-collapsed-wedge-options`    | `{ shape?, fill?, fillAttribute?, fillOpacity?, gap?, minBody?, allowOverlap?, sizeAttribute?, sizeScale?, sizeTarget?, sizeRange?, outline?, labelDeclutter?, labelOrientation? }`         | Shape, fill, spacing, labels and data sizing for collapsed clade wedges, plus the clade-background outline. `fillAttribute` names the node-meta colour key the `attribute` fill reads; `null` clears it. `fillOpacity` (0..1) sets the translucency of the `branch` and `attribute` fills. `labelDeclutter` pushes crowded wedge labels outward on leader lines instead of seating them at the wedge tip; `labelOrientation` reads them along the incoming branch (`branch`) or outward from the centre (`bearing`). |
 | `view.set-node-circles-visible`       | `{ visible }`                                                                                              | Show or hide all data-defined node circles.                                    |
 | `view.toggle-labels`                  | `{}`                                                                                                       | Toggle leaf labels.                                                            |
 | `view.toggle-support-labels`          | `{}`                                                                                                       | Toggle support labels.                                                         |
@@ -461,6 +461,12 @@ changes. `getLayoutMetrics()` counts `labelsVisible`, `labelsCulled`,
 screen size above zoom 1, so to judge legibility at a target zoom call
 `view.zoom`, wait for the next render, and read the metrics again. Capture a
 screenshot or exported PNG before calling visual changes complete.
+
+Radial figures with collapsed wedges add `wedgeOverlapPairs`, pairs of wedge
+fills that intersect, and `wedgeBranchCrossings`, branches of other lineages
+that run through a wedge, both measured on the drawn polygons. Either above
+zero puts `metrics.wedge.overlap` in `warnings`. Both fields are absent when
+the figure draws no such wedge.
 
 ## Diagnostics
 

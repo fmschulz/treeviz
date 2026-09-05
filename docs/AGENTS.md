@@ -105,6 +105,12 @@ Metrics describe the current camera. Labels keep their screen size above zoom
 1, so `labelsCulled` at fit is not the count a reader sees at 2x: call
 `view.zoom`, wait for the render, and read the metrics again.
 
+Radial figures with collapsed wedges also report `wedgeOverlapPairs`, pairs of
+wedge fills that intersect, and `wedgeBranchCrossings`, branches of other
+lineages that run through a wedge. Either above zero adds
+`metrics.wedge.overlap` to `warnings`. Both fields are absent when the figure
+draws no such wedge.
+
 ## References
 
 - [Browser API](API.md)

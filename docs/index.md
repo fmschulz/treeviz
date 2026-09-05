@@ -12,7 +12,7 @@ data files. Everything runs in the browser, with no server and no account.
 This site covers the public browser app, the Python package, metadata
 structure, tree styling, and agent automation.
 
-The hosted app reports version 0.8.0. The Python examples target the released
+The hosted app reports version 0.8.1. The Python examples target the released
 `treeviz-phylo` 0.6.0 package. Its bundled schema lacks several fields the app
 writes, so `validate_session` rejects app-saved sessions with them; see
 [Schema Compatibility](PYTHON.md#schema-compatibility). Sessions from earlier
