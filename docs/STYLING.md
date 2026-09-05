@@ -155,8 +155,11 @@ the same colour takes that colour, so a monophyletic group is painted up to and
 including the stem of its last common ancestor, and a group that is not
 monophyletic is painted up to each of its largest monophyletic parts. A child
 without a colour stops the extension. Internal nodes with their own colour value
-keep it, and that value counts as the colour of their subtree. On these internal
-branches the metadata colour wins over a clade style, as it does on the leaves.
+keep it, and that value counts as the colour of their subtree. A colour set on a
+clade by hand (Style > Branch colour in the browser, or a `[[branch_rule]]`
+`color`) wins over every data-derived colour on that clade and its descendants,
+so recolouring a wedge or clade always shows; Reset clade style brings the data
+colour back.
 
 ## Layouts
 
@@ -252,7 +255,9 @@ clade_background_outline = "hull"      # or "fitted"
   fill can encode something other than the outline; a clade without a value
   under that key keeps the `background` fill. `collapsed_wedge_fill_opacity`
   sets the translucency of the `branch` and `attribute` fills (default 0.28, a
-  tint); a fill that carries its own data reads better around 0.8.
+  tint); a fill that carries its own data reads better around 0.8. A collapsed
+  clade's own `wedgeFill` clade style (Style > Wedge fill on a right-clicked
+  wedge) replaces the mode's fill for that wedge.
 - `collapsed_wedge_size_attribute` replaces the footprint width with a data
   value: the wedge runs out to its footprint depth and its outer-edge width is
   the value mapped (as-is, or after `log10`) from the range of values across
@@ -315,14 +320,17 @@ label_color = "#163e8a"
 ```
 
 A collapsed clade's label sits just past its wedge tip, beyond any node
-circle, and by default reads along the branch that enters the clade. When
+circle, and by default reads along the branch that enters the clade, walked
+back until at least 12 px of branch are in view so a stub of a final segment
+does not turn the label. When
 several wedges share a bearing their labels land on each other, which no wedge
 length or angle setting can fix.
 `collapsed_wedge_label_declutter` (Controls: **Collapsed wedge labels** set to
 **Leader lines**) pushes a label that overlaps one already placed further out
-along its own bearing until it clears, so crowded labels stack in rings. A
-pushed label gets a thin leader line back to its wedge, in the label's own
-colour:
+along the line of its branch until it clears (along its bearing when that line
+is blocked, or under the **Outward** direction), so its leader continues the
+branch and crowded labels stack in rings. A pushed label gets a thin leader
+line back to its wedge, in the label's own colour:
 
 ```toml
 [view]

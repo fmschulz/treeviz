@@ -157,6 +157,7 @@ fields.
   `cladeLabelFontSize`.
 - Clade underlay: `cladeBackground`. `cladeLabelBackground` is still accepted
   as a legacy alias.
+- Collapsed wedge fill: `wedgeFill`, read from the clade's own entry only.
 - Node/leaf markers: `internalDotSize`, `leafShape`,
   `nodeCircleDiameter`, `nodeCircleColor`.
 
@@ -167,7 +168,12 @@ rectangular, circular, and radial layouts. If the same clade is collapsed,
 TreeViz uses that label text for the collapsed wedge label. `cladeBackground`
 draws a translucent region from the clade root to the descendant tips: a band in
 rectangular layout, a sector in circular layout, and a hull around the clade's
-tips in radial layout, which has no centre to sweep a sector about. Clade-annotation
+tips in radial layout, which has no centre to sweep a sector about. The drawn
+region is a click target: left-click selects the clade and tints the region,
+right-click opens the clade menu, where Style > Clade underlay recolours it. A
+hand-set `color` wins over `branchColorAttribute` and rule colours on the clade
+and its descendants, wedge outline included; Reset clade style brings the data
+colour back. Clade-annotation
 labels reserve readable white backing before metadata tracks: a measured column
 in rectangular layout and a measured radial lane in circular/radial layouts. The
 reserved space follows the label text and `cladeLabelFontSize`, so tracks start
@@ -281,7 +287,9 @@ const activeRules = api.getSession().view.conditionalStyleRules
 In the webapp, open **Controls** to select exact node-circle diameter/color and
 branch width/color attributes. Right-click a clade and choose **Style clade**
 for clade branch color, line width, dash pattern, label color, label size, and
-clade annotation styling. Open the **Inspector** on a single leaf or internal
+clade annotation styling; on a collapsed wedge the same popover carries the
+wedge outline color and **Wedge fill**. The popover names the clade it styles
+and is dragged by that title. Open the **Inspector** on a single leaf or internal
 node to edit branch color/width and direct node-circle diameter/color without
 writing an API call.
 

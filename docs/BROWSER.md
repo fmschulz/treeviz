@@ -104,12 +104,13 @@ inside the wedge and takes the same width cap as the wedge's own outline, so
 it never crosses a neighbour and a thin wedge keeps its fill.
 
 A collapsed clade's label sits past its wedge tip and reads along the branch
-that enters the clade (**Collapsed wedge label direction**: **Along branch**,
+that enters the clade, walked back until 12 px of branch are in view so a stub
+of a final segment does not turn it (**Collapsed wedge label direction**: **Along branch**,
 the default) or out from the centre of the drawing (**Outward**; TOML
 `collapsed_wedge_label_orientation = "bearing"`). With **Collapsed wedge
 labels** set to **Leader lines** (`collapsed_wedge_label_declutter`), a label
-that would land on another is pushed away from its wedge and joined to it by a
-thin leader line in the label's colour; **At wedge tip** seats every label at
+that would land on another is pushed out along the line of its branch and joined
+to its wedge by a thin leader line in the label's colour; **At wedge tip** seats every label at
 its tip. See
 [Tree styling](STYLING.md#label-colour-direction-and-position).
 

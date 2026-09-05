@@ -67,7 +67,7 @@ https://treeviz.newlineages.com/?mode=headless&api=1
 
 ## Compatibility
 
-The hosted app reports version 0.8.1 through
+The hosted app reports version 0.8.2 through
 [`version.json`](https://treeviz.newlineages.com/version.json). The
 [`treeviz-phylo` 0.6.0](https://pypi.org/project/treeviz-phylo/) package
 writes sessions the app opens. Its bundled schema lacks fields the app writes

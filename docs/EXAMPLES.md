@@ -93,8 +93,8 @@ The same figure with phylum names at the wedge tips and a fixed-size circle
 per phylum: black for no isolate genomes, dark brown for 1 to 10, orange for
 more than 10, grey where no count is available. Each domain colours its own
 labels. Each label sits at its wedge tip and reads along the branch that
-enters its phylum. Labels that share a bearing are pushed
-outward and joined to their wedge by a leader line; labels that still collide
+enters its phylum. Labels that share a bearing are pushed out along that
+branch and joined to their wedge by a leader line; labels that still collide
 are culled at the fitted zoom and return as you zoom in. Three hand-written
 legends (domain, isolate genomes per phylum, culturedness) sit in the figure.
 Any label can be dragged to a clearer spot. **Show labels** and **Show node

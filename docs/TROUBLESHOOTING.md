@@ -90,8 +90,8 @@ capped so a thin wedge keeps its fill, and never cross into a neighbour.
   wedge labels** to **Leader lines** (TOML `collapsed_wedge_label_declutter`).
   Wedges that share a bearing seat their labels on top of each other, and no
   wedge length or spacing value separates them; the declutter pass pushes each
-  colliding label further out along its own bearing until it clears and draws
-  a leader line back to the wedge.
+  colliding label further out along the line of its branch until it clears and
+  draws a leader line back to the wedge.
 
 ## Labels Are Missing At The Fitted View
 

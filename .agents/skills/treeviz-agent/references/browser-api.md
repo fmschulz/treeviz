@@ -230,7 +230,11 @@ if (result?.exact && result.mrcaStableKey) {
 }
 ```
 
-Use stable keys for tree edits.
+Use stable keys for tree edits. A hand-set `patch.color` wins over
+`branchColorAttribute` and rule colours on the clade and its descendants; on a
+collapsed clade it recolours the wedge outline and `patch.wedgeFill` sets the
+wedge fill. The region `patch.cladeBackground` draws is itself a click target:
+left-click selects the clade, right-click opens its menu.
 
 ## Collapsed Wedges And Backgrounds
 

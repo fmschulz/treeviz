@@ -110,8 +110,8 @@ For repeatable file-based rerooting from metadata, use
 - Labels colliding in a crowded radial fan: `collapsed_wedge_label_declutter`
   in TOML (view `collapsedWedgeLabelDeclutter`; Controls **Collapsed wedge
   labels**: **Leader lines**) pushes a label that overlaps
-  one already placed further out along its own bearing and draws a leader
-  line back to its wedge. Wedge length and Branch spacing do not fix this
+  one already placed further out along the line of its branch and draws a
+  leader line back to its wedge. Wedge length and Branch spacing do not fix this
   case: the labels share a bearing.
 - Wedge labels reading out from the centre instead of along the branch that
   enters each clade: `collapsed_wedge_label_orientation = "bearing"` in TOML
