@@ -69,6 +69,10 @@ markdown_extensions:
 plugins:
   - search
 
+not_in_nav: |
+  examples/README.md
+  assets/gallery/README.md
+
 nav:
   - Home: index.md
   - Getting started: GETTING_STARTED.md
@@ -81,9 +85,7 @@ nav:
   - Automation:
       - Agent automation: AGENTS.md
       - Browser API: API.md
-  - Examples:
-      - Overview: EXAMPLES.md
-      - Example notes: examples/README.md
+  - Examples: EXAMPLES.md
   - Troubleshooting: TROUBLESHOOTING.md
 
 extra:

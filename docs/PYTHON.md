@@ -10,10 +10,11 @@ ships Python helpers and the TreeViz session schema.
 
 !!! note "Published package compatibility"
     The examples on this page target `treeviz-phylo` 0.6.0, the current PyPI
-    release. Its bundled session schema matches the hosted app, so view fields
-    such as `conditionalStyleRules` and `branchColorAttribute` validate in
-    Python. Browser-side styling is documented in [Tree styling](STYLING.md)
-    and [Browser API](API.md).
+    release. View fields such as `conditionalStyleRules`,
+    `branchColorAttribute`, `allowLabelOverlap` and `figureLegendVisible`
+    validate in Python. Fields the app writes but the package schema lacks are
+    listed under Schema Compatibility. Browser-side styling is documented in
+    [Tree styling](STYLING.md) and [Browser API](API.md).
 
 ## Install
 
@@ -32,6 +33,25 @@ Import name:
 ```python
 import treeviz
 ```
+
+## Schema Compatibility
+
+`validate_session` checks a session against the schema bundled in the package.
+The 0.6.0 package schema does not include fields the hosted app (0.8.0)
+writes: the view fields `showNodeCircles`, `collapsedWedgeFillAttribute`,
+`collapsedWedgeFillOpacity` and `collapsedWedgeLabelDeclutter`, the
+`attribute` value of `collapsedWedgeFill`, and the top-level `legends` and
+`attributeLabels`. A session saved from the app with any of them fails
+`validate_session` with an `additionalProperties` or `enum` error. Sessions
+built by the package itself validate. To check a saved app session, validate
+it against the live schema instead:
+
+```bash
+curl -A treeviz-docs -o treeviz-session.schema.json \
+  https://treeviz.newlineages.com/treeviz-session.schema.json
+```
+
+and pass that file to `jsonschema.validate`.
 
 ## Minimal Session
 
@@ -111,8 +131,10 @@ labels exactly. Pass that column as `row_key_column`.
 
 ```python
 metadata = [
-    {"sample_id": "A", "lineage": "alpha", "load": 1.2, "detected": True},
-    {"sample_id": "B", "lineage": "alpha", "load": 0.8, "detected": False},
+    {"sample_id": "A", "lineage": "alpha", "load": 1.2, "detected": True,
+     "score_a": 0.9, "score_b": 0.4, "day": 3, "note": "reference"},
+    {"sample_id": "B", "lineage": "alpha", "load": 0.8, "detected": False,
+     "score_a": 0.2, "score_b": 0.7, "day": 5, "note": "candidate"},
 ]
 
 session = build_session("(A,B);", metadata=metadata, row_key_column="sample_id")
@@ -178,7 +200,11 @@ apply conditional rules, draw compact symbol or wedge lanes, and style terminal
 branches. `treeviz-phylo` 0.6.0 validates these view fields in Python; pass
 them through the `view` argument or apply them
 later through `window.__treeviz`. Metadata branch colours extend to the MRCA
-stem of each same-coloured clade (see [Tree styling](STYLING.md)).
+stem of each same-coloured clade (see [Tree styling](STYLING.md)). Hand-written
+legends (`legends`) and attribute display names (`attributeLabels`) are
+app-side fields; add them to a saved session for the hosted app after
+`validate_session`, or write them in a TOML config
+(see [Legends and attribute names](STYLING.md#legends-and-attribute-names)).
 
 ## Tree Inspection
 
@@ -240,11 +266,19 @@ browser app.
 
 ## Runnable Example Script
 
-This repository includes a public script that imports the package, builds 30
-and 100 leaf examples, validates metadata binding, and writes sessions:
+A clone of this repository includes a script that imports the package, builds
+30- and 100-leaf examples, validates metadata binding, and writes sessions:
 
 ```bash
+git clone https://github.com/fmschulz/treeviz
+cd treeviz
 python examples/plot_treeviz_examples.py --out treeviz-example-output
 ```
 
-See [Examples](EXAMPLES.md) for static rendering options.
+It writes `lineage_30.treeviz.json` (rectangular, metadata tracks, binary leaf
+symbols, support markers, numeric branch colouring), `clade_100.treeviz.json`
+(circular, the same features), a `_bare` twin of each without metadata, and
+`summary.json` with leaf counts, binding diagnostics, and hosted URLs. Open the
+`.treeviz.json` files in the browser, or pass
+`--render --renderer-command /path/to/treeviz-renderer` if a renderer is
+installed; see [Exports](EXPORTS.md).

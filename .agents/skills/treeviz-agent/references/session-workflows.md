@@ -85,14 +85,68 @@ For repeatable file-based rerooting from metadata, use
   `tree.style-clade` patch fields `color`, `lineWidth`, `labelColor`,
   `labelFontSize`, `nodeCircleDiameter`, and `nodeCircleColor`.
 - Numeric branch coloring: `view.set-branch-colour-attribute`.
+- Readable name on one leaf: leaf names must be unique, so keep the leaf name
+  and set the displayed text with `tree.style-clade` patch `label`, which
+  writes `cladeStyles[leafKey].label`. In a `treeviz.toml` this is a
+  `[[branch_rule]]` with `label = "<leaf name>"` and `clade_label = "<text>"`.
+  A tree with repeated leaf labels fails to parse with
+  `parse.duplicate-leaf-label`.
 - Rerooting: `tree.reroot`, `tree.reroot-at-outgroup`, `tree.midpoint-reroot`.
 - Collapsing, expanding, hiding, pruning: `tree.collapse-clade`,
   `tree.expand-clade`, `tree.hide-clade`, `tree.prune-clade`.
+- Label colour for a whole subtree: `tree.style-clade` with
+  `patch.labelColor` (TOML `label_color`), inherited by leaf labels and
+  collapsed-clade wedge labels alike, so one rule per domain colours a tree
+  of life. It is separate from `cladeLabelColor`, which colours only the
+  annotation on the selected root.
+- A label reading against its neighbours: in the polar layouts text on the
+  far side turns around so it is never upside down, and a clade on that
+  turnover ends up mirrored. `patch.labelFlip` (TOML `label_flip`) reverses
+  the choice for one label.
+- Moving a label: any label can be dragged in the webapp, which writes
+  `patch.cladeLabelOffsetX` / `cladeLabelOffsetY` on that clade, so the nudge
+  survives saving and appears in exports. Set the same fields directly for a
+  reproducible figure.
+- Labels colliding in a crowded radial fan: `collapsed_wedge_label_declutter`
+  in TOML (view `collapsedWedgeLabelDeclutter`) pushes a label that overlaps
+  one already placed further out along its own bearing and draws a leader
+  line back to its wedge. Wedge length and Branch spacing do not fix this
+  case: the labels share a bearing.
+- Labels that still collide: `allow_label_overlap = false` in TOML (view
+  `allowLabelOverlap`, flipped by `view.toggle-label-overlap`; Controls
+  **Auto-cull overlaps**) drops a label that would land on one already drawn.
+  The culler judges collapsed labels at their decluttered seats. Above zoom 1
+  labels keep their screen size while the tree grows, so culled labels return
+  as the view zooms in.
+- Legends for attribute encodings (branch colour, node-circle colour, wedge
+  fill): TOML `[[legend]]` tables with `title` and
+  `entries = [{ label, color }]`, compiled to the top-level `legends` array
+  and shown in the Legend panel, the in-figure legend and exports.
+  `figure_legend = true` in `[view]` (view `figureLegendVisible`) opens the
+  in-figure legend on load. No command edits `legends`; set it on the document
+  and `session.restore`.
+- Readable names for node-meta keys in the Controls pickers and hover
+  tooltips: TOML `[attribute_labels]` (`vc = "Domain colour"`), compiled to
+  the top-level `attributeLabels` map; pickers show `Domain colour (vc)`.
+- Finding a taxon or clade by name: `view.search` matches leaf names, leaf
+  labels and collapsed-clade labels and writes stable keys to
+  `view.searchHits`; a hit inside a collapsed clade is that clade's wedge.
+  Hovering or selecting a collapsed clade (`view.hover`, `selection.set`)
+  outlines its wedge.
+- Crowded radial figures: `view.set-leaf-spacing` (Controls: Branch spacing)
+  scales the rectangular row pitch and shapes the radial angle split, where
+  each child is weighted by its leaf count raised to that power. Above 1 the
+  wide clades take more of the turn, which keeps the drawing compact so it
+  renders larger and crowded regions gain room.
 - Layout and density: `view.set-layout`, `view.set-branch-scale-mode`,
   `view.set-branch-scale`,
   `view.set-leaf-spacing`, `view.set-metadata-gap`,
   `view.set-metadata-row-scale`, `view.toggle-label-overlap`,
   `view.set-scale-bar-position`.
+- Layout choice: circular gives every leaf an equal angular slot, so a clade's
+  footprint tracks taxon count. Radial draws true branch lengths, so a clade
+  with longer root-to-tip depths covers more area. Pick the layout by what the
+  figure should encode.
 
 ## Exact Style Workflow
 

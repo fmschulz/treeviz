@@ -28,30 +28,82 @@ TreeViz accepts:
 - `.treeviz.json` sessions;
 - TSV/CSV metadata tables with one header row.
 
-Load the tree first. Then import metadata and choose the row-key column that
-matches metadata rows to tree leaves.
+Drop files onto the page or use the file picker. Load the tree first, then
+the metadata, and choose the row-key column that matches metadata rows to tree
+leaves.
 
 ## Configure The View
 
-Use metadata tracks to encode values next to leaves:
+Metadata tracks encode table values next to leaves: colour strips for
+categories, gradients and heatmaps for continuous values, bars for numeric
+comparisons, text tracks for labels, binary dots for presence and absence.
+The **Tracks** panel adds and orders them.
 
-- color strips for categories;
-- gradients for continuous values;
-- heatmaps for multiple continuous columns;
-- bars for numeric comparisons;
-- text tracks for labels;
-- binary dots for presence/absence markers.
+The **Controls** panel holds the figure settings:
 
-Use clade styling and support display for internal-node annotations. Use saved
-views when you need more than one layout for the same session.
+- **Layout and density**: branch scale, **Branch spacing**, metadata scale and
+  gap, label font size and family, **Auto-cull overlaps**. Branch spacing
+  scales the row pitch in the rectangular layout and shapes the angle split in
+  the radial one, where raising it keeps the drawing compact so crowded clades
+  gain room. Auto-cull overlaps (TOML `allow_label_overlap = false`) drops a
+  label that would land on one already drawn; zooming in brings it back.
+- **Show labels**, **Show support labels**, **Show node circles**, **Show
+  metadata tracks**: switch leaf and clade labels, support values,
+  data-defined node circles, and metadata tracks on and off.
+- **Colour branches by**: **Metadata columns (scale)** maps a numeric column
+  onto a colour scale. **Node colours (exact)** applies a colouring stored on
+  the tree itself (Newick `[&key=#rrggbb]` comments) as exact colours. Wedge
+  outlines follow the branch colour.
+- **Exact styling**: node-circle diameter and colour, branch width and colour,
+  each from a data attribute. A key with a display name in the session
+  (`[attribute_labels]`) is listed as `Name (key)`.
+- **Pretty terminal branches**: thicker, rounded branches into terminal
+  leaves.
+- Collapsed wedges, radial layout only: **Shape** (Rounded or Triangle),
+  **Fill** (Background, Branch, or Attribute) with **Fill attribute** and
+  **Fill opacity**, **Gap** and **Min body** in px, **Allow overlap**,
+  **Size by** a numeric attribute or **Tree shape** with a Linear or Log10
+  **Scale** and a Width or Length **Size target**, and the clade
+  **Background** outline (Hull or Fitted).
 
-For figure styling, the Controls panel includes **Pretty terminal branches**.
-It thickens and rounds only branches leading into terminal leaves, in any
-layout. The same panel includes **Exact styling** selectors for node-circle
-diameter/color and branch width/color attributes. Metadata or tree annotations
-can also drive those exact values. For one-off edits, select a leaf or internal
-node and use the Inspector's branch and circle controls. See
-[Tree styling](STYLING.md).
+The Controls panel scrolls when it is taller than the stage; a thin scrollbar
+marks the rows below the fold.
+
+Any label can be dragged: press on the text and move it. The offset is stored
+on that clade, so it survives saving and appears in exports.
+
+For one-off edits, select a leaf or internal node and use the Inspector's
+branch, circle, and label controls. Saved views keep more than one arrangement
+of the same session. Every option is listed in [Tree styling](STYLING.md).
+
+The **Legend** panel lists the legends derived from tracks, markers, node marks
+and connections, then any hand-written legends stored on the session
+(`legends`, from `[[legend]]` tables in a TOML config). **Display in figure**
+places a section on the canvas; the in-figure legend is part of SVG, PNG and
+PDF exports.
+
+## Navigate
+
+Scroll to zoom and drag to pan. **Fit** (`F`) fits the whole tree into the
+viewport; `0` resets zoom and pan. Above zoom 1 the topology grows while
+labels, branch strokes, node circles and leaf markers keep their screen size,
+so zooming in opens space between labels and brings back the labels the
+overlap culler dropped at fit. The culler re-runs about 150 ms after the
+camera stops moving. Below zoom 1 everything shrinks with the tree. The camera
+stays where you put it when you open a panel or edit the document; the view
+refits only when a session loads or the layout changes. In the rectangular
+layout the fitted view includes collapsed wedge tips and their labels.
+
+Hovering a leaf, an internal node or a collapsed wedge shows a tooltip: the
+label or name, `N leaves` for a wedge, `Branch length x`, `Support y`, then the
+node's attributes under their display names, with a swatch for colour values.
+Hovering or selecting a collapsed wedge outlines its polygon.
+
+The search field (**Search taxa and clades…**) matches leaf names, leaf labels
+and collapsed-clade labels. A hit inside a collapsed clade lands on that
+clade's wedge. **Enter** zooms to the active hit (to at least 2x);
+**Shift+Enter** and the arrow keys step through the hits; **Escape** clears
+the search.
 
 ## Save And Export
 

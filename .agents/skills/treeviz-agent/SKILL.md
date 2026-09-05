@@ -1,6 +1,6 @@
 ---
 name: treeviz-agent
-description: Use for agent-driven phylogenetic tree visualization in TreeViz: load Newick/Nexus/.treeviz.json sessions, import leaf or node metadata, choose row keys, plan tracks, style clades, add node marks or tip connections, tune layouts, inspect diagnostics, and export figures through the hosted TreeViz browser API.
+description: Use for agent-driven phylogenetic tree visualization in TreeViz: load Newick/Nexus/.treeviz.json sessions, import leaf or node metadata, choose row keys, plan tracks, style clades, add node marks, tip connections, legends and attribute names, tune layouts and label culling, check legibility at a zoom, search and inspect nodes, and export figures through the hosted TreeViz browser API.
 ---
 
 # TreeViz Agent
@@ -41,6 +41,8 @@ Use the hosted app unless the user explicitly provides another TreeViz runtime.
 
 - Start metadata-heavy figures in rectangular layout.
 - Try circular or radial layout only when labels and metadata remain readable.
+- Shape radial collapsed-clade wedges with `view.set-collapsed-wedge-options`:
+  fill source, opacity, gap, minimum body, outline, and data sizing.
 - Keep metadata tracks contiguous; use `metadataGap: 0` unless separation is useful.
 - Keep `branchScaleMode` on `auto` unless fixed geometry is required. Setting a
   manual branch scale freezes the automatic width and spacing calculation.
@@ -67,6 +69,12 @@ Use the hosted app unless the user explicitly provides another TreeViz runtime.
 - Put tip-to-tip connections in the saved session and resolve endpoint
   diagnostics before export.
 - Use explicit legend titles and item labels when exporting publication figures.
+- Give attribute encodings (branch colour, node-circle colour, wedge fill) a
+  legend through `legends` on the session document and readable picker names
+  through `attributeLabels`; set `view.figureLegendVisible` when the figure
+  should open with the legend shown.
+- On crowded radial figures set `collapsedWedgeLabelDeclutter: true` and
+  `allowLabelOverlap: false`; culled labels return as the reader zooms in.
 - Treat high unmatched-leaf or unmatched-row counts as a binding problem to fix or report.
 
 ## Reference Loading
@@ -80,7 +88,7 @@ Load only the reference needed for the task:
   and export QA.
 - `references/example-inputs.md`: deterministic 30-leaf and 100-leaf example recipes with metadata and support markers.
 - `references/large-taxonomy-trees.md`: large taxonomy-tree workflows, metadata-derived categories, rerooting, and dense exports.
-- `references/hosted-runtime.md`: hosted URLs, public machine-readable files, and live API smoke testing.
+- `references/hosted-runtime.md`: hosted URLs, public machine-readable files, the six hosted real-data sessions, and live API smoke testing.
 - `references/wrapper-api.md`: published Python 0.6.0 package and notebook workflows.
 
 ## Helper Scripts
@@ -95,6 +103,9 @@ Load only the reference needed for the task:
 - Always `await` API calls before issuing dependent commands.
 - Check `getDiagnostics()` after import and after major edits.
 - Check `getLayoutMetrics()` after layout changes.
+- Judge legibility at the zoom the reader will use: labels hold their screen
+  size above zoom 1, so `labelsVisible` and `labelsCulled` at fit differ from
+  the counts at 2x. Call `view.zoom`, wait for the render, read the metrics again.
 - Start layout QA with `contentOccupancyX`, `contentOccupancyY`,
   `labelsClipped`, `labelCollisions`, `trackDensity`, and `p75BranchPx`.
 - Do not claim visual quality from configuration alone; inspect a recent screenshot, SVG, PNG, or PDF.

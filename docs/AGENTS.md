@@ -87,14 +87,23 @@ failed automation step unless the task intentionally tests invalid input.
   collapsed, hidden, and same-leaf endpoints through diagnostics.
 - Keep `branchScaleMode` on `auto` unless fixed geometry is required. Calling
   `view.set-branch-scale` switches the view to manual scale.
+- Put hand-written legends in `session.legends` and attribute display names
+  in `session.attributeLabels` before `session.restore`; no command edits
+  them.
+- Use `view.search` to find a taxon or clade by name; the hits are stable
+  keys in `getSession().view.searchHits`, and a hit inside a collapsed clade
+  resolves to the wedge.
 - Re-check `getDiagnostics()` and `getLayoutMetrics()` after visual changes.
 - Capture or export a figure after the final layout change before reporting that the figure is ready.
 - Save durable work as `.treeviz.json`.
 
 Layout QA should start with `contentOccupancyX`, `contentOccupancyY`,
-`labelsClipped`, `labelCollisions`, `trackDensity`, and `p75BranchPx`.
-For circular and radial layouts, occupancy is measured against the shorter
-viewport side because the figure is round.
+`labelsClipped`, `labelCollisions`, `labelsVisible`, `labelsCulled`,
+`trackDensity`, and `p75BranchPx`. For circular and radial layouts, occupancy
+is measured against the shorter viewport side because the figure is round.
+Metrics describe the current camera. Labels keep their screen size above zoom
+1, so `labelsCulled` at fit is not the count a reader sees at 2x: call
+`view.zoom`, wait for the render, and read the metrics again.
 
 ## References
 

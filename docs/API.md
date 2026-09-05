@@ -70,6 +70,11 @@ Command mutability has three values:
 | `session.save`            | `{}`                                                              | Download the current session as `.treeviz.json`.        |
 | `session.import-node-metadata` | `{ tsv, rowKeyColumn? }`                                     | Parse TSV keyed to internal nodes and bind it. Rows key on the internal node label, or on an `mrca_of` column holding `|`-separated leaf names. |
 
+`session.restore` takes the whole document, including the top-level `legends`
+(hand-written swatch legends, `[{ title, entries: [{ label, color }] }]`) and
+`attributeLabels` (node-meta key to display name). No command edits those two
+fields.
+
 ## View Commands
 
 | Command                               | Args                                                                                                       | Effect                                                                         |
@@ -98,12 +103,14 @@ Command mutability has three values:
 | `view.set-tree-style-attributes`      | `{ nodeDiameterAttribute?, nodeColorAttribute?, branchWidthAttribute?, branchColorAttribute? }`            | Map exact node-circle and branch style values to data attributes.              |
 | `view.set-pretty-terminal-branches`   | `{ enabled }`                                                                                              | Decorate branches entering terminal leaves.                                    |
 | `view.set-conditional-style-rules`    | `{ rules }`                                                                                                | Replace ordered metadata-driven style rules.                                   |
+| `view.set-collapsed-wedge-options`    | `{ shape?, fill?, fillAttribute?, fillOpacity?, gap?, minBody?, allowOverlap?, sizeAttribute?, sizeScale?, sizeTarget?, sizeRange?, outline? }` | Patch how collapsed clades draw in radial: wedge shape, fill source and opacity, spacing, metadata sizing, clade-background outline. |
+| `view.set-node-circles-visible`       | `{ visible }`                                                                                              | Show or hide all data-defined node circles.                                    |
 | `view.toggle-labels`                  | `{}`                                                                                                       | Toggle leaf labels.                                                            |
 | `view.toggle-support-labels`          | `{}`                                                                                                       | Toggle support labels.                                                         |
 | `view.set-show-support`               | `{ visible }`                                                                                              | Set support-label visibility.                                                  |
 | `view.set-highlighted-path`           | `{ path }`                                                                                                 | Highlight a path by stable keys.                                               |
 | `view.clear-highlighted-path`         | `{}`                                                                                                       | Clear the highlighted path.                                                    |
-| `view.toggle-label-overlap`           | `{}`                                                                                                       | Toggle label-overlap allowance.                                                |
+| `view.toggle-label-overlap`           | `{}`                                                                                                       | Toggle `allowLabelOverlap` (Controls: **Auto-cull overlaps**).                 |
 | `view.toggle-metadata`                | `{}`                                                                                                       | Toggle metadata track visibility.                                              |
 | `view.set-metadata-visibility`        | `{ visible }`                                                                                              | Set metadata track visibility.                                                 |
 | `view.toggle-figure-legend`           | `{}`                                                                                                       | Toggle the compact in-figure legend overlay.                                   |
@@ -386,7 +393,7 @@ await api.execute('track.update', {
 | `selection.select-clade` | `{ cladeKey }`            | Select visible leaves under a clade. |
 | `selection.style-leaves` | `{ patch }`               | Style the selected leaves.           |
 | `view.hover`             | `{ key: string \| null }` | Set or clear hover state.            |
-| `view.search`            | `{ query }`               | Search leaf labels.                  |
+| `view.search`            | `{ query }`               | Match leaf names, leaf labels and collapsed-clade labels; a hit inside a collapsed clade resolves to the wedge. Hits are stable keys in `view.searchHits`. |
 
 ## History Commands
 
@@ -449,8 +456,11 @@ const diagnostics = api.getDiagnostics()
 ```
 
 Use `getLayoutMetrics()` and `getDiagnostics()` after each logical batch of
-changes. Capture a screenshot or exported PNG before calling visual changes
-complete.
+changes. `getLayoutMetrics()` counts `labelsVisible`, `labelsCulled`,
+`labelCollisions` and `labelsClipped` at the current camera. Labels hold their
+screen size above zoom 1, so to judge legibility at a target zoom call
+`view.zoom`, wait for the next render, and read the metrics again. Capture a
+screenshot or exported PNG before calling visual changes complete.
 
 ## Diagnostics
 

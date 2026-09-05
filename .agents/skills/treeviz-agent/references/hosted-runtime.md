@@ -24,6 +24,33 @@ files, thumbnails, provenance, and synthetic-data labels.
 Do not infer browser support from the published Python package. The hosted app
 and its schemas can be newer than `treeviz-phylo`.
 
+## Real-Data Sessions
+
+Six hosted sessions hold a 1070-leaf GTDB marker tree with 84 collapsed phylum
+clades in radial layout. Open one with `?session=`:
+
+```text
+https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla.treeviz.json
+```
+
+- `rekhatree-tol-phyla`: domain branch colours, footprint wedges.
+- `rekhatree-tol-phyla-pd`: wedge length from phylogenetic diversity, with
+  `sizeScale: 'log'`, `sizeTarget: 'length'`, `sizeRange: [40, 400]`.
+- `rekhatree-tol-phyla-cultured`: branches coloured by isolates per unit of
+  diversity, wedges filled from the branch colour.
+- `rekhatree-tol-phyla-muted`: muted branch colouring, footprint wedges.
+- `rekhatree-tol-phyla-domain-cultured`: domain branch and outline colours with
+  `fill: 'attribute'` from a second node-meta key at `fillOpacity: 0.85`.
+- `rekhatree-tol-phyla-labelled`: phylum labels at the wedge tips and isolate
+  circles, with `showLabels` and `showNodeCircles` on;
+  `collapsedWedgeLabelDeclutter: true` with leader lines,
+  `allowLabelOverlap: false`, three hand-written `legends` (Domain; Isolate
+  genomes per phylum; Culturedness), `attributeLabels` for every node-meta
+  key, and `figureLegendVisible: true`.
+
+Read `getSession().view` after loading one to see the wedge options, node-meta
+colour keys, and clade styles that produce the figure.
+
 ## Live API Smoke
 
 When Playwright and Bun are available:

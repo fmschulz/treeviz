@@ -23,6 +23,11 @@ Use SVG, PNG, or PDF for figures.
 - PNG is best for quick review, web display, and screenshots.
 - PDF is best when a downstream workflow expects page-based output.
 
+SVG export follows the on-screen rule for zoom: above zoom 1 text, strokes and
+node marks are scaled so the file matches what the screen shows; at zoom 1 and
+below the SVG is the unzoomed figure. The in-figure legend, including
+hand-written `legends`, is part of the export when it is displayed.
+
 For automated rendering, inspect the output after the final layout change.
 Whitespace, clipped labels, or unreadable metadata tracks should be fixed in
 the layout before the figure is considered final.

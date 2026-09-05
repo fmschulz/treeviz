@@ -28,6 +28,14 @@ Pass it explicitly when you can.
 Python:
 
 ```python
+from treeviz import build_session
+
+metadata = [
+    {"leaf_id": "A", "clade": "Alpha", "habitat": "soil", "abundance": 0.42},
+    {"leaf_id": "B", "clade": "Alpha", "habitat": "water", "abundance": 1.10},
+    {"leaf_id": "C", "clade": "Beta", "habitat": "soil", "abundance": 0.08},
+]
+
 session = build_session(
     "(A,B,C);",
     metadata=metadata,
@@ -130,6 +138,11 @@ await api.execute('view.set-pretty-terminal-branches', { enabled: true })
 Terminal leaves use tree node metadata first and then the bound metadata row.
 Internal nodes only use tree node metadata. Branch style values are keyed by
 the child node, so a row for `A1` styles the branch entering `A1`.
+
+A node-meta key can carry a display name through `[attribute_labels]` in a
+TOML config (session `attributeLabels`); the Controls pickers and hover
+tooltips then show `Name (key)`. See
+[Legends and attribute names](STYLING.md#legends-and-attribute-names).
 
 See [Tree styling](STYLING.md) for current browser examples.
 

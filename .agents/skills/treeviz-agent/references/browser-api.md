@@ -43,7 +43,7 @@ its saved default view.
 - `analyzeSessionMetadata(prompt?)`: plan tracks for loaded metadata.
 - `applyTrackRecommendations(recommendations)`: add planned tracks.
 - `resolveClade(query)`: resolve leaves or metadata predicates to a stable key.
-- `getLayoutMetrics()`: clipping, collision, density, branch, and occupancy metrics.
+- `getLayoutMetrics()`: label visibility, culling, collision and clipping counts, density, branch, and occupancy metrics, at the current camera.
 - `exportSvg()`: current figure as SVG text.
 
 ## Import Tree And Metadata
@@ -53,7 +53,7 @@ const api = window.__treeviz
 
 await api.execute('session.import-tree', {
   source: '(A,B,(C,D));',
-  name: 'tree.nwk',
+  name: 'example.nwk',
   format: 'newick'
 })
 
@@ -130,6 +130,12 @@ await api.execute('view.set-pretty-terminal-branches', { enabled: true })
 
 Branch colours from `branchColorAttribute` and `branch-color` rules extend up to
 the MRCA stem of each same-coloured clade and win over clade styles there.
+
+`branchColorAttribute` reads a node-meta key whose values are colours (Newick
+`[&key=#rrggbb]` comments) and applies them as exact branch and wedge-outline
+colours. `view.set-branch-colour-attribute` maps a numeric metadata-table
+column onto a colour scale. Use one at a time: clear the other with
+`branchColorAttribute: null` or `{ attribute: null }`.
 
 Apply ordered conditions when the source data holds measurements or classes:
 
@@ -225,6 +231,108 @@ if (result?.exact && result.mrcaStableKey) {
 ```
 
 Use stable keys for tree edits.
+
+## Collapsed Wedges And Backgrounds
+
+Collapse a clade with `tree.collapse-clade`; the session records it as
+`cladeStyles[stableKey].collapsed`. In the radial layout every collapsed clade
+draws as a wedge. `view.set-collapsed-wedge-options` applies a partial patch:
+
+```js
+await api.execute('view.set-collapsed-wedge-options', {
+  shape: 'rounded',      // or 'triangle'
+  fill: 'attribute',     // 'background' | 'branch' | 'attribute'
+  fillAttribute: 'cc',   // node-meta colour key the 'attribute' fill reads
+  fillOpacity: 0.8,      // default 0.28; near 0.8 when the fill carries data
+  gap: 6,                // px between neighbouring wedges
+  minBody: 5,            // px half-width floor
+  allowOverlap: false,
+  sizeAttribute: 'pd',   // node-meta numeric key
+  sizeScale: 'log',      // or 'linear'
+  sizeTarget: 'length',  // or 'width'
+  sizeRange: [40, 400],  // px [min, max]
+  outline: 'fitted'      // clade-background outline: 'hull' | 'fitted'
+})
+```
+
+The session view fields are `collapsedWedgeShape`, `collapsedWedgeFill`,
+`collapsedWedgeFillAttribute`, `collapsedWedgeFillOpacity`,
+`collapsedWedgeGap`, `collapsedWedgeMinBody`, `collapsedWedgeAllowOverlap`,
+`collapsedWedgeSizeAttribute`, `collapsedWedgeSizeScale`,
+`collapsedWedgeSizeTarget`, `collapsedWedgeSizeRange`, and
+`cladeBackgroundOutline`. A `treeviz.toml` uses the snake_case forms plus
+`collapse_attribute`, which collapses every internal node whose node-meta value
+for that key is truthy.
+
+`sizeTarget: 'length'` puts the value in the wedge's reach from clade root to
+base and keeps each clade's angular slot, so one colliding wedge is pulled back
+on its own. `sizeTarget: 'width'` puts the value in the outer edge; colliding
+widths in a crowded fan are scaled down by one shared factor.
+
+Node circles and labels draw on top of wedges:
+
+```js
+await api.execute('view.set-node-circles-visible', { visible: false })
+await api.execute('view.toggle-labels')
+```
+
+`view.set-node-circles-visible` sets `showNodeCircles` and hides every
+data-defined node circle without unsetting the style attributes.
+`view.toggle-labels` flips `showLabels`. A collapsed clade whose root node is
+named is labelled beyond its wedge tip in radial, and that label follows
+`showLabels`. `collapsedWedgeLabelDeclutter: true` pushes colliding labels
+outward with leader lines; `allowLabelOverlap: false` culls the ones that
+still collide, judged at their pushed seats. Hovering or selecting a collapsed
+clade outlines its wedge.
+
+## Legends And Attribute Names
+
+Hand-written legends and picker names live on the session document, not
+behind a command. Add them and restore:
+
+```js
+const doc = api.getSession()
+await api.execute('session.restore', {
+  snapshot: {
+    ...doc,
+    legends: [
+      {
+        title: 'Domain',
+        entries: [
+          { label: 'Bacteria', color: '#1f5fd0' },
+          { label: 'Archaea', color: '#00ced1' }
+        ]
+      }
+    ],
+    attributeLabels: { vc: 'Domain colour' }
+  }
+})
+await api.execute('view.set-figure-legend-visibility', { visible: true })
+```
+
+`legends` follow the legends derived from tracks, markers, node marks and
+connections in the Legend panel, the in-figure legend and exports. Pickers and
+hover tooltips show a labelled key as `Domain colour (vc)`. In a
+`treeviz.toml` these are `[[legend]]` tables, `[attribute_labels]`, and
+`figure_legend = true` under `[view]`.
+
+## Search, Hover And Zoom
+
+```js
+await api.execute('view.search', { query: 'Cyanobacteriota' })
+const hits = api.getSession().view.searchHits // stable keys
+await api.execute('view.hover', { key: hits[0] ?? null })
+await api.execute('view.zoom', { factor: 2 })
+```
+
+`view.search` matches leaf names, leaf labels and collapsed-clade labels; a hit
+inside a collapsed clade resolves to that clade's wedge. Clear it with an empty
+query. Above zoom 1 labels, strokes and node marks keep their screen size while
+the tree grows, and the label culler re-runs once the camera has been still
+for about 150 ms, so read `getLayoutMetrics()` after that: `labelsVisible`,
+`labelsCulled`, `labelCollisions` and `labelsClipped` describe the current
+camera. `exportSvg()` applies the same screen-size rule, so an SVG taken while
+zoomed matches the screen.
 
 ## Layout And Evidence
 

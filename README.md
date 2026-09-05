@@ -1,49 +1,22 @@
 # TreeViz
 
 TreeViz is a browser-based viewer for phylogenetic trees, metadata tracks, and
-publication figures. It reads Newick, Nexus, TSV/CSV metadata, and
-`.treeviz.json` session files.
+publication figures. It reads Newick, Nexus, TSV and CSV metadata, and
+`.treeviz.json` sessions, and runs at
+[treeviz.newlineages.com](https://treeviz.newlineages.com/).
 
-The live app is available at:
+![Radial tree of life with phyla collapsed to wedges and coloured by domain](docs/assets/gallery/tree-of-life-phylum-wedges.png)
 
-```text
-https://treeviz.newlineages.com/
-```
-
-This repository contains the public documentation, examples, issue tracker, and
-agent skill for TreeViz. It does not contain the browser app source code or a
-vendored browser build.
-
-Current compatibility:
-
-- The hosted browser app reports version 0.6.0 through
-  [`version.json`](https://treeviz.newlineages.com/version.json). The browser
-  API docs and hosted agent skill target that deployment.
-- The Python examples target the published
-  [`treeviz-phylo` 0.6.0 package](https://pypi.org/project/treeviz-phylo/),
-  whose bundled session schema matches the hosted app. Sessions written by
-  0.3.1 still load: the app migrates them, and a 0.3.1 `layout: "radial"`
-  opens as `circular` with straight connectors, which is what that release
-  drew under the name. The current `radial` is the unrooted equal-daylight
-  layout.
+This repository holds the public documentation, the examples, the issue
+tracker, and the agent skill. The app source is not published here.
 
 ## Documentation
 
-The documentation is organized as a small site:
-
-- [Documentation home](docs/index.md)
-- [Getting started](docs/GETTING_STARTED.md)
-- [Browser usage](docs/BROWSER.md)
-- [Python package](docs/PYTHON.md)
-- [Metadata](docs/METADATA.md)
-- [Tree styling](docs/STYLING.md)
-- [Exports](docs/EXPORTS.md)
-- [Browser API](docs/API.md)
-- [Agent automation](docs/AGENTS.md)
-- [Examples](docs/EXAMPLES.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
-
-The same Markdown pages can be served with MkDocs Material:
+The site is at [fmschulz.github.io/treeviz](https://fmschulz.github.io/treeviz/).
+Start with [Getting started](docs/GETTING_STARTED.md), then the
+[Examples](docs/EXAMPLES.md) page for complete figures with their settings, the
+[Tree styling](docs/STYLING.md) reference for every option, and the
+[Browser API](docs/API.md) for automation. To serve the pages locally:
 
 ```bash
 pip install -r requirements-docs.txt
@@ -52,13 +25,11 @@ mkdocs serve
 
 ## Python Package
 
-The PyPI distribution is `treeviz-phylo`; the Python import name is `treeviz`.
+The PyPI distribution is `treeviz-phylo`; the import name is `treeviz`.
 
 ```bash
 pip install treeviz-phylo
 ```
-
-Minimal use:
 
 ```python
 from treeviz import build_session, save_session, validate_session, view_session
@@ -78,28 +49,36 @@ tracks = [
 session = build_session(tree, metadata=metadata, tracks=tracks, row_key_column="id")
 validate_session(session)
 save_session(session, "example.treeviz.json")
-view = view_session(session, open_browser=False)
-view.url
+view_session(session, open_browser=False).url
 ```
 
-See [Use TreeViz From Python](docs/PYTHON.md) for notebooks, metadata, track
-configuration, tree inspection, and static export options.
+See [Python package](docs/PYTHON.md).
 
 ## Agent Skill
 
-The public skill is in [.agents/skills/treeviz-agent/SKILL.md](.agents/skills/treeviz-agent/SKILL.md).
-It is designed for Claude Code, Codex, and other coding agents that need to
-open TreeViz, import data, configure tracks, tune layouts, and export figures
-through the hosted browser API.
-
-Hosted agent endpoints:
+[.agents/skills/treeviz-agent/SKILL.md](.agents/skills/treeviz-agent/SKILL.md)
+is for coding agents that open TreeViz, import data, configure tracks, tune
+layouts, and export figures through the hosted browser API:
 
 ```text
 https://treeviz.newlineages.com/?api=1
 https://treeviz.newlineages.com/?mode=headless&api=1
 ```
 
+## Compatibility
+
+The hosted app reports version 0.8.0 through
+[`version.json`](https://treeviz.newlineages.com/version.json). The
+[`treeviz-phylo` 0.6.0](https://pypi.org/project/treeviz-phylo/) package
+writes sessions the app opens. Its bundled schema lacks fields the app writes
+(the view fields `showNodeCircles`, `collapsedWedgeFillAttribute`,
+`collapsedWedgeFillOpacity`, `collapsedWedgeLabelDeclutter` and
+`collapsedWedgeFill = "attribute"`, and the top-level `legends` and
+`attributeLabels`), so `validate_session` rejects app-saved sessions that use
+them; see [Schema Compatibility](docs/PYTHON.md#schema-compatibility).
+Sessions written by earlier releases load and are migrated on open.
+
 ## Issues
 
-Use GitHub issues in this repository for documentation, Python package usage,
-metadata import questions, and agent workflow reports.
+Use GitHub issues here for documentation, Python package usage, metadata
+import questions, and agent workflow reports.

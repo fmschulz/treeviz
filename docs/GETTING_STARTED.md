@@ -1,71 +1,77 @@
 # Getting Started
 
-TreeViz can be used directly in the browser, from Python, or through the
-browser API for agent-driven workflows.
+This page takes one hosted example to an exported PNG in the browser. No
+install is needed. The Python and agent routes follow at the end.
 
-## Browser
+## 1. Open an example
 
-Open:
+[Open the labelled tree of life](https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla-labelled.treeviz.json).
+It loads a 1070-genome tree whose phyla are collapsed to wedges.
 
-```text
-https://treeviz.newlineages.com/
-```
+The toolbar switches layout (**Rect**, **Circular**, **Radial**), toggles
+branch lengths (phylogram or cladogram), and opens the **Controls**, **Tracks**,
+**Legend** and **Export** panels. **Fit** resets the camera. The **Legend**
+panel lists this session's three legends; the same legends sit in the figure.
 
-Load a Newick or Nexus tree, then add optional TSV/CSV metadata. Save
-`.treeviz.json` when you want to preserve tree edits, metadata bindings,
-tracks, view settings, and saved views.
+## 2. Zoom in and hover
 
-## Python
+At the fitted view some phylum labels are missing: labels that would overlap
+are culled. Scroll to zoom in on the bacterial fan. The labels keep their size
+while the tree grows, and the culled ones return once they have room. Hover a
+wedge: the tooltip gives the phylum, its leaf count, the branch length and the
+node's attributes, with a swatch for each colour. Press `F` or click **Fit** to
+return.
 
-Install the package:
+## 3. Find a phylum
 
-```bash
-pip install treeviz-phylo
-```
+Type `Cyanobacteriota` into **Search taxa and clades…** and press **Enter**.
+The view zooms to the wedge. A search for a genome inside a collapsed phylum
+lands on that phylum's wedge. **Shift+Enter** and the arrow keys step through
+several hits; **Escape** clears the search.
 
-Create and validate a session:
+## 4. Change what the wedges show
 
-```python
-from treeviz import build_session, save_session, validate_session
+Open **Controls** and find the collapsed-wedge settings:
 
-session = build_session("(A,B,(C,D));")
-validate_session(session)
-save_session(session, "example.treeviz.json")
-```
+- **Size by** shows `pd`, the phylogenetic diversity stored on each phylum
+  node, with **Size target** set to **Length**. Switch **Size by** to **Tree
+  shape** to draw each wedge from the footprint of its collapsed subtree
+  instead, then back to `pd`.
+- **Fill** switches between **Background** (the enclosing clade background),
+  **Branch** (the outline colour) and **Attribute** (a separate colour
+  attribute chosen under **Fill attribute**).
+- **Allow overlap** off, the default, keeps neighbouring wedges apart.
 
-Open the saved file in the browser, or use `view_session(...)` in a notebook.
-See [Python](PYTHON.md) for metadata and notebook examples.
+Untick **Show labels** and **Show node circles** in the same panel to see the
+figure without phylum names and isolate circles, then tick them again.
 
-Tree styling can also be saved in the session. Use [Tree styling](STYLING.md)
-for data-defined node circles, branch width/color, and the pretty terminal
-branch checkbox.
+## 5. Recolour the branches
 
-## Agent Automation
+Still in **Controls**, **Colour branches by** has two groups. **Metadata
+columns (scale)** maps a numeric table column onto a colour scale. **Node
+colours (exact)** lists colourings stored on the tree itself, and this session
+carries three: `vc` (domain), `mc` (a muted palette) and `cc` (a culturedness
+gradient). Choose `cc`, then `vc` to return. Wedge outlines follow the branch
+colour.
 
-Open the hosted app with the public API enabled:
+## 6. Look at the tree as a circle
 
-```text
-https://treeviz.newlineages.com/?api=1
-```
+Click **Circular**. Each leaf now gets an equal angular slot, so Archaea take
+about a sixth of the ring, in proportion to their 182 of 1070 genomes. Click
+**Radial** again: branches are drawn at their true lengths, and the longer
+archaeal root-to-tip distances give that domain a larger footprint. The two
+layouts encode different quantities.
 
-For render-only browser automation:
+## 7. Export
 
-```text
-https://treeviz.newlineages.com/?mode=headless&api=1
-```
+Open **Export**, choose **PNG**, and download. **SVG** gives an editable vector
+file and **PDF** a printable page. **Sessions** saves a `.treeviz.json` that restores everything: tree,
+edits, styling, and saved views.
 
-Agents should call `window.__treeviz.execute(...)` and related API methods
-instead of driving the interface through mouse gestures. See
-[Agent automation](AGENTS.md) and [Browser API](API.md).
+## Next
 
-## Basic Inputs
-
-- Tree: Newick or Nexus.
-- Metadata: TSV or CSV with one header row and one row per leaf.
-- Session: `.treeviz.json` for a complete saved visualization.
-
-## Basic Outputs
-
-- `.treeviz.json`: complete session.
-- SVG, PNG, PDF: figures.
-- Newick, Nexus, TSV: downstream data exchange.
+- [Browser usage](BROWSER.md): load your own tree and metadata table.
+- [Examples](EXAMPLES.md): the settings behind this figure and five others.
+- [Python package](PYTHON.md): build sessions from scripts and notebooks.
+- [Agent automation](AGENTS.md) and the [Browser API](API.md): drive the app
+  through `window.__treeviz` with `?api=1`.

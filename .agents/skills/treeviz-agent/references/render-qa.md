@@ -23,6 +23,8 @@ Start with:
 - `labelsClipped`: labels that cross a viewport edge. The target is zero.
 - `labelCollisions`: pairs of labels whose glyphs overlap, even when overlap is
   allowed.
+- `labelsVisible` and `labelsCulled`: labels drawn and labels dropped by the
+  overlap culler (`allowLabelOverlap: false`), at the current camera.
 - `trackDensity`: metadata-lane density.
 - `p75BranchPx`: branch-length measure that is less sensitive to one long
   branch. More than 160 px on an 8-to-100-tip tree often means the topology is
@@ -41,11 +43,36 @@ uses the shorter viewport side for both axes because the figure is round.
 - Start metadata-heavy figures in rectangular layout.
 - Try circular or radial layout only when labels, wedges, and legends remain
   readable.
+- In radial, after collapsing many clades, check that wedges do not overlap
+  (`collapsedWedgeAllowOverlap` is false by default) and that clade labels sit
+  outside the wedge tips. Prefer `sizeTarget: 'length'` for data-sized wedges
+  in a crowded fan. The crowding pass compares every pair of collapsed
+  wedges, so a figure with hundreds of them renders slower.
+- When wedge labels share a bearing, set `collapsedWedgeLabelDeclutter: true`
+  (labels stack outward with leader lines) and `allowLabelOverlap: false`
+  (labels that still collide are culled until the reader zooms in).
 - Tighten leaf spacing only while labels and symbols remain distinct.
 - Fix clipping with layout, font size, overlap policy, and track density before
   adding large margins.
 - Keep scale bars clear of labels, branches, and tracks.
 - Use `categoryColors` when exact categorical colors must survive upload.
+
+## Legibility At A Zoom
+
+Labels, strokes and node marks keep their screen size above zoom 1, so a
+figure that culls labels at fit shows more of them at 2x. Metrics describe the
+camera they were measured at:
+
+```js
+const atFit = api.getLayoutMetrics()
+await api.execute('view.zoom', { factor: 2 })
+// the culler re-runs ~150 ms after the camera settles
+const atTwo = api.getLayoutMetrics()
+```
+
+Compare `labelsVisible`, `labelsCulled`, `labelCollisions` and `warnings`
+between the two. On a small viewport the fitted zoom can be below 1; labels
+then shrink with the tree; zoom in, or export at a larger canvas.
 
 ## Hosted Browser Evidence
 

@@ -4,7 +4,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-fmschulz%2Ftreeviz-blue?logo=github)](https://github.com/fmschulz/treeviz){ .md-button }
 [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/fmschulz/treeviz/blob/main/LICENSE){ .md-button }
 
-**TreeViz is a client-side phylogenetic tree viewer and editor.** It imports
+TreeViz is a client-side phylogenetic tree viewer and editor. It imports
 Newick, CONTree, Nexus, metadata tables, and `.treeviz.json` sessions; renders
 metadata tracks; supports common tree edits; and exports SVG, PNG, PDF, and
 data files. Everything runs in the browser, with no server and no account.
@@ -12,28 +12,16 @@ data files. Everything runs in the browser, with no server and no account.
 This site covers the public browser app, the Python package, metadata
 structure, tree styling, and agent automation.
 
-The hosted app reports version 0.6.0. Public Python examples target the
-released `treeviz-phylo` 0.6.0 package, whose bundled schema matches the
-browser app. Older 0.3.1 sessions still load and are migrated (see the layout
-note in [Styling](STYLING.md#layouts)).
+The hosted app reports version 0.8.0. The Python examples target the released
+`treeviz-phylo` 0.6.0 package. Its bundled schema lacks several fields the app
+writes, so `validate_session` rejects app-saved sessions with them; see
+[Schema Compatibility](PYTHON.md#schema-compatibility). Sessions from earlier
+releases load and are migrated on open (see the layout note in
+[Styling](STYLING.md#layouts)).
 
-```
-                                          ┌─ recA ████░░██░░░░░░██
-                              ┌──── inner ┤
-                              │           └─ uvrA ██░░██████░░░░░░
-                  ┌── ancestor┤
-                  │           │           ┌─ groEL █████░░░░██░░░░
-                  │           └──── inner ┤
-                  │                       └─ dnaK ████░░██░░░░░░██
-   ────── root ── ┤
-                  │                       ┌─ sodA ░░██████░░░░░░░░
-                  │           ┌──── inner ┤
-                  │           │           └─ katG ░░██░░██████░░░░
-                  └── ancestor┤
-                              │           ┌─ oxyR ██░░░░██████░░░░
-                              └──── inner ┤
-                                          └─ rpoS ░░░░██████░░░░██
-```
+![Radial tree of life with phyla collapsed to wedges, coloured by domain](assets/gallery/tree-of-life-phylum-wedges.png)
+
+*A 1070-genome tree of life with 84 phyla collapsed to wedges. Settings and session link on the [Examples](EXAMPLES.md) page.*
 
 ---
 
@@ -53,7 +41,7 @@ note in [Styling](STYLING.md#layouts)).
 
 ## Start here
 
-- [**Getting started**](GETTING_STARTED.md): choose the browser, Python, or agent workflow.
+- [**Getting started**](GETTING_STARTED.md): one hosted example to an exported figure in the browser.
 - [**Browser app**](BROWSER.md): load trees, add metadata, save sessions, export figures.
 - [**Python package**](PYTHON.md): build `.treeviz.json` sessions from scripts and notebooks.
 - [**Metadata**](METADATA.md): prepare TSV/CSV metadata and track definitions.
@@ -61,7 +49,7 @@ note in [Styling](STYLING.md#layouts)).
 
 ## More
 
-- [Examples](EXAMPLES.md): run the package example script and inspect generated sessions.
+- [Examples](EXAMPLES.md): complete figures with their settings and hosted sessions.
 - [Hosted examples](https://treeviz.newlineages.com/): open current biological,
   feature, and stress-test sessions.
 - [Troubleshooting](TROUBLESHOOTING.md): resolve binding, display, and export issues.

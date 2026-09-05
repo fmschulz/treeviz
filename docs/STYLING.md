@@ -2,8 +2,8 @@
 
 TreeViz styling is data-first. The hosted browser, `.treeviz.json` sessions,
 and `window.__treeviz` use the same palette ids and style fields.
-`treeviz-phylo` 0.6.0 bundles the same session schema; sessions written by
-0.3.1 are migrated on load.
+Sessions written by earlier releases are migrated on load. Complete figures
+built from these settings are on the [Examples](EXAMPLES.md) page.
 
 ## Palette Registry
 
@@ -183,6 +183,20 @@ await window.__treeviz.execute('view.set-layout', {
 })
 ```
 
+`leaf_spacing` (Controls: **Branch spacing**) sets how much room each leaf
+gets. In the rectangular layout it scales the row pitch. The radial layout has
+only a full turn to give, so there it shapes the angle split: each child is
+weighted by its leaf count raised to this power. Above 1 the wide clades take
+more of the turn, which keeps the drawing compact so it renders larger and
+crowded regions gain room; below 1 the shares even out and wide clades reach
+further, inflating the drawing.
+
+```toml
+[view]
+layout = "radial"
+leaf_spacing = 1.6
+```
+
 ## Collapsed Clades
 
 Collapse a clade from the browser (`tree.collapse-clade`) or from a config
@@ -199,7 +213,7 @@ collapsed_wedge_fill = "background"    # "branch", or "attribute" to fill from a
 collapsed_wedge_fill_attribute = "fc"  # node-meta colour key the "attribute" fill reads
 collapsed_wedge_fill_opacity = 0.28    # branch/attribute fill opacity; raise it when the fill carries data
 collapsed_wedge_gap = 6                # px kept between neighbouring wedges
-collapsed_wedge_min_body = 5           # px half-width floor, on top of the stroke
+collapsed_wedge_min_body = 5           # px half-width floor
 collapsed_wedge_allow_overlap = false  # true keeps crowded wedges as first shaped
 collapsed_wedge_size_attribute = "pd"  # size wedges from node metadata instead
 collapsed_wedge_size_scale = "log"     # "linear" or "log" (log10)
@@ -208,12 +222,17 @@ collapsed_wedge_size_range = [10, 80]  # px, outer-edge width or length
 clade_background_outline = "hull"      # or "fitted"
 ```
 
-- `rounded` (default) insets each wedge by half the gap plus half the stroke so
-  neighbours stay apart, thickens footprints thinner than the minimum body so a
-  two-tip clade reads as a rod rather than a line, rounds the outline, and
-  shrinks any pair that would still overlap. `triangle` draws the plain
-  triangle from the clade root to the extreme tips; it still gets the minimum
-  body where a two-tip clade would otherwise be a hairline.
+- `rounded` (default) insets each wedge by half the gap so neighbours stay
+  apart, thickens footprints thinner than the minimum body so a two-tip clade
+  reads as a rod rather than a line, rounds the outline, and shrinks any pair
+  that would still overlap. `triangle` draws the plain triangle from the clade
+  root to the extreme tips; it still gets the minimum body where a two-tip
+  clade would otherwise be a hairline. The outline stroke is drawn over the
+  body and does not change it: a thicker branch stroke gives a thicker outline
+  on the same polygon.
+- Gap, minimum body and size range are pixels at full tree scale. When a larger
+  label font takes more of the radius, the tree and every wedge, sized or
+  footprint-shaped, shrink by the same factor.
 - `collapsed_wedge_fill` picks the fill. `background` (default) takes the
   nearest enclosing `clade_background`, or the branch colour where there is
   none. `branch` takes the wedge's own branch colour, translucent, which tells
@@ -244,9 +263,18 @@ clade_background_outline = "hull"      # or "fitted"
   wedges themselves, with no outline: the buffer is several overlapping shapes
   in one path, and a stroke would draw the seams where they cross.
 
-The same fields exist on the session view (`collapsedWedgeShape`,
-`collapsedWedgeGap`, `collapsedWedgeMinBody`, `collapsedWedgeSizeAttribute`,
-`collapsedWedgeSizeScale`, `collapsedWedgeSizeRange`) for `session.restore`.
+Each key has a camelCase counterpart on the session view for
+`session.restore`: `collapsedWedgeShape`, `collapsedWedgeFill`,
+`collapsedWedgeFillAttribute`, `collapsedWedgeFillOpacity`,
+`collapsedWedgeGap`, `collapsedWedgeMinBody`, `collapsedWedgeAllowOverlap`,
+`collapsedWedgeSizeAttribute`, `collapsedWedgeSizeScale`,
+`collapsedWedgeSizeTarget`, `collapsedWedgeSizeRange`,
+`cladeBackgroundOutline`, `collapsedWedgeLabelDeclutter`, `allowLabelOverlap`,
+and `showNodeCircles`. The command
+`view.set-collapsed-wedge-options` patches the same settings under short
+names: `shape`, `fill`, `fillAttribute`, `fillOpacity`, `gap`, `minBody`,
+`allowOverlap`, `sizeAttribute`, `sizeScale`, `sizeTarget`, `sizeRange`,
+`outline`.
 A data-defined node circle (`node_diameter_attribute`) on a collapsed clade is
 drawn just past the wedge's outer edge; `show_node_circles = false` (Controls >
 Show node circles) hides every data-defined circle without unsetting the
@@ -255,6 +283,106 @@ wedge tip, reading outward along the clade's axis, whenever labels are shown
 (Controls > Show labels). Leaf labels must stay unique, so a single-taxon clade
 drawn as a leaf gets a readable name through a `[[branch_rule]]` with a `label`
 selector and a `clade_label`, which replaces the leaf's displayed name.
+
+## Label Colour, Direction, And Position
+
+`label_color` on a `[[branch_rule]]` sets the text colour of every label in the
+matched subtree: leaf labels, and the wedge label of any collapsed clade inside
+it. One rule per domain colours a whole tree of life.
+
+```toml
+[[branch_rule]]
+clade = "Bacteria"
+label_color = "#163e8a"
+```
+
+A collapsed clade's label sits past its own wedge and reads outward from the
+centre of the drawing, like a spoke. When several wedges share a bearing their
+labels land on each other, which no wedge length or angle setting can fix.
+`collapsed_wedge_label_declutter` pushes a label that overlaps one already
+placed further out along its own bearing until it clears, so crowded labels
+stack in rings. A pushed label gets a thin leader line back to its wedge, in
+the label's own colour:
+
+```toml
+[view]
+collapsed_wedge_label_declutter = true
+```
+
+It is off by default and does nothing to a figure whose labels already clear
+each other.
+
+`allow_label_overlap = false` (Controls: **Auto-cull overlaps**; view
+`allowLabelOverlap`) drops a label that would land on one already drawn. The
+culler judges a collapsed clade's label at its decluttered seat, so a pushed
+label that clears its neighbours is kept. Culled labels return as the view
+zooms in: above zoom 1 labels keep their screen size while the tree grows,
+so room opens between them. Default `true`.
+
+```toml
+[view]
+collapsed_wedge_label_declutter = true
+allow_label_overlap = false
+```
+
+Text on the far side of the figure turns around so it is never upside down. A
+clade sitting where that rule turns over reads against its neighbours.
+`label_flip` reverses the choice for one label:
+
+```toml
+[[branch_rule]]
+clade = "Bdellovibrionota"
+label_flip = true
+```
+
+Any label can also be dragged. Press on the text and move it; the offset is
+stored on that clade as `cladeLabelOffsetX` and `cladeLabelOffsetY`, so it
+survives saving the session and appears in exports. Set the same values from
+the browser API:
+
+```js
+await window.__treeviz.execute('tree.style-clade', {
+  stableKey,
+  patch: { cladeLabelOffsetX: 18, cladeLabelOffsetY: -6, labelFlip: true }
+})
+```
+
+## Legends And Attribute Names
+
+Attribute encodings (branch colour, node-circle colour, wedge fill from a
+node-meta key) carry no legend of their own, and the Controls pickers list
+their keys as written in the tree. `[[legend]]` tables add hand-written swatch
+lists after the legends derived from tracks, markers, node marks and
+connections; they appear in the Legend panel, the in-figure legend and
+exports. `[attribute_labels]` maps a node-meta key to the name the pickers and
+hover tooltips show, as `Name (key)`. `figure_legend = true` opens the
+in-figure legend when the session loads.
+
+```toml
+[view]
+figure_legend = true
+
+[attribute_labels]
+vc = "Domain colour"
+cc = "Culturedness colour"
+fcol = "Isolate colour"
+
+[[legend]]
+title = "Domain"
+entries = [
+  { label = "Bacteria", color = "#1f5fd0" },
+  { label = "Archaea", color = "#00ced1" },
+  { label = "Eukaryota", color = "#6b8e23" }
+]
+```
+
+On the session document the `[[legend]]` tables compile to a top-level
+`legends` array of `{ title, entries: [{ label, color }] }`,
+`[attribute_labels]` to a top-level `attributeLabels` map from key to name,
+and `figure_legend` to `view.figureLegendVisible`. No command edits `legends`
+or `attributeLabels`: set them in the document and load it with
+`session.restore`. `view.set-figure-legend-visibility` and
+`view.toggle-figure-legend` control the overlay.
 
 ## Conditional Style Rules
 
@@ -316,94 +444,3 @@ Rendered targets are `branch-color`, `branch-width`, `node-color`, `node-size`,
 `track-bar-color` are saved in sessions and resolved for compact track
 workflows; compact track display itself is controlled by `displayMode` on the
 track.
-
-## Prompt-To-Figure Recipes
-
-TreeViz does not run a language model in the browser. The expected agent
-workflow is: translate a natural-language request into browser commands or
-package code; validate the session; render a tight export; then inspect
-diagnostics and layout metrics.
-
-### Circular Taxonomy Wedges
-
-Prompt:
-
-> Create a circular tree using a colorblind-safe categorical palette for
-> taxonomy, show compact wedge tracks and a diverging trait heatmap, and export
-> a tight PNG.
-
-Open the
-[hosted bootstrap and taxonomy session](https://treeviz.newlineages.com/?session=%2Fexamples%2Fbootstrap-heatmap-taxonomy%2Fsession.treeviz.json&api=1),
-inspect diagnostics and layout metrics, then export PNG or SVG from the app.
-
-Visual intent: circular 100-tip taxonomy tree, bootstrap markers, one compact
-phylum wedge ring, and two signed trait heatmap rings.
-
-![Circular taxonomy tree with bootstrap labels, wedge tracks, and diverging heatmap rings.](assets/styling/bootstrap-heatmap-wedges.png)
-
-### Diverging Heatmap And Bar Axis
-
-Prompt:
-
-> Use a blue-red diverging palette centered at zero for signed response scores,
-> include a module strip, retain the oxidative-response bar axis, and export a
-> compact rectangular figure.
-
-Open the
-[hosted differential-expression session](https://treeviz.newlineages.com/?session=%2Fexamples%2Fdifferential-expression%2Fsession.treeviz.json&api=1),
-inspect diagnostics and layout metrics, then export PNG or SVG from the app.
-
-Visual intent: a small rectangular tree with a module strip, a dense 30-column
-heatmap centered on zero, a quantitative bar axis, and a normalized composition
-track.
-
-![Rectangular differential-expression tree with categorical strip, diverging heatmap, and bar axis.](assets/styling/differential-expression-heatmap.png)
-
-### Compact Symbol And Wedge Lanes
-
-Prompt:
-
-> Convert genome size into three symbol bins, render GC content as compact
-> wedges, keep the binary marker lanes, and minimize whitespace.
-
-Open the
-[hosted genome-symbol session](https://treeviz.newlineages.com/?session=%2Fexamples%2Fgenome-symbol-lanes%2Fsession.treeviz.json&api=1),
-inspect diagnostics and layout metrics, then export PNG or SVG from the app.
-
-Visual intent: a compact rectangular example that shows manual bar interval
-symbols, automatic bar wedges, categorical strips, binary marker lanes, and a
-text fallback lane in one reproducible session.
-
-![Compact genome example with symbol bins, wedge bins, binary marker lanes, and a text marker lane.](assets/styling/genome-symbol-wedge-lanes.png)
-
-### Node And Branch Styling
-
-Prompt:
-
-> Use metadata-defined node circles and branch strokes, draw a turquoise
-> ancestor-to-tip gradient plus one warm root-to-tip path, and export a
-> manuscript-ready figure.
-
-Open the
-[hosted node and branch styling session](https://treeviz.newlineages.com/?session=%2Fexamples%2Fgradient-node-branch-styling%2Fsession.treeviz.json&api=1),
-inspect diagnostics and layout metrics, then export PNG or SVG from the app.
-
-Visual intent: exact data-defined node sizes, node colors, branch widths, and
-branch colors, with metadata tracks explaining terminal roles.
-
-![Rectangular tree with metadata-defined node circles, branch colors, and tapered branch widths.](assets/styling/gradient-node-branch-styling.png)
-
-## Screenshot Gallery
-
-These screenshots come from the current hosted example sessions. Open the
-linked session to inspect the saved state, diagnostics, layout metrics, and
-export controls.
-
-| Screenshot | Reproducibility note |
-| ---------- | -------------------- |
-| ![Differential-expression heatmap](assets/styling/differential-expression-heatmap.png) | [Open session](https://treeviz.newlineages.com/?session=%2Fexamples%2Fdifferential-expression%2Fsession.treeviz.json&api=1). Compact heatmap with a bar axis and composition track. |
-| ![Genome symbol and wedge lanes](assets/styling/genome-symbol-wedge-lanes.png) | [Open session](https://treeviz.newlineages.com/?session=%2Fexamples%2Fgenome-symbol-lanes%2Fsession.treeviz.json&api=1). Explicit symbol bins and automatic wedge bins. |
-| ![Agent clade playground](assets/styling/agent-clade-playground.png) | [Open session](https://treeviz.newlineages.com/?session=%2Fexamples%2Fagent-clade-playground%2Fsession.treeviz.json&api=1). Clade labels, underlays, symbols, and wedges on a 100-tip tree. |
-| ![Bootstrap heatmap wedges](assets/styling/bootstrap-heatmap-wedges.png) | [Open session](https://treeviz.newlineages.com/?session=%2Fexamples%2Fbootstrap-heatmap-taxonomy%2Fsession.treeviz.json&api=1). Circular labels, support marks, wedges, and heatmap rings. |
-| ![Gradient node and branch styling](assets/styling/gradient-node-branch-styling.png) | [Open session](https://treeviz.newlineages.com/?session=%2Fexamples%2Fgradient-node-branch-styling%2Fsession.treeviz.json&api=1). Exact node and branch styling with role tracks. |
-| ![Large bacterial tree](assets/styling/large-bacterial-tree.png) | [Open session](https://treeviz.newlineages.com/?session=%2Fexamples%2Flarge-bacterial-tree%2Fsession.treeviz.json&api=1). A 6,000-tip stress view with categorical and quantitative rings. |
