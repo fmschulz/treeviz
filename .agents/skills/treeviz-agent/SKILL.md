@@ -9,7 +9,7 @@ TreeViz is a browser-based tree visualization tool. Keep biological reasoning,
 file preparation, and interpretation in the agent; use TreeViz for deterministic
 parsing, metadata binding, layout, styling, diagnostics, and export.
 
-Default runtime:
+Default hosted runtime:
 
 ```text
 https://treeviz.newlineages.com/?api=1
@@ -23,6 +23,8 @@ https://treeviz.newlineages.com/?mode=headless&api=1
 
 This public skill does not vendor the TreeViz browser app or frontend source.
 Use the hosted app unless the user explicitly provides another TreeViz runtime.
+Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
+`https://treeviz.newlineages.com/agent`.
 
 ## Core Workflow
 
@@ -69,6 +71,8 @@ Use the hosted app unless the user explicitly provides another TreeViz runtime.
 - Put tip-to-tip connections in the saved session and resolve endpoint
   diagnostics before export.
 - Use explicit legend titles and item labels when exporting publication figures.
+  Place relevant sections on the figure with `view.set-figure-legend-section`
+  and move the legend with `view.set-panel-position` when it covers the tree.
 - Give attribute encodings (branch colour, node-circle colour, wedge fill) a
   legend through `legends` on the session document and readable picker names
   through `attributeLabels`; set `view.figureLegendVisible` when the figure
@@ -90,7 +94,8 @@ Load only the reference needed for the task:
   and export QA.
 - `references/example-inputs.md`: deterministic 30-leaf and 100-leaf example recipes with metadata and support markers.
 - `references/large-taxonomy-trees.md`: large taxonomy-tree workflows, metadata-derived categories, rerooting, and dense exports.
-- `references/hosted-runtime.md`: hosted URLs, public machine-readable files, the six hosted real-data sessions, and live API smoke testing.
+- `references/hosted-runtime.md`: hosted URLs, public files, current examples,
+  additional tree-of-life sessions, and live API smoke testing.
 - `references/wrapper-api.md`: published Python 0.6.0 package and notebook workflows.
 
 ## Helper Scripts

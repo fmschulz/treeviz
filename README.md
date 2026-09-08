@@ -1,29 +1,33 @@
 # TreeViz
 
-TreeViz is a browser-based viewer for phylogenetic trees, metadata tracks, and
-publication figures. It reads Newick, Nexus, TSV and CSV metadata, and
-`.treeviz.json` sessions, and runs at
-[treeviz.newlineages.com](https://treeviz.newlineages.com/).
+TreeViz is a browser-based viewer and editor for phylogenetic trees and
+tree-aligned metadata. It reads Newick, CONTree, Nexus, TSV, CSV, and
+`.treeviz.json` files; supports rerooting, pruning, collapsing, and styling;
+and exports SVG, PNG, PDF, and data files. Tree and metadata processing happens
+in the browser.
 
-![Radial tree of life with phyla collapsed to wedges and coloured by domain](docs/assets/gallery/tree-of-life-phylum-wedges.png)
+[Open TreeViz](https://treeviz.newlineages.com/) ·
+[Read the documentation](https://fmschulz.github.io/treeviz/) ·
+[Browse the examples](https://fmschulz.github.io/treeviz/EXAMPLES/)
 
-This repository holds the public documentation, the examples, the issue
-tracker, and the agent skill. The app source is not published here.
+![Circular bacterial tree with metadata rings and branch styling](docs/assets/gallery/bacterial-encoding-showcase.svg)
 
-## Documentation
+This repository contains the public documentation, example scripts, issue
+tracker, and agent skill. The browser app source is maintained separately.
 
-The site is at [fmschulz.github.io/treeviz](https://fmschulz.github.io/treeviz/).
-Start with [Getting started](docs/GETTING_STARTED.md), then the
-[Examples](docs/EXAMPLES.md) page for complete figures with their settings, the
-[Tree styling](docs/STYLING.md) reference for every option, and the
-[Browser API](docs/API.md) for automation. To serve the pages locally:
+## Browser app
 
-```bash
-pip install -r requirements-docs.txt
-mkdocs serve
-```
+Open [treeviz.newlineages.com](https://treeviz.newlineages.com/), then choose a
+hosted example or load a tree from your computer. Add a TSV or CSV table when
+you want to align metadata with the leaves. Save a `.treeviz.json` session to
+preserve the tree, metadata binding, tracks, edits, and view settings.
 
-## Python Package
+The [getting-started tutorial](docs/GETTING_STARTED.md) uses a 42-species tree
+derived from GTDB release R232. The [examples page](docs/EXAMPLES.md) labels
+each dataset as sourced biological data, a synthetic feature demonstration, or
+a synthetic stress test.
+
+## Python package
 
 The PyPI distribution is `treeviz-phylo`; the import name is `treeviz`.
 
@@ -52,34 +56,45 @@ save_session(session, "example.treeviz.json")
 view_session(session, open_browser=False).url
 ```
 
-See [Python package](docs/PYTHON.md).
+See the [Python package guide](docs/PYTHON.md) for metadata, notebooks, static
+rendering, and schema compatibility.
 
-## Agent Skill
+## Agent skill
 
-[.agents/skills/treeviz-agent/SKILL.md](.agents/skills/treeviz-agent/SKILL.md)
-is for coding agents that open TreeViz, import data, configure tracks, tune
-layouts, and export figures through the hosted browser API:
+The public skill at
+[`.agents/skills/treeviz-agent/`](.agents/skills/treeviz-agent/) teaches coding
+agents to import data, configure tracks, style clades, inspect diagnostics, tune
+layouts, and export figures through `window.__treeviz`.
+
+Use the hosted runtime:
 
 ```text
 https://treeviz.newlineages.com/?api=1
 https://treeviz.newlineages.com/?mode=headless&api=1
 ```
 
-## Compatibility
+Start with the [agent automation guide](docs/AGENTS.md). The live app also
+publishes a compact [agent API entry page](https://treeviz.newlineages.com/agent),
+the command schema, the session schema, and the example manifest.
 
-The hosted app reports version 0.8.2 through
-[`version.json`](https://treeviz.newlineages.com/version.json). The
-[`treeviz-phylo` 0.6.0](https://pypi.org/project/treeviz-phylo/) package
-writes sessions the app opens. Its bundled schema lacks fields the app writes
-(the view fields `showNodeCircles`, `collapsedWedgeFillAttribute`,
-`collapsedWedgeFillOpacity`, `collapsedWedgeLabelDeclutter`,
-`collapsedWedgeLabelOrientation` and `collapsedWedgeFill = "attribute"`, and
-the top-level `legends` and
-`attributeLabels`), so `validate_session` rejects app-saved sessions that use
-them; see [Schema Compatibility](docs/PYTHON.md#schema-compatibility).
-Sessions written by earlier releases load and are migrated on open.
+## Build the documentation
+
+```bash
+pip install -r requirements-docs.txt
+mkdocs serve
+```
+
+Run `mkdocs build --strict` before publishing.
+
+## Versions and compatibility
+
+The hosted app reports its build through
+[`version.json`](https://treeviz.newlineages.com/version.json). The app and the
+Python package have separate release cycles. Check [schema
+compatibility](docs/PYTHON.md#schema-compatibility) before validating an
+app-saved session with the Python package.
 
 ## Issues
 
-Use GitHub issues here for documentation, Python package usage, metadata
-import questions, and agent workflow reports.
+Use GitHub issues for documentation, Python package use, metadata import, and
+agent workflow reports.

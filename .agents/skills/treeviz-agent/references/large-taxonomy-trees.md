@@ -63,10 +63,11 @@ Before rerooting on a named taxon:
 5. If the MRCA is the whole tree or too broad, use a smaller concentrated clade
    only when that matches the user's stated goal.
 
-Use the helper script for repeatable rerooting:
+Use the helper script for repeatable rerooting. Run it from the installed
+`treeviz-agent` skill directory:
 
 ```bash
-python .agents/skills/treeviz-agent/scripts/reroot-newick-by-metadata.py \
+python scripts/reroot-newick-by-metadata.py \
   --tree input.contree \
   --metadata metadata.tsv \
   --output rerooted.contree \

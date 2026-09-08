@@ -1,61 +1,52 @@
 # TreeViz
 
-[![Live app](https://img.shields.io/badge/live-treeviz.newlineages.com-green)](https://treeviz.newlineages.com){ .md-button }
-[![GitHub](https://img.shields.io/badge/GitHub-fmschulz%2Ftreeviz-blue?logo=github)](https://github.com/fmschulz/treeviz){ .md-button }
-[![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/fmschulz/treeviz/blob/main/LICENSE){ .md-button }
+[Open the browser app](https://treeviz.newlineages.com){ .md-button }
+[View examples](EXAMPLES.md){ .md-button }
+[GitHub](https://github.com/fmschulz/treeviz){ .md-button }
 
-TreeViz is a client-side phylogenetic tree viewer and editor. It imports
-Newick, CONTree, Nexus, metadata tables, and `.treeviz.json` sessions; renders
-metadata tracks; supports common tree edits; and exports SVG, PNG, PDF, and
-data files. Everything runs in the browser, with no server and no account.
+TreeViz turns a Newick, CONTree, or Nexus tree and an optional CSV or TSV table
+into an interactive phylogenetic figure. Use it to inspect clades, align
+metadata with leaves, compare visual encodings, and export SVG, PNG, or PDF.
+Tree and metadata processing happens in the browser, without an account.
 
-This site covers the public browser app, the Python package, metadata
-structure, tree styling, and agent automation.
+Save the complete visualization as a `.treeviz.json` session when another
+person needs to reopen the tree with the same metadata binding, tracks, edits,
+and view settings.
 
-The hosted app reports version 0.8.2. The Python examples target the released
-`treeviz-phylo` 0.6.0 package. Its bundled schema lacks several fields the app
-writes, so `validate_session` rejects app-saved sessions with them; see
-[Schema Compatibility](PYTHON.md#schema-compatibility). Sessions from earlier
-releases load and are migrated on open (see the layout note in
-[Styling](STYLING.md#layouts)).
+![Circular bacterial tree with metadata rings and branch styling](assets/gallery/bacterial-encoding-showcase.svg)
 
-![Radial tree of life with phyla collapsed to wedges, coloured by domain](assets/gallery/tree-of-life-phylum-wedges.png)
+*A GTDB-derived bacterial topology with a family ring for 14 groups, genome-size symbols, GC-content shading, and metabolism categories. The displayed measurements are deterministic synthetic values; see [Examples](EXAMPLES.md#bacterial-encoding-showcase).*
 
-*A 1070-genome tree of life with 84 phyla collapsed to wedges. Settings and session link on the [Examples](EXAMPLES.md) page.*
+## Choose a workflow
 
----
-
-## What TreeViz does
-
-| Surface | Purpose | Where to start |
+| Workflow | Use it for | Start here |
 | --- | --- | --- |
-| **Browser app** | Load trees, add metadata tracks, edit clades, save and share sessions | [Browser app](BROWSER.md) |
-| **Tree styling** | Map node circles, branch width/color, heatmaps, and terminal branches | [Tree styling](STYLING.md) |
-| **Metadata** | Bind TSV/CSV tables to leaves by stable key, independent of leaf order | [Metadata](METADATA.md) |
-| **Python package** | Build `.treeviz.json` sessions from scripts and notebooks | [Python package](PYTHON.md) |
-| **Exports** | SVG, PNG, PDF, Newick, Nexus, leaf lists, metadata TSV, session JSON | [Exports](EXPORTS.md) |
-| **Browser API** | Drive the app programmatically via `window.__treeviz` | [Browser API](API.md) |
-| **Agent automation** | Control patterns for Codex, Claude Code, and similar agents | [Agent automation](AGENTS.md) |
+| Browser app | Explore a tree, add metadata tracks, edit clades, and export a figure | [Getting started](GETTING_STARTED.md) |
+| Metadata | Match table rows to leaves and choose categorical or quantitative tracks | [Prepare metadata](METADATA.md) |
+| Tree styling | Control labels, branches, node marks, collapsed clades, and figure legends | [Tree styling](STYLING.md) |
+| Python package | Build and validate `.treeviz.json` sessions from scripts or notebooks | [Python package](PYTHON.md) |
+| Agent automation | Drive the hosted app through `window.__treeviz` and inspect diagnostics | [Agent automation](AGENTS.md) |
+| Browser API | Look up methods, command arguments, and session behavior | [Browser API](API.md) |
 
----
+## Start with sourced data
 
-## Start here
+The [getting-started tutorial](GETTING_STARTED.md) opens a 42-species bacterial
+tree derived from GTDB release R232. Its family strip uses the accompanying
+taxonomy table. You can inspect the inputs, change the layout, and export the
+figure without installing TreeViz.
 
-- [**Getting started**](GETTING_STARTED.md): one hosted example to an exported figure in the browser.
-- [**Browser app**](BROWSER.md): load trees, add metadata, save sessions, export figures.
-- [**Python package**](PYTHON.md): build `.treeviz.json` sessions from scripts and notebooks.
-- [**Metadata**](METADATA.md): prepare TSV/CSV metadata and track definitions.
-- [**Tree styling**](STYLING.md): node circles, branch width/color, pretty terminal branches.
+The [example gallery](EXAMPLES.md) separates sourced biological data from
+synthetic feature demonstrations and synthetic stress tests. Each catalog
+entry links to its saved session, input tree, metadata, and configuration.
 
-## More
+## Reference and troubleshooting
 
-- [Examples](EXAMPLES.md): complete figures with their settings and hosted sessions.
-- [Hosted examples](https://treeviz.newlineages.com/): open current biological,
-  feature, and stress-test sessions.
-- [Troubleshooting](TROUBLESHOOTING.md): resolve binding, display, and export issues.
-- [GitHub repo](https://github.com/fmschulz/treeviz) · [Live app](https://treeviz.newlineages.com)
+- [Browser app](BROWSER.md): input files, Controls, navigation, saving, and exports.
+- [Exports](EXPORTS.md): figure and data formats.
+- [Troubleshooting](TROUBLESHOOTING.md): metadata matching, crowded labels, wedges, and session validation.
+- [Live app version](https://treeviz.newlineages.com/version.json): current deployed build.
 
 !!! note "Public scope"
-    This repository is documentation-first. It does not vendor the TreeViz
-    browser app, frontend source, deployment scripts, project planning notes,
-    or generated build artifacts.
+    This repository contains the public documentation, examples, issue tracker,
+    and agent skill. It does not contain the browser app source or deployment
+    configuration.

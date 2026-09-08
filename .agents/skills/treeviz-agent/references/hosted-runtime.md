@@ -8,6 +8,9 @@ discover public machine-readable files.
 - App: `https://treeviz.newlineages.com/`
 - API mode: `https://treeviz.newlineages.com/?api=1`
 - Headless API mode: `https://treeviz.newlineages.com/?mode=headless&api=1`
+- Compact agent entry: `https://treeviz.newlineages.com/agent`
+- Agent guide: `https://fmschulz.github.io/treeviz/AGENTS/`
+- Browser API reference: `https://fmschulz.github.io/treeviz/API/`
 
 ## Public Files
 
@@ -24,7 +27,30 @@ files, thumbnails, provenance, and synthetic-data labels.
 Do not infer browser support from the published Python package. The hosted app
 and its schemas can be newer than `treeviz-phylo`.
 
-## Real-Data Sessions
+## Example Catalog
+
+Read `/examples/manifest.json` instead of maintaining a fixed example list in
+agent prompts. Each entry gives the title, purpose, synthetic-data flag, leaf
+count, source, thumbnail, saved session, tree, metadata, and TOML
+configuration.
+
+Open a catalog session with its `sessionUrl`:
+
+```text
+https://treeviz.newlineages.com/?session=/examples/bacterial-starter/session.treeviz.json
+```
+
+The current catalog's `purpose` values describe the intended use:
+
+- `biological`: a biological-data example.
+- `feature-demo`: a demonstration of rendering or styling features.
+- `stress-test`: a scale and rendering test.
+
+Read the separate `synthetic` and `source` fields for data provenance. Do not
+treat a plausible synthetic value as a measurement. Use all three fields when
+writing figure captions or reports.
+
+## Additional Tree-of-Life Sessions
 
 Six hosted sessions hold a 1070-leaf GTDB marker tree with 84 collapsed phylum
 clades in radial layout. Open one with `?session=`:
@@ -55,10 +81,11 @@ colour keys, and clade styles that produce the figure.
 
 ## Live API Smoke
 
-When Playwright and Bun are available:
+When Playwright and Bun are available, run this from the installed
+`treeviz-agent` skill directory:
 
 ```bash
-bun .agents/skills/treeviz-agent/scripts/check-live-api-smoke.ts \
+bun scripts/check-live-api-smoke.ts \
   --url https://treeviz.newlineages.com/
 ```
 
@@ -67,7 +94,7 @@ installed Chromium build:
 
 ```bash
 TREEVIZ_CHROMIUM_EXECUTABLE_PATH=/path/to/chromium \
-  bun .agents/skills/treeviz-agent/scripts/check-live-api-smoke.ts \
+  bun scripts/check-live-api-smoke.ts \
   --url https://treeviz.newlineages.com/
 ```
 

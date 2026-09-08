@@ -1,81 +1,65 @@
 # Getting Started
 
-This page takes one hosted example to an exported PNG in the browser. No
-install is needed. The Python and agent routes follow at the end.
+This tutorial opens a sourced bacterial tree, checks its metadata track,
+compares two layouts, and exports a figure. It runs in the hosted browser app
+and requires no installation.
 
-## 1. Open an example
+## 1. Open the starter
 
-[Open the labelled tree of life](https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla-labelled.treeviz.json).
-It loads a 1070-genome tree whose phyla are collapsed to wedges.
+[Open the Bacterial Diversity Starter](https://treeviz.newlineages.com/?session=/examples/bacterial-starter/session.treeviz.json).
+The session contains 42 representative species from seven bacterial phyla. Its
+tree and taxonomy derive from [GTDB release
+R232](https://data.gtdb.ecogenomic.org/releases/release232/).
 
-The toolbar switches layout (**Rect**, **Circular**, **Radial**), toggles
-branch lengths (phylogram or cladogram), and opens the **Controls**, **Tracks**,
-**Legend** and **Export** panels. **Fit** resets the camera. The **Legend**
-panel lists this session's three legends; the same legends sit in the figure.
+The saved session opens as a rectangular phylogram with leaf labels, branch
+lengths, and one family track.
 
-## 2. Zoom in and hover
+## 2. Check the metadata track
 
-At the fitted view some phylum labels are missing: labels that would overlap
-are culled. Scroll to zoom in on the bacterial fan. The labels keep their size
-while the tree grows, and the culled ones return once they have room. Hover a
-wedge: the tooltip gives the phylum, its leaf count, the branch length and the
-node's attributes, with a swatch for each colour. Press `F` or click **Fit** to
-return.
+Open **Tracks**. Each track is listed by title. Expand **Family** to edit its
+column, palette, and width; the first track is open when the panel appears. The
+track reads the `family` column from the linked taxonomy table. TreeViz matches
+rows to leaves by the `species` row key rather than table position.
 
-## 3. Find a phylum
+You can inspect the exact inputs:
 
-Type `Cyanobacteriota` into **Search taxa and clades…** and press **Enter**.
-The view zooms to the wedge. A search for a genome inside a collapsed phylum
-lands on that phylum's wedge. **Shift+Enter** and the arrow keys step through
-several hits; **Escape** clears the search.
+- [Newick tree](https://treeviz.newlineages.com/examples/bacterial-starter/tree.nwk)
+- [TSV taxonomy](https://treeviz.newlineages.com/examples/bacterial-starter/metadata.tsv)
+- [TOML configuration](https://treeviz.newlineages.com/examples/bacterial-starter/treeviz.toml)
 
-## 4. Change what the wedges show
+## 3. Inspect a species
 
-Open **Controls** and find the collapsed-wedge settings:
+Hover a leaf to read its name, branch length, and metadata values. Search for
+`Aquipseudomonas aylmerensis` to focus that tip. Press **Escape** to clear the
+search and **F** to fit the whole tree.
 
-- **Size by** shows `pd`, the phylogenetic diversity stored on each phylum
-  node, with **Size target** set to **Length**. Switch **Size by** to **Tree
-  shape** to draw each wedge from the footprint of its collapsed subtree
-  instead, then back to `pd`.
-- **Fill** switches between **Background** (the enclosing clade background),
-  **Branch** (the outline colour) and **Attribute** (a separate colour
-  attribute chosen under **Fill attribute**).
-- **Allow overlap** off, the default, keeps neighbouring wedges apart.
-- **Collapsed wedge labels** is on **Leader lines** and **Collapsed wedge
-  label direction** on **Along branch** in this session. Switch them to **At
-  wedge tip** and **Outward** to seat every label at its wedge tip, reading
-  out from the centre, then set them back.
+## 4. Compare layouts
 
-Untick **Show labels** and **Show node circles** in the same panel to see the
-figure without phylum names and isolate circles, then tick them again.
+Switch from **Rectangular** to **Circular**, then press **F**. The same tree and
+family values now fill a ring. Switch back to **Rectangular** to restore the
+saved figure's layout.
 
-## 5. Recolour the branches
+Open **Controls** when you need more detail. Quick actions for label and
+metadata-track visibility appear first. The settings are grouped under
+**Layout**, **Labels**, **Branches & nodes**, and **Metadata**. The stage
+toolbar holds the layout and branch-length buttons used in this tutorial.
 
-Still in **Controls**, **Colour branches by** has two groups. **Metadata
-columns (scale)** maps a numeric table column onto a colour scale. **Node
-colours (exact)** lists colourings stored on the tree itself, and this session
-carries three: `vc` (domain), `mc` (a muted palette) and `cc` (a culturedness
-gradient). Choose `cc`, then `vc` to return. Wedge outlines follow the branch
-colour.
+## 5. Export or save
 
-## 6. Look at the tree as a circle
+Open **Export** and choose the output that matches the next step:
 
-Click **Circular**. Each leaf now gets an equal angular slot, so Archaea take
-about a sixth of the ring, in proportion to their 182 of 1070 genomes. Click
-**Radial** again: branches are drawn at their true lengths, and the longer
-archaeal root-to-tip distances give that domain a larger footprint. The two
-layouts encode different quantities.
+- **SVG** for an editable vector figure.
+- **PNG** for a raster image.
+- **PDF** for a printable page.
+- **TreeViz session** to preserve the tree, metadata, tracks, edits, and view settings.
 
-## 7. Export
+The `.treeviz.json` session is the editable TreeViz record. Figure exports do
+not preserve the interactive state.
 
-Open **Export**, choose **PNG**, and download. **SVG** gives an editable vector
-file and **PDF** a printable page. **Sessions** saves a `.treeviz.json` that restores everything: tree,
-edits, styling, and saved views.
+## Continue with your data
 
-## Next
-
-- [Browser usage](BROWSER.md): load your own tree and metadata table.
-- [Examples](EXAMPLES.md): the settings behind this figure and five others.
+- [Browser app](BROWSER.md): load a tree and metadata table from your computer.
+- [Metadata](METADATA.md): choose a row key and handle unmatched rows or leaves.
+- [Examples](EXAMPLES.md): compare the ten hosted example sessions and their data provenance.
 - [Python package](PYTHON.md): build sessions from scripts and notebooks.
-- [Agent automation](AGENTS.md) and the [Browser API](API.md): drive the app
-  through `window.__treeviz` with `?api=1`.
+- [Agent automation](AGENTS.md): control TreeViz through `window.__treeviz`.

@@ -4,13 +4,9 @@ Use these deterministic examples when an agent needs a known-good TreeViz
 session for testing metadata binding, tracks, support markers, legends, and
 layout tuning.
 
-The runnable source is:
-
-```text
-examples/plot_treeviz_examples.py
-```
-
-Run:
+The public repository includes the runnable
+[`plot_treeviz_examples.py`](https://github.com/fmschulz/treeviz/blob/main/examples/plot_treeviz_examples.py)
+source. In a repository checkout, run:
 
 ```bash
 python examples/plot_treeviz_examples.py --out treeviz-example-output

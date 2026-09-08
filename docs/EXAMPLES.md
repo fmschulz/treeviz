@@ -1,218 +1,240 @@
 # Examples
 
-Every figure on this page is an export of a session that is hosted on the
-live app. Open the session link under a figure to see the saved state, change
-a setting in Controls, and export your own version. The settings under each
-figure are the `[view]`, `[[branch_rule]]`, `[[legend]]` and
-`[attribute_labels]` entries of the TOML config that produces it, or the
-`tracks` and `view` arguments of `build_session` in Python.
-Each TOML key has a camelCase counterpart on the session view and a short
-argument name in `view.set-collapsed-wedge-options`. [Tree
-styling](STYLING.md#collapsed-clades) lists the mapping.
+Each figure below is a TreeViz export from the linked saved session. Open a
+session to inspect the tree, metadata binding, tracks, view settings, and
+diagnostics. The source links provide the input tree, metadata table, and TOML
+configuration where those files are published.
 
-## Tree of life, collapsed to phyla
+The TOML files are readable source recipes used to build the saved sessions.
+The hosted browser opens the `.treeviz.json` session and exposes the same
+settings through its panels and browser API.
 
-A 1070-genome GTDB concatenated-marker tree (776 Bacteria, 182 Archaea,
-112 Eukaryota) in the radial layout. Of its 93 phylum-level blocks, the 84
-with more than one genome are collapsed to wedges; the 9 single-genome phyla
-stay as leaves. Bacteria are blue, Archaea turquoise, Eukaryota green, and each
-domain sits on a fitted underlay that follows its branches and wedges.
-Circle area is proportional to the number of genomes in the block, coloured by
-isolate category.
+The data labels have narrow meanings:
 
-![Radial tree of life with phylum wedges coloured by domain](assets/gallery/tree-of-life-phylum-wedges.png)
+- **Sourced data**: the tree and displayed metadata come from the named source.
+- **Synthetic feature demo**: some or all values were generated to demonstrate a rendering feature. Do not interpret them as measurements.
+- **Synthetic stress test**: the topology and metadata were generated to test scale and rendering behavior.
 
-[Open the session](https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla.treeviz.json)
+The [live manifest](https://treeviz.newlineages.com/examples/manifest.json) is
+the machine-readable source for the current catalog, file links, and
+provenance.
 
-```toml
-[view]
-layout = "radial"
-collapse_attribute = "clps"           # node-meta flag on each phylum root
-branch_color_attribute = "vc"         # node-meta colour: domain
-branch_width_attribute = "bw"
-node_diameter_attribute = "nd"        # node-meta px: 5 * sqrt(genomes)
-node_color_attribute = "ncol"
-clade_background_outline = "fitted"
+## Bacterial Diversity Starter
 
-[[branch_rule]]
-clade = "Bacteria"
-clade_background = "rgba(31,95,208,0.16)"
+**Sourced data · 42 tips · rectangular phylogram**
 
-[[branch_rule]]
-clade = "Archaea"
-clade_background = "rgba(0,206,209,0.20)"
+[![Rectangular bacterial tree with a family metadata strip](assets/gallery/bacterial-starter.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/bacterial-starter/session.treeviz.json)
 
-[[branch_rule]]
-clade = "Eukaryota"            # listed last: it sits inside Archaea and paints on top
-clade_background = "rgba(154,205,50,0.35)"
-```
+This starter uses 42 representative species from seven bacterial phyla. The
+tree and taxonomy derive from [GTDB release
+R232](https://data.gtdb.ecogenomic.org/releases/release232/). A single family strip
+shows how a categorical metadata column aligns with leaf labels while leaving
+the topology visible.
 
-## Wedge length encodes phylogenetic diversity
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/bacterial-starter/session.treeviz.json) ·
+[SVG figure](assets/gallery/bacterial-starter.svg) ·
+[Tree](https://treeviz.newlineages.com/examples/bacterial-starter/tree.nwk) ·
+[Metadata](https://treeviz.newlineages.com/examples/bacterial-starter/metadata.tsv) ·
+[Configuration](https://treeviz.newlineages.com/examples/bacterial-starter/treeviz.toml)
 
-The same tree. Each wedge's length is log10 of the phylum's total phylogenetic
-diversity, mapped onto 40 to 400 px. Length is the target rather than width
-because in a radial fan a clade's angular room is bounded by its neighbours. A
-data-driven width would be shrunk to avoid overlap. Length keeps each clade's
-slot.
+## Bacterial Encoding Showcase
+
+**Synthetic feature demo · 196 tips · circular tree**
+
+[![Circular bacterial tree with metadata rings, symbols, and branch styling](assets/gallery/bacterial-encoding-showcase.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/bacterial-encoding-showcase/session.treeviz.json)
+
+This figure combines four metadata tracks for 14 family groups, genome-size
+symbols, a GC-content gradient, and metabolism categories with node circles and
+branch styling. The topology and taxonomy derive from GTDB release R232. Genome
+size, GC content, metabolism, branch width, and highlighted-path values are
+deterministic synthetic values.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/bacterial-encoding-showcase/session.treeviz.json) ·
+[SVG figure](assets/gallery/bacterial-encoding-showcase.svg) ·
+[Tree](https://treeviz.newlineages.com/examples/bacterial-encoding-showcase/tree.nwk) ·
+[Metadata](https://treeviz.newlineages.com/examples/bacterial-encoding-showcase/metadata.tsv) ·
+[Configuration](https://treeviz.newlineages.com/examples/bacterial-encoding-showcase/treeviz.toml) ·
+[GTDB source](https://data.gtdb.ecogenomic.org/releases/release232/)
+
+## Synthetic Expression Heatmap (40 genes)
+
+**Synthetic feature demo · 40 genes · rectangular tree**
+
+[![Synthetic gene tree with a diverging expression heatmap and summary tracks](assets/gallery/differential-expression.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/differential-expression/session.treeviz.json)
+
+An illustrative generated gene tree is aligned with a diverging expression
+heatmap, a module strip, a response bar, and a composition track. TreeViz does
+not calculate the clustering. The topology and every displayed value are
+synthetic and demonstrate dense rectangular metadata tracks.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/differential-expression/session.treeviz.json) ·
+[SVG figure](assets/gallery/differential-expression.svg) ·
+[Tree](https://treeviz.newlineages.com/examples/differential-expression/tree.nwk) ·
+[Metadata](https://treeviz.newlineages.com/examples/differential-expression/metadata.tsv) ·
+[Configuration](https://treeviz.newlineages.com/examples/differential-expression/treeviz.toml)
+
+## Ancestral State Pies
+
+**Synthetic feature demo · 24 tips · rectangular tree**
+
+[![Rectangular tree with donut marks at named internal nodes](assets/gallery/ancestral-state-pies.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/ancestral-state-pies/session.treeviz.json)
+
+Donut marks show three habitat-state proportions at named internal nodes. A
+clade strip identifies the four leaf groups. The topology, leaf metadata, and
+ancestral-state values are deterministic fixtures for node-metadata and
+node-mark workflows.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/ancestral-state-pies/session.treeviz.json) ·
+[SVG figure](assets/gallery/ancestral-state-pies.svg) ·
+[Tree](https://treeviz.newlineages.com/examples/ancestral-state-pies/tree.nwk) ·
+[Leaf metadata](https://treeviz.newlineages.com/examples/ancestral-state-pies/metadata.tsv) ·
+[Node metadata](https://treeviz.newlineages.com/examples/ancestral-state-pies/node-states.tsv) ·
+[Configuration](https://treeviz.newlineages.com/examples/ancestral-state-pies/treeviz.toml)
+
+## HGT Connections
+
+**Synthetic feature demo · 40 tips · circular tree**
+
+[![Circular tree with synthetic transfer events drawn between leaves](assets/gallery/hgt-connections.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/hgt-connections/session.treeviz.json)
+
+Forty synthetic transfer events are drawn as chords between leaves and colored
+by donor group. A categorical strip provides the four group labels around the
+tree.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/hgt-connections/session.treeviz.json) ·
+[SVG figure](assets/gallery/hgt-connections.svg) ·
+[Tree](https://treeviz.newlineages.com/examples/hgt-connections/tree.nwk) ·
+[Metadata](https://treeviz.newlineages.com/examples/hgt-connections/metadata.tsv) ·
+[Transfer table](https://treeviz.newlineages.com/examples/hgt-connections/transfers.tsv) ·
+[Configuration](https://treeviz.newlineages.com/examples/hgt-connections/treeviz.toml)
+
+## Genome Symbol Lanes
+
+**Synthetic feature demo · 8 tips · rectangular tree**
+
+[![Rectangular tree with interval symbols, wedges, and binary marker lanes](assets/gallery/genome-symbol-lanes.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/genome-symbol-lanes/session.treeviz.json)
+
+The tracks compare interval symbols, compact numeric wedges, binary markers,
+and a text fallback lane. Familiar bacterial species names label a generated
+topology. The displayed track values are also generated.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/genome-symbol-lanes/session.treeviz.json) ·
+[SVG figure](assets/gallery/genome-symbol-lanes.svg) ·
+[Tree](https://treeviz.newlineages.com/examples/genome-symbol-lanes/tree.nwk) ·
+[Metadata](https://treeviz.newlineages.com/examples/genome-symbol-lanes/metadata.tsv) ·
+[Configuration](https://treeviz.newlineages.com/examples/genome-symbol-lanes/treeviz.toml)
+
+## Large-Tree Stress Fixture
+
+**Synthetic stress test · 6,000 tips · circular tree**
+
+[![Circular 6,000-tip stress-test tree with four metadata rings](assets/gallery/large-bacterial-tree.png){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/large-bacterial-tree/session.treeviz.json)
+
+This generated dataset tests circular rendering with domain and phylum strips,
+genome-size values, and GC-content values. It demonstrates scale and density;
+it is not a biological result.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/large-bacterial-tree/session.treeviz.json) ·
+[SVG figure (5.7 MB)](assets/gallery/large-bacterial-tree.svg) ·
+[Tree](https://treeviz.newlineages.com/examples/large-bacterial-tree/tree.nwk) ·
+[Metadata](https://treeviz.newlineages.com/examples/large-bacterial-tree/metadata.tsv) ·
+[Configuration](https://treeviz.newlineages.com/examples/large-bacterial-tree/treeviz.toml)
+
+## Bootstrap Support with Taxonomy
+
+**Synthetic feature demo · 100 tips · circular tree**
+
+[![Circular tree with bootstrap markers, a phylum wedge track, and heatmap rings](assets/gallery/bootstrap-heatmap-taxonomy.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/bootstrap-heatmap-taxonomy/session.treeviz.json)
+
+Internal-node marker size encodes bootstrap support. A phylum wedge track and
+two continuous heatmap rings show the generated taxonomy and environmental
+values.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/bootstrap-heatmap-taxonomy/session.treeviz.json) ·
+[SVG figure](assets/gallery/bootstrap-heatmap-taxonomy.svg) ·
+[Tree](https://treeviz.newlineages.com/examples/bootstrap-heatmap-taxonomy/tree.nwk) ·
+[Metadata](https://treeviz.newlineages.com/examples/bootstrap-heatmap-taxonomy/metadata.tsv) ·
+[Configuration](https://treeviz.newlineages.com/examples/bootstrap-heatmap-taxonomy/treeviz.toml)
+
+## Agent Styling Playground
+
+**Synthetic feature demo · 100 tips · rectangular tree**
+
+[![Rectangular tree with named clades, backgrounds, and compact metadata lanes](assets/gallery/agent-clade-playground.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/agent-clade-playground/session.treeviz.json)
+
+Named clades, annotation labels, backgrounds, genome-size symbols, and GC
+wedges provide a deterministic target for agent-driven styling. Taxon names,
+topology, taxonomy, and measurements are generated.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/agent-clade-playground/session.treeviz.json) ·
+[SVG figure](assets/gallery/agent-clade-playground.svg) ·
+[Tree](https://treeviz.newlineages.com/examples/agent-clade-playground/tree.nwk) ·
+[Metadata](https://treeviz.newlineages.com/examples/agent-clade-playground/metadata.tsv) ·
+[Configuration](https://treeviz.newlineages.com/examples/agent-clade-playground/treeviz.toml)
+
+## Node and Branch Styling
+
+**Synthetic feature demo · 9 tips · rectangular tree**
+
+[![Rectangular tree with data-defined node circles and branch styles](assets/gallery/gradient-node-branch-styling.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/gradient-node-branch-styling/session.treeviz.json)
+
+Node-circle size and color, branch width and color, and rounded terminal
+branches are read from generated metadata. Three metadata tracks show the
+style role, terminal-branch width, and a short style note.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/gradient-node-branch-styling/session.treeviz.json) ·
+[SVG figure](assets/gallery/gradient-node-branch-styling.svg) ·
+[Tree](https://treeviz.newlineages.com/examples/gradient-node-branch-styling/tree.nwk) ·
+[Metadata](https://treeviz.newlineages.com/examples/gradient-node-branch-styling/metadata.tsv) ·
+[Configuration](https://treeviz.newlineages.com/examples/gradient-node-branch-styling/treeviz.toml)
+
+## Additional Tree-of-Life Figures
+
+These collaboration figures use a 1,070-genome concatenated-marker tree with
+84 multi-genome phylum blocks collapsed to wedges. They show wedge geometry,
+dual color encodings, labels, and legends on a dense biological tree. The
+finished TreeViz sessions are hosted, but the underlying tree and per-phylum
+source tables are not published in this repository. Treat these as visual case
+studies rather than reproducible example datasets.
+
+### Phyla Collapsed to Wedges
+
+![Radial tree of life with phylum wedges colored by domain](assets/gallery/tree-of-life-phylum-wedges.png)
+
+The outline color identifies Bacteria, Archaea, or Eukaryota. Circle area is
+proportional to the number of genomes in a phylum block and circle color shows
+its isolate category.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla.treeviz.json)
+
+### Wedge Length by Phylogenetic Diversity
 
 ![Radial tree of life with wedge length by phylogenetic diversity](assets/gallery/tree-of-life-wedge-length-by-diversity.png)
 
-[Open the session](https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla-pd.treeviz.json)
+Each wedge's length maps the log10 of the phylum's total phylogenetic diversity
+onto a 40 to 400 pixel range.
 
-```toml
-[view]
-collapsed_wedge_size_attribute = "pd"   # node-meta number on each phylum root
-collapsed_wedge_size_scale = "log"
-collapsed_wedge_size_target = "length"
-collapsed_wedge_size_range = [40, 400]
-```
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla-pd.treeviz.json)
 
-## Two colourings on two channels
-
-Branches and wedge outlines carry the domain. Each wedge is filled with a
-second colouring: black for phyla with no isolate genomes, and a dark red to
-yellow gradient over log10 of isolate genomes per unit of phylogenetic
-diversity. The fill opacity is raised from the 0.28 default because the fill
-carries data rather than tinting the outline.
+### Domain Outlines and Culturedness Fills
 
 ![Radial tree of life with domain outlines and culturedness fills](assets/gallery/tree-of-life-domain-outlines-culturedness-fill.png)
 
-[Open the session](https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla-domain-cultured.treeviz.json)
+Branch and wedge outlines identify the domain. Wedge fill shows isolate genomes
+per unit of phylogenetic diversity.
 
-```toml
-[view]
-branch_color_attribute = "vc"           # outline colour
-collapsed_wedge_fill = "attribute"
-collapsed_wedge_fill_attribute = "cc"   # fill colour, a different node-meta key
-collapsed_wedge_fill_opacity = 0.85
-```
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla-domain-cultured.treeviz.json)
 
-## Labelled phyla with isolate circles
+### Phylum Labels and Isolate Circles
 
-The same figure with phylum names at the wedge tips and a fixed-size circle
-per phylum: black for no isolate genomes, dark brown for 1 to 10, orange for
-more than 10, grey where no count is available. Each domain colours its own
-labels. Each label sits at its wedge tip and reads along the branch that
-enters its phylum. Labels that share a bearing are pushed out along that
-branch and joined to their wedge by a leader line; labels that still collide
-are culled at the fitted zoom and return as you zoom in. Three hand-written
-legends (domain, isolate genomes per phylum, culturedness) sit in the figure.
-Any label can be dragged to a clearer spot. **Show labels** and **Show node
-circles** in Controls switch the two layers.
+![Radial tree of life with phylum labels, isolate circles, and three legends](assets/gallery/tree-of-life-labelled-phyla.png)
 
-![Radial tree of life with phylum labels, isolate circles and three legends](assets/gallery/tree-of-life-labelled-phyla.png)
+Phylum labels follow the incoming branch and move onto leader lines when they
+collide. Circle color encodes isolate-count classes. Three explicit legends
+describe domain, isolate count, and culturedness.
 
-[Open the session](https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla-labelled.treeviz.json)
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla-labelled.treeviz.json)
 
-```toml
-[view]
-show_labels = true                # collapsed roots are named after their phylum
-show_node_circles = true
-node_diameter_attribute = "fd"    # fixed 14 px
-node_color_attribute = "fcol"     # isolate category colour
-leaf_spacing = 1.6                # more of the turn to the wide clades, so the
-                                  # drawing stays compact and the crowded
-                                  # bacterial phyla get room
-collapsed_wedge_label_declutter = true   # push colliding labels outward, with leader lines
-collapsed_wedge_label_orientation = "branch"  # read each label along the branch entering its phylum
-allow_label_overlap = false              # cull labels that still collide; zoom in to see them
-figure_legend = true                     # open the in-figure legend on load
-
-[attribute_labels]                # names the Controls pickers show, as "Name (key)"
-vc = "Domain colour"
-cc = "Culturedness colour"
-fcol = "Isolate colour"
-
-[[legend]]
-title = "Domain"
-entries = [
-  { label = "Bacteria", color = "#1f5fd0" },
-  { label = "Archaea", color = "#00ced1" },
-  { label = "Eukaryota", color = "#6b8e23" }
-]
-
-[[legend]]
-title = "Isolate genomes per phylum"
-entries = [
-  { label = "No isolates", color = "#000000" },
-  { label = "1-10", color = "#3b1f0e" },
-  { label = "More than 10", color = "#f47a1f" },
-  { label = "No data", color = "#9aa0a6" }
-]
-# A third [[legend]] table, "Culturedness (isolate genomes per unit PD)",
-# has the same shape.
-
-[[branch_rule]]
-clade = "Bacteria"
-label_color = "#163e8a"           # inherited by every label in the domain
-```
-
-Leaf names have to stay unique, so a phylum represented by a single genome
-keeps its accession as the leaf name and gets its phylum label through a rule:
-
-```toml
-[[branch_rule]]
-label = "GB_GCA_024275655.1"
-clade_label = "B1Sed10-29"
-```
-
-## Circular taxonomy with heatmap rings
-
-A synthetic 100-tip fixture: bootstrap support as internal-node markers sized
-by value, a compact phylum wedge ring, and two trait heatmap rings.
-
-![Circular tree with support markers, a wedge ring, and heatmap rings](assets/gallery/circular-taxonomy-heatmap-rings.png)
-
-[Open the session](https://treeviz.newlineages.com/?session=/examples/bootstrap-heatmap-taxonomy/session.treeviz.json)
-
-```python
-view = {
-    "layout": "circular",
-    "connectors": "arc",
-    "internalNodeMarkerAttribute": "support",
-    "internalNodeMarkerEncoding": "size",
-}
-tracks = [
-    {"kind": "color_strip", "column_key": "phylum", "title": "Phylum wedges", "palette": "Tableau10"},
-    {"kind": "heatmap", "column_keys": ["temperature_z"], "title": "Temperature", "palette": "coolwarm"},
-    {"kind": "heatmap", "column_keys": ["nutrient_index"], "title": "Nutrient", "palette": "Cividis"},
-]
-```
-
-## Rectangular heatmap with a bar axis
-
-A synthetic 8-tip fixture: a module colour strip, a 30-column heatmap centred
-on zero, a quantitative bar track with its axis, and a normalised composition
-track.
-
-![Rectangular tree with a colour strip, diverging heatmap, and bar axis](assets/gallery/rectangular-heatmap-bar-axis.png)
-
-[Open the session](https://treeviz.newlineages.com/?session=/examples/differential-expression/session.treeviz.json)
-
-```python
-conditions = ["heat", "oxid", "stationary", "recovery", "nutrient"]
-view = {"layout": "rectangular"}
-tracks = [
-    {"kind": "color_strip", "column_key": "module", "title": "Module", "palette": "Dark2"},
-    {"kind": "heatmap", "title": "Response", "palette": "coolwarm",
-     "column_keys": [f"{c}_{i:02d}" for c in conditions for i in range(1, 7)]},
-    {"kind": "bar", "column_key": "oxid_04", "title": "Oxidative peak", "show_axis": True},
-    {"kind": "stacked_bar", "title": "Response mix", "palette": "okabe-ito",
-     "column_keys": [f"comp_{c}" for c in conditions]},
-]
-```
-
-## More hosted sessions
-
-The live app lists every example under **Sessions**. The manifest at
-`https://treeviz.newlineages.com/examples/manifest.json` gives each one's
-title, leaf count, and whether its data is synthetic. Two further tree-of-life
-variants are hosted: a culturedness gradient on the branches
-(`/sessions/rekhatree-tol-phyla-cultured.treeviz.json`) and a muted print
-palette (`/sessions/rekhatree-tol-phyla-muted.treeviz.json`).
-
-The [example script](PYTHON.md#runnable-example-script) in the Python package
-docs builds sessions like the last two from a table.
-
-How each image on this page was rendered, and where its data comes from, is
-recorded in the [gallery provenance notes](assets/gallery/README.md).
+The [gallery provenance note](assets/gallery/README.md) records the render and
+data source for every committed image, with exact dimensions for the current
+catalog exports.

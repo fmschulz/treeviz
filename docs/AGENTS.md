@@ -1,12 +1,13 @@
 # Agent Automation
 
-Agents should control TreeViz through `window.__treeviz` when the app is opened
-with `?api=1`. This is more reliable than replaying clicks or guessing DOM
-state.
+Use the hosted TreeViz API when a script or coding agent needs to build,
+inspect, or export a phylogenetic visualization. The API exposes command
+schemas, diagnostics, layout metrics, session state, and SVG export through
+`window.__treeviz`.
 
 ## Runtime
 
-Use the hosted app:
+Open the browser app with the API enabled:
 
 ```text
 https://treeviz.newlineages.com/?api=1
@@ -18,16 +19,28 @@ Use headless mode for render-only browser automation:
 https://treeviz.newlineages.com/?mode=headless&api=1
 ```
 
-The public skill is available at:
+The hosted [agent API page](https://treeviz.newlineages.com/agent) links the
+runtime, command schema, session schema, and example manifest.
 
-```text
-.agents/skills/treeviz-agent/SKILL.md
-```
+## Use the public skill
 
-The skill does not include a browser build. It uses the hosted TreeViz app and
-small helper scripts for session QA and file processing.
+The installable skill is the complete
+[`treeviz-agent` directory](https://github.com/fmschulz/treeviz/tree/main/.agents/skills/treeviz-agent)
+in the public repository. It contains the entry file, task-specific references,
+and helper scripts. Download or sync the whole directory; `SKILL.md` refers to
+the adjacent files.
 
-## Standard Sequence
+- [Read `SKILL.md`](https://github.com/fmschulz/treeviz/blob/main/.agents/skills/treeviz-agent/SKILL.md)
+- [Open the raw entry file](https://raw.githubusercontent.com/fmschulz/treeviz/main/.agents/skills/treeviz-agent/SKILL.md)
+- [Browse the Browser API reference](API.md)
+- [Inspect the live command schema](https://treeviz.newlineages.com/treeviz-command-schema.json)
+- [Inspect the live session schema](https://treeviz.newlineages.com/treeviz-session.schema.json)
+- [List hosted examples](https://treeviz.newlineages.com/examples/manifest.json)
+
+The public skill uses the hosted app. It does not include the browser build or
+frontend source.
+
+## Standard sequence
 
 ```js
 const api = window.__treeviz
@@ -60,56 +73,54 @@ await api.execute('session.import-metadata', {
 await api.applyTrackRecommendations(plan.recommendedTracks)
 
 const diagnostics = api.getDiagnostics()
+if (diagnostics.some((item) => item.level === 'error')) {
+  throw new Error('TreeViz diagnostics contain errors')
+}
+
 const metrics = api.getLayoutMetrics()
 const svg = api.exportSvg()
+if (!svg.startsWith('<svg')) throw new Error('SVG export failed')
 ```
 
-Check diagnostics after each logical batch. Treat error-level diagnostics as a
-failed automation step unless the task intentionally tests invalid input.
+Wait for each API call before issuing a dependent command. Check diagnostics
+after import and after each logical batch of edits.
 
-## Practical Rules
+## Practical rules
 
 - Load or restore a session before metadata, tracks, or styling.
-- Use `commands()` when exact command ids or argument schemas matter.
-- Use `palettes()` for palette ids and exact color sets.
-- Use `planMetadataImport(...)` before importing metadata from text.
+- Read `commands()` when an exact command id or argument schema matters.
+- Read `palettes()` for palette ids and exact color sets.
+- Call `planMetadataImport(...)` before importing metadata from text.
 - Use stable keys from the session tree for clade edits.
 - Use `categoryColors` when categorical colors must remain exact across uploads.
-- Use `displayMode: 'symbol'` or `'wedge'` on color-strip and bar tracks for
-  compact lanes. Bar tracks can use explicit `bins` or `autoBins`.
-- Use `view.set-tree-style-attributes` for exact node-circle and branch
-  width/color values, and `view.set-pretty-terminal-branches` for styled
-  terminal leaf branches.
-- Use `view.set-conditional-style-rules` for metadata thresholds, ranks,
-  missing values, and category conditions.
+- Use `displayMode: 'symbol'` or `'wedge'` on color-strip and bar tracks for compact lanes.
+- Use `view.set-tree-style-attributes` for data-defined node circles and branch width or color.
+- Use `view.set-conditional-style-rules` for metadata thresholds, ranks, missing values, and categories.
 - Use `nodemark.add` for pie, donut, or bar marks on bound internal nodes.
-- Store tip-to-tip links in `session.connections`; validate unresolved,
-  collapsed, hidden, and same-leaf endpoints through diagnostics.
-- Keep `branchScaleMode` on `auto` unless fixed geometry is required. Calling
-  `view.set-branch-scale` switches the view to manual scale.
-- Put hand-written legends in `session.legends` and attribute display names
-  in `session.attributeLabels` before `session.restore`; no command edits
-  them.
-- Use `view.search` to find a taxon or clade by name; the hits are stable
-  keys in `getSession().view.searchHits`, and a hit inside a collapsed clade
-  resolves to the wedge.
-- Re-check `getDiagnostics()` and `getLayoutMetrics()` after visual changes.
-- Capture or export a figure after the final layout change before reporting that the figure is ready.
+- Store tip connections in `session.connections` and resolve endpoint diagnostics before export.
+- Keep `branchScaleMode` on `auto` unless the figure requires fixed geometry.
+- Put explicit legends in `session.legends` and readable attribute names in `session.attributeLabels` before `session.restore`.
+- Use `view.search` to find a taxon or clade by name.
 - Save durable work as `.treeviz.json`.
 
-Layout QA should start with `contentOccupancyX`, `contentOccupancyY`,
-`labelsClipped`, `labelCollisions`, `labelsVisible`, `labelsCulled`,
-`trackDensity`, and `p75BranchPx`. For circular and radial layouts, occupancy
-is measured against the shorter viewport side because the figure is round.
-Metrics describe the current camera. Labels keep their screen size above zoom
-1, so `labelsCulled` at fit is not the count a reader sees at 2x: call
-`view.zoom`, wait for the render, and read the metrics again.
+## Check the layout
 
-Radial figures with collapsed wedges also report `wedgeOverlapPairs`, pairs of
-wedge fills that intersect, and `wedgeBranchCrossings`, branches of other
-lineages that run through a wedge. Either above zero adds
-`metrics.wedge.overlap` to `warnings`. Both fields are absent when the figure
-draws no such wedge.
+Read `getLayoutMetrics()` after the latest visual change. Start with
+`contentOccupancyX`, `contentOccupancyY`, `labelsClipped`, `labelCollisions`,
+`labelsVisible`, `labelsCulled`, `trackDensity`, and `p75BranchPx`.
+
+For circular and radial layouts, occupancy is measured against the shorter
+viewport side because the figure is round. Metrics describe the current camera.
+Labels keep their screen size above zoom 1, so the fitted view and a 2x view can
+have different `labelsVisible` and `labelsCulled` counts. Zoom, wait for the
+render, and read the metrics again.
+
+Radial figures with collapsed wedges also report `wedgeOverlapPairs` and
+`wedgeBranchCrossings`. Either count above zero adds `metrics.wedge.overlap` to
+`warnings`.
+
+Inspect the final exported SVG, PNG, or PDF before reporting that a figure is
+ready.
 
 ## References
 

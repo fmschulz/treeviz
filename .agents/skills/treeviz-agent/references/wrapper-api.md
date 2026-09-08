@@ -5,13 +5,19 @@ pipeline.
 
 ## Compatibility
 
-The current PyPI release is `treeviz-phylo` 0.6.0. It builds and validates
-TreeViz sessions against the same session schema the hosted app (0.6.0) uses.
+The current PyPI release is `treeviz-phylo` 0.6.0. It bundles an older TreeViz
+session schema than the hosted app. The live schema additionally supports
+`legends`, `attributeLabels`, `showNodeCircles`,
+`collapsedWedgeFillAttribute`, `collapsedWedgeFillOpacity`,
+`collapsedWedgeLabelDeclutter`, `collapsedWedgeLabelOrientation`, and the
+`attribute` value of `collapsedWedgeFill`. Validate an app-saved session against
+`https://treeviz.newlineages.com/treeviz-session.schema.json` when it uses
+those fields.
+
 Sessions written by 0.3.1 still load, and a 0.3.1 `radial` layout opens as
-`circular` with straight connectors. The package validates the current view
-fields,
-so view fields such as `conditionalStyleRules`, `branchColorAttribute`,
-`nodeCircleDiameterAttribute`, and `prettyTerminalBranches` validate in Python.
+`circular` with straight connectors. The package validates other current view
+fields, including `conditionalStyleRules`, `branchColorAttribute`,
+`nodeCircleDiameterAttribute`, and `prettyTerminalBranches`.
 Track dictionaries accept `category_colors`, `display_mode`, `bins`, and
 `auto_bins` (or their camelCase forms). Sessions written by the 0.1.0 package
 still load; the hosted app migrates them and keeps their branch scale in manual

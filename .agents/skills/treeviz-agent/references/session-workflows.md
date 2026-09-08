@@ -45,7 +45,8 @@ Remember:
 - CSV is safer for quoted fields, commas, or embedded newlines;
 - TSV is best for simple tabular metadata.
 
-For user-facing details, read `docs/METADATA.md`.
+For user-facing details, read
+`https://fmschulz.github.io/treeviz/METADATA/`.
 
 ## Clade Resolution
 

@@ -37,8 +37,8 @@ import treeviz
 ## Schema Compatibility
 
 `validate_session` checks a session against the schema bundled in the package.
-The 0.6.0 package schema does not include fields the hosted app (0.8.0)
-writes: the view fields `showNodeCircles`, `collapsedWedgeFillAttribute`,
+The 0.6.0 package schema does not include fields the current hosted app writes:
+the view fields `showNodeCircles`, `collapsedWedgeFillAttribute`,
 `collapsedWedgeFillOpacity`, `collapsedWedgeLabelDeclutter` and
 `collapsedWedgeLabelOrientation`, the `attribute` value of
 `collapsedWedgeFill`, and the top-level `legends` and

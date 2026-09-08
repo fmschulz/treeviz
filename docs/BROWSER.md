@@ -37,36 +37,34 @@ leaves.
 Metadata tracks encode table values next to leaves: colour strips for
 categories, gradients and heatmaps for continuous values, bars for numeric
 comparisons, text tracks for labels, binary dots for presence and absence.
-The **Tracks** panel adds and orders them.
+The **Tracks** panel lists each track by title. Expand a track to edit its
+columns, palette, width, and other settings; the first track is open when the
+panel appears. The same panel adds and removes tracks.
 
-The **Controls** panel holds the figure settings:
+The stage toolbar switches layout, shows or hides branch lengths, sets tip
+alignment, fits the tree, and opens the panels. The **Controls** panel starts
+with quick actions for label and metadata-track visibility, followed by four
+groups:
 
-- **Layout and density**: branch scale, **Branch spacing**, metadata scale and
-  gap, label font size and family, **Auto-cull overlaps**. Branch spacing
-  scales the row pitch in the rectangular layout and shapes the angle split in
-  the radial one, where raising it keeps the drawing compact so crowded clades
-  gain room. Auto-cull overlaps (TOML `allow_label_overlap = false`) drops a
-  label that would land on one already drawn; zooming in brings it back.
-- **Show labels**, **Show support labels**, **Show node circles**, **Show
-  metadata tracks**: switch leaf and clade labels, support values,
-  data-defined node circles, and metadata tracks on and off.
-- **Colour branches by**: **Metadata columns (scale)** maps a numeric column
-  onto a colour scale. **Node colours (exact)** applies a colouring stored on
-  the tree itself (Newick `[&key=#rrggbb]` comments) as exact colours. Wedge
-  outlines follow the branch colour.
-- **Exact styling**: node-circle diameter and colour, branch width and colour,
-  each from a data attribute. A key with a display name in the session
-  (`[attribute_labels]`) is listed as `Name (key)`.
-- **Pretty terminal branches**: thicker, rounded branches into terminal
-  leaves.
-- Collapsed wedges, radial layout only: **Shape** (Rounded or Triangle),
-  **Fill** (Background, Branch, or Attribute) with **Fill attribute** and
-  **Fill opacity**, **Gap** and **Min body** in px, **Allow overlap**,
-  **Size by** a numeric attribute or **Tree shape** with a Linear or Log10
-  **Scale** and a Width or Length **Size target**, the clade
-  **Background** outline (Hull or Fitted), **Collapsed wedge labels** (At
-  wedge tip or Leader lines) and **Collapsed wedge label direction** (Along
-  branch or Outward).
+- **Layout**: zoom and automatic collapse threshold.
+- **Labels**: label font and size, support labels, and **Auto-cull overlaps**.
+  Auto-cull overlaps (TOML
+  `allow_label_overlap = false`) drops a label that would land on one already
+  drawn; zooming in brings it back.
+- **Branches & nodes**: **Tree width**, **Branch stroke width**, **Branch
+  spacing**, **Colour by**, **Exact styling**, node circles, and **Pretty
+  terminal branches**. Branch spacing scales row pitch in the rectangular
+  layout. In the radial layout it shapes the angular split so crowded clades
+  can receive more room. **Colour by** maps a numeric metadata column onto a
+  scale or applies exact colours stored in node metadata. **Exact styling**
+  maps node-circle diameter or colour and branch width or colour from data
+  attributes. Wedge outlines follow the branch colour.
+- **Metadata**: adjust metadata-track widths, row height, and gap. Add, remove,
+  and edit the tracks themselves in **Tracks**.
+
+Collapsed-wedge controls appear under **Branches & nodes** in the radial
+layout. They include shape, fill source and opacity, gap, minimum body, overlap
+policy, data-driven size, background outline, and label placement.
 
 The Controls panel scrolls when it is taller than the stage; a thin scrollbar
 marks the rows below the fold.

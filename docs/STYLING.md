@@ -5,6 +5,11 @@ and `window.__treeviz` use the same palette ids and style fields.
 Sessions written by earlier releases are migrated on load. Complete figures
 built from these settings are on the [Examples](EXAMPLES.md) page.
 
+TOML snippets on this page show the source-recipe form used to build saved
+example sessions. The hosted browser does not load TOML directly. Use the
+corresponding panel or browser API command, or open the compiled
+`.treeviz.json` session.
+
 ## Palette Registry
 
 The web app ships a small static palette registry. Inspect it from the browser

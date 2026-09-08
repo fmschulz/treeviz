@@ -97,11 +97,12 @@ the same state as `.treeviz.json`.
 
 ## Export Cleanup
 
-For repeated SVG and PNG cleanup:
+For repeated SVG and PNG cleanup, run this from the installed
+`treeviz-agent` skill directory:
 
 ```bash
 uv run --with pillow python \
-  .agents/skills/treeviz-agent/scripts/postprocess-treeviz-export.py \
+  scripts/postprocess-treeviz-export.py \
   --svg results/tree.svg \
   --png results/tree.png \
   --layout circular
