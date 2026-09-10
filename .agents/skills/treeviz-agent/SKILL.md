@@ -29,7 +29,11 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
 ## Core Workflow
 
 1. Open TreeViz with `?api=1` and wait for `window.__treeviz`.
-2. Import a tree or restore a `.treeviz.json` session.
+2. Import a tree or restore a `.treeviz.json` session. Example 1:
+   Mirusviricota has 18 tracks and a fitted circular opening. Example 2: SILVA
+   taxonomy has imported node angles, count-scaled nodes and branches, 50
+   centered labels, and a continuous count legend. Both sessions cite their
+   source paper by DOI.
 3. Inspect `getSession()`, `commands()`, `palettes()`, and `getDiagnostics()`.
 4. For metadata, call `planMetadataImport(source, format, prompt)` before import.
 5. Import metadata with the suggested row key, flags, and leaf identifier source.
@@ -64,6 +68,18 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
 - Use exact style attributes for data-defined node circles and branch
   width/color; enable pretty terminal branches when the user asks for styled
   leaf-facing terminal branches.
+- For abundance trees, store display-ready diameters, widths, and colors in
+  node metadata. Add horizontal names with `tree.style-clade` and
+  `{ label, cladeLabelPlacement: 'node', cladeLabelFontSize }`. Node placement
+  works on internal and terminal nodes, and font size accepts fractional values
+  from 1 to 96 pixels. Set `showScaleBar: false` through `view.set-layout` when
+  taxonomic depth should remain visible without a distance scale.
+- To preserve a source circular layout, store degrees from 0 through 360 in
+  direct node metadata and select the key with `circularAngleAttribute` through
+  `view.set-layout`. Opening and rotation still apply. Missing or invalid
+  values fall back per node. Keep angles in traversal order for arc connectors
+  and collapsed spans. Pass `null` to restore automatic angles. Rectangular and
+  radial layouts ignore this setting.
 - For one-off webapp edits, use Controls > Exact styling for data attributes,
   Style clade for clade branch/label styling, and Inspector for direct
   selected-node circle diameter/color and branch width/color.
@@ -74,12 +90,19 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
 - Put tip-to-tip connections in the saved session and resolve endpoint
   diagnostics before export.
 - Use explicit legend titles and item labels when exporting publication figures.
-  Place relevant sections on the figure with `view.set-figure-legend-section`
-  and move the legend with `view.set-panel-position` when it covers the tree.
+  Place, move or hide sections with `view.set-figure-legend-placement` and
+  `{ sectionKey, visible, x, y }`. Custom legend keys are `custom:0`,
+  `custom:1`, etc. Explicit section visibility overrides the
+  global `view.set-figure-legend-visibility` command.
 - Give attribute encodings (branch colour, node-circle colour, wedge fill) a
   legend through `legends` on the session document and readable picker names
   through `attributeLabels`; set `view.figureLegendVisible` when the figure
   should open with the legend shown.
+- For a combined numeric size/color legend, use a session JSON
+  `continuous-scale` legend with `title`, `axisLabel`, `colors`, `domain`,
+  `sizeRange`, `transform`, `ticks`, and optional `scale`. `scale` defaults to
+  `1` and accepts `0.1` to `4`. It scales the ramp, spacing, stroke, axis,
+  ticks, and text. TOML legends define swatches only.
 - On crowded radial figures set `collapsedWedgeLabelDeclutter: true` and
   `allowLabelOverlap: false`; culled labels return as the reader zooms in.
   `collapsedWedgeLabelOrientation: 'branch'` reads each label along the
@@ -115,6 +138,10 @@ Load only the reference needed for the task:
 - Check `getRenderDiagnostics()` after a render when the renderer may omit an
   item, such as a connection with an unresolved endpoint.
 - Check `getLayoutMetrics()` after layout changes.
+- After restore, wait for `onReady` and `document.fonts.ready`, then wait until
+  the camera and layout metrics stop changing across several animation frames.
+  Confirm that exported SVG dimensions match the settled stage before saving a
+  thumbnail.
 - Judge legibility at the zoom the reader will use: labels hold their screen
   size above zoom 1, so `labelsVisible` and `labelsCulled` at fit differ from
   the counts at 2x. Call `view.zoom`, wait for the render, read the metrics again.

@@ -33,7 +33,9 @@ await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(r
 ```
 
 Pass `skipAutoApplyDefault: true` only when the restored snapshot must not apply
-its saved default view.
+its saved default view. After restore, wait until the camera and
+`getLayoutMetrics()` stop changing across several animation frames. A mounted
+editor can briefly report its previous viewport.
 
 ## Core Methods
 
@@ -243,6 +245,13 @@ collapsed clade it recolours the wedge outline and `patch.wedgeFill` sets the
 wedge fill. The region `patch.cladeBackground` draws is itself a click target:
 left-click selects the clade, right-click opens its menu.
 
+For text centered on a node, set `patch.cladeLabelPlacement: 'node'`. It uses
+`patch.label`, `cladeLabelFontSize` (fractional 1–96 px), `cladeLabelColor`,
+`cladeLabelBold`, and the offsets. It works on internal and terminal nodes,
+stays horizontal, and reserves no outer label lane. Terminal nodes get one
+label. Use `view.set-layout` with `{ layout, showScaleBar: false }` to hide the
+distance scale without changing branch geometry.
+
 ## Collapsed Wedges And Backgrounds
 
 Collapse a clade with `tree.collapse-clade`; the session records it as
@@ -330,7 +339,7 @@ await api.execute('session.restore', {
     attributeLabels: { vc: 'Domain colour' }
   }
 })
-await api.execute('view.set-figure-legend-visibility', { visible: true })
+await api.execute('view.set-figure-legend-placement', { sectionKey: 'custom:0', visible: true })
 ```
 
 `legends` follow the legends derived from tracks, markers, node marks and
@@ -338,6 +347,20 @@ connections in the Legend panel, the in-figure legend and exports. Pickers and
 hover tooltips show a labelled key as `Domain colour (vc)`. In a
 `treeviz.toml` these are `[[legend]]` tables, `[attribute_labels]`, and
 `figure_legend = true` under `[view]`.
+
+Custom legend keys are `custom:0`, `custom:1`, etc. Use
+`view.set-figure-legend-placement` with `visible: false` to hide a section
+in both the figure and export; pass `x` and `y` together to move it. Explicit
+section visibility overrides `view.set-figure-legend-visibility`.
+
+For numeric size/color encodings, session JSON also accepts
+`{ kind: 'continuous-scale', title, axisLabel, colors, domain, sizeRange, transform, ticks, scale? }`.
+`transform` is `linear` or `sqrt`. Optional `scale` defaults to `1`, accepts
+finite values from `0.1` to `4`, and scales the ramp, spacing, stroke, axis,
+ticks, and text. The standalone figure section is frameless and transparent,
+with a centered regular-weight title above the ramp; the side panel keeps its
+container. The legend describes display values already stored on nodes and
+branches. It does not compute them. TOML legends define swatches only.
 
 ## Search, Hover And Zoom
 
@@ -393,6 +416,15 @@ widths, or the viewport change. It keeps the label edge fixed and does not
 respond to zoom or pan. Opening and interior colors accept `#RRGGBB` or `null`.
 In circular layout, `alignment: 'label'` draws guides from tips to the inner
 edge of the visible metadata rings; use `'tip'` to turn them off.
+
+`circularAngleAttribute` selects a direct `node.meta` key containing angles in
+degrees from 0 through 360. Finite numbers and nonempty numeric strings are
+accepted. Missing, Boolean, nonfinite, or out-of-range values use the automatic
+angle for that node. Bound metadata-table columns are excluded. Values map into
+the current opening and rotation; opening 0 with rotation 90 gives clockwise
+angles from the right. Keep values in traversal order for arc connectors and
+collapsed spans. Pass `null` to clear the setting. Rectangular and radial
+layouts ignore it.
 
 Save and reapply an exact view after fitting it:
 

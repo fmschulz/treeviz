@@ -46,7 +46,11 @@ alignment, fits the tree, and opens the panels. The **Controls** panel starts
 with quick actions for label and metadata-track visibility, followed by four
 groups:
 
-- **Layout**: zoom and automatic collapse threshold.
+- **Layout**: zoom, automatic collapse threshold, and scale-bar visibility.
+  Circular layout also provides opening, rotation, imported node angles, and
+  opening/interior fill controls. **Node angles (degrees)** lists numeric
+  attributes stored directly on tree nodes; **Automatic** uses TreeViz's
+  computed angles.
 - **Labels**: label font and size, support labels, and **Auto-cull overlaps**.
   Auto-cull overlaps (TOML
   `allow_label_overlap = false`) drops a label that would land on one already
@@ -79,8 +83,10 @@ of the same session. Every option is listed in [Tree styling](STYLING.md).
 The **Legend** panel lists the legends derived from tracks, markers, node marks
 and connections, then any hand-written legends stored on the session
 (`legends`, from `[[legend]]` tables in a TOML config). **Display in figure**
-places a section on the canvas; the in-figure legend is part of SVG, PNG and
-PDF exports.
+places a section on the canvas; the in-figure legend is part of SVG, PNG, and
+PDF exports. Session JSON can also supply a continuous size/color legend. Its
+standalone figure section is frameless, with the title above the ramp; the side
+panel keeps its normal container.
 
 ## Navigate
 

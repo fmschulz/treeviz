@@ -78,6 +78,9 @@ For repeatable file-based rerooting from metadata, use
 - Clade annotation labels: `tree.style-clade` with `patch.label`,
   `cladeLabelColor`, `cladeLabelBold`, `cladeLabelFontSize`, or
   `cladeBackground`.
+- Horizontal node names: add `cladeLabelPlacement: 'node'` to the same patch.
+  The label is centered on either an internal or terminal node. Fractional
+  `cladeLabelFontSize` values from 1 to 96 pixels support scaled names.
 - Bootstrap/support labels: `view.set-show-support`.
 - Internal-node support markers: `view.set-internal-node-marker`.
 - Exact node/branch style values: `view.set-tree-style-attributes`.
@@ -161,6 +164,10 @@ For repeatable file-based rerooting from metadata, use
 - Circular opening, rotation, fit, and fills: `view.set-layout` with
   `circularOpeningAngle`, `circularOpeningAutoFit`, `circularRotation`,
   `circularOpeningColor`, and `circularInteriorColor`.
+- Authored circular angles: `view.set-layout` with
+  `circularAngleAttribute: '<direct-node-meta-key>'`; pass `null` for automatic
+  angles. The values are degrees from 0 through 360.
+- Scale visibility: `view.set-layout` with `showScaleBar`.
 - Circular tip-to-track guides: `view.set-tip-alignment` with
   `alignment: 'label'`; use `'tip'` to disable them.
 - Named views: `view.save`, `view.rename`, `view.set-default`, and `view.apply`.

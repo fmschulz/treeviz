@@ -45,9 +45,11 @@ of truth when building an external tool.
 
 `version().session` is a legacy value of `1`. The document format is
 `getSession().version`, also published as `schemaVersions.session` in `/version.json`.
-`onReady` signals the first rendered frame after a session load. For later
-edits, wait for fonts and layout before reading metrics or exporting; see the
-[agent workflow](AGENTS.md).
+`onReady` signals the first rendered frame after a session load. After restore,
+wait for `document.fonts.ready` and for the camera and layout metrics to stop
+changing across several animation frames before reading metrics or exporting.
+A mounted editor can briefly report its previous viewport. See the [agent
+workflow](AGENTS.md).
 
 Underscored properties on `window.__treeviz` are internal integration hooks
 and are not stable. External tools should use `commands()`, `execute(...)`,
@@ -77,11 +79,11 @@ Command mutability has three values:
 | `session.save`            | `{}`                                                              | Download the current session as `.treeviz.json`.        |
 | `session.import-node-metadata` | `{ tsv, rowKeyColumn? }`                                     | Parse TSV keyed to internal nodes and bind it. Rows key on the internal node label, or on an `mrca_of` column holding `|`-separated leaf names. |
 
-`session.restore` takes the whole document, including the top-level `legends`
-(hand-written swatch legends, `[{ title, entries: [{ label, color }] }]`) and
-`attributeLabels` (node-meta key to display name). No command edits those two
-fields. An optional `meta.description` string can record provenance in the
-saved `.treeviz.json` document.
+`session.restore` takes the whole document, including top-level `legends` and
+`attributeLabels` (node-meta key to display name). Legends can be hand-written
+swatches (`[{ title, entries: [{ label, color }] }]`) or continuous scales.
+No command edits those two fields. An optional `meta.description` string can
+record provenance in the saved `.treeviz.json` document.
 
 ## View Commands
 
@@ -89,7 +91,7 @@ saved `.treeviz.json` document.
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `view.pan`                            | `{ dx, dy }`                                                                                               | Pan the camera.                                                                |
 | `view.zoom`                           | `{ factor, panX?, panY? }`                                                                                 | Zoom the camera.                                                               |
-| `view.set-layout`                     | `{ layout, connectors?, circularOpeningAngle?, circularOpeningAutoFit?, circularRotation?, circularOpeningColor?, circularInteriorColor?, branchScale?, branchScaleMode?, leafSpacing?, metadataScale?, metadataGap?, labelFontSize?, allowLabelOverlap? }` | Change layout, circular opening and fills, connector style, and density settings. |
+| `view.set-layout`                     | `{ layout, connectors?, circularOpeningAngle?, circularOpeningAutoFit?, circularRotation?, circularAngleAttribute?, circularOpeningColor?, circularInteriorColor?, branchScale?, branchScaleMode?, leafSpacing?, metadataScale?, metadataGap?, labelFontSize?, allowLabelOverlap?, showScaleBar? }` | Change layout, circular angles and fills, connector style, density settings, and scale visibility. |
 | `view.set-scale-bar-position`         | `{ x, y }`                                                                                                 | Move the scale bar.                                                            |
 | `view.set-panel-position`             | `{ panel, x, y }`                                                                                          | Move `treeHud`, `viewControls`, `inspector`, `figureLegend`, or `utilityDock`. |
 | `view.set-panel-size`                 | `{ panel, width, height }`                                                                                 | Resize `viewControls`, `inspector`, or `utilityDock`.                          |
@@ -121,8 +123,8 @@ saved `.treeviz.json` document.
 | `view.toggle-label-overlap`           | `{}`                                                                                                       | Toggle `allowLabelOverlap` (Controls: **Auto-cull overlaps**).                 |
 | `view.toggle-metadata`                | `{}`                                                                                                       | Toggle metadata track visibility.                                              |
 | `view.set-metadata-visibility`        | `{ visible }`                                                                                              | Set metadata track visibility.                                                 |
-| `view.toggle-figure-legend`           | `{}`                                                                                                       | Toggle the compact in-figure legend overlay.                                   |
-| `view.set-figure-legend-visibility`   | `{ visible }`                                                                                              | Set in-figure legend overlay visibility.                                       |
+| `view.toggle-figure-legend`           | `{}`                                                                                                       | Toggle figure legends without explicit section settings.                                   |
+| `view.set-figure-legend-visibility`   | `{ visible }`                                                                                              | Set visibility for legends without explicit section settings.                                       |
 | `view.set-figure-legend-section`      | `{ sectionIndex }`                                                                                         | Display one legend section in the figure; use `null` for all sections.         |
 | `view.set-figure-legend-placement`    | `{ sectionKey, visible?, x?, y? }`                                                                         | Set per-section figure legend visibility and position.                         |
 | `view.set-figure-legend-title`        | `{ sectionKey, title }`                                                                                    | Rename a displayed figure legend title.                                        |
@@ -145,6 +147,7 @@ They affect circular layout only.
 | `circularOpeningAngle` | Opening width in degrees, 0–350 | `0` (full circle) |
 | `circularOpeningAutoFit` | Fit the opening to horizontal track names, keeping their edge fixed | `false` |
 | `circularRotation` | Clockwise rotation in degrees, -180–180; zero centers the opening at the top | `0` |
+| `circularAngleAttribute` | Direct node metadata key containing angles in degrees, or `null` for automatic angles | automatic |
 | `circularOpeningColor` | `#RRGGBB` or `null` for transparent | `null` |
 | `circularInteriorColor` | `#RRGGBB` or `null` for transparent | `null` |
 
@@ -176,6 +179,39 @@ the inner metadata edge, even when leaf labels are hidden. The guides require
 visible metadata. Use `'tip'` to turn them off. The same setting aligns labels
 in rectangular layout and is ignored in radial layout.
 
+Set `showScaleBar: false` through `view.set-layout` to hide the distance scale
+without changing branch lengths or node positions. The default is `true`. The
+checkbox is **Controls > Layout > Scale bar**. The setting persists in sessions
+and named views.
+
+### Imported circular angles
+
+`circularAngleAttribute` selects a direct tree-node metadata key containing
+angles from 0 through 360 degrees. Finite numbers and nonempty numeric strings
+are accepted. Each missing, Boolean, nonfinite, or out-of-range value uses that
+node's automatic angle. Bound leaf-table columns are not used for angles.
+
+The value maps proportionally into the circular sweep, starting at the edge
+set by the opening and rotation. For a full circle with zero degrees pointing
+right and increasing clockwise, use:
+
+```js
+await window.__treeviz.execute('view.set-layout', {
+  layout: 'circular',
+  circularOpeningAngle: 0,
+  circularRotation: 90,
+  circularAngleAttribute: 'paper_angle_degrees'
+})
+```
+
+The setting affects nodes, connectors, and collapsed spans. Keep angle values
+in tree traversal order when using arc connectors or collapsed clades. Select
+the key with **Controls > Layout > Node angles (degrees)**, or pass
+`circularAngleAttribute: null` to restore automatic angles. The setting persists
+in sessions and named views. Rectangular and radial layouts ignore it.
+Reordering children leaves imported angles attached to their nodes; clear the
+setting to lay out the new order.
+
 ## Tree Commands
 
 | Command                                     | Args                             | Effect                                                      |
@@ -203,7 +239,8 @@ in rectangular layout and is ignored in radial layout.
 - Tip label styling: `labelColor`, `labelBold`, `labelItalic`,
   `labelFontSize`.
 - Clade annotations: `label`, `cladeLabelColor`, `cladeLabelBold`,
-  `cladeLabelFontSize`.
+  `cladeLabelFontSize`, `cladeLabelPlacement`, `cladeLabelOffsetX`,
+  `cladeLabelOffsetY`.
 - Clade underlay: `cladeBackground`. `cladeLabelBackground` is still accepted
   as a legacy alias.
 - Collapsed wedge fill: `wedgeFill`, read from the clade's own entry only.
@@ -227,6 +264,14 @@ labels reserve readable white backing before metadata tracks: a measured column
 in rectangular layout and a measured radial lane in circular/radial layouts. The
 reserved space follows the label text and `cladeLabelFontSize`, so tracks start
 after the label box as clade labels grow or shrink.
+
+Set `cladeLabelPlacement: 'node'` to center horizontal text on an internal or
+terminal node. It uses the annotation text, color, weight, size, and offsets,
+without a white backing or reserved label lane. A terminal node gets one
+annotation instead of a second tip label. Hidden descendants and collapsed
+clades retain their normal visibility rules. The default placement is
+`'clade'`. `cladeLabelFontSize` accepts fractional sizes from 1 to 96 pixels.
+Set the placement in **Style clade > Clade annotation**.
 
 ```js
 await api.execute('tree.style-clade', {
@@ -260,6 +305,63 @@ await api.execute('view.set-internal-node-marker', {
   ]
 })
 ```
+
+## Continuous Attribute Legends
+
+`session.legends` accepts custom swatches and continuous size/color scales. A
+continuous scale draws a vertical ramp with its smaller value at the top.
+`sizeRange` gives the top and bottom widths in pixels, and `colors` supplies
+evenly spaced color stops. Tick positions use the selected `linear` or `sqrt`
+transform.
+
+For a loaded session whose node and branch attributes encode sequence counts:
+
+```js
+const api = window.__treeviz
+const session = api.getSession()
+await api.execute('session.restore', {
+  snapshot: {
+    ...session,
+    legends: [{
+      kind: 'continuous-scale',
+      title: 'Node',
+      axisLabel: 'Sequence count',
+      colors: ['#BEBEBE', '#018571', '#80cdc1', '#dfc27d', '#a6611a'],
+      domain: [1, 3000000],
+      sizeRange: [0.48, 32],
+      transform: 'sqrt',
+      ticks: [1, 83800, 334000, 751000, 1330000, 2080000, 3000000],
+      scale: 1.6
+    }],
+    view: {
+      ...session.view,
+      figureLegendVisible: true,
+      figureLegendSectionIndex: null
+    }
+  },
+  skipAutoApplyDefault: true
+})
+```
+
+The domain must increase, size values must be nonnegative and increase, ticks
+must fall within the domain, and a square-root domain must be nonnegative.
+
+`scale` is optional, defaults to `1`, and accepts finite values from `0.1` to
+`4`. It scales the ramp, spacing, stroke, axis, ticks, and text. A standalone
+continuous figure legend has no frame or fill. Its regular-weight title is
+centered above the ramp. The side Legend panel keeps its normal container.
+
+The legend describes an encoding; it does not calculate node or branch
+attributes. Use the same transform and domain when computing those display
+values. Continuous legends are available in session JSON. TOML `[[legend]]`
+tables define swatch legends only.
+
+Use `view.set-figure-legend-placement` with
+`{ sectionKey: 'custom:0', visible: false }` to hide the first custom legend
+in the figure and export. Set `visible: true` to show it; provide both `x`
+and `y` to move it. Custom legend keys use zero-based indices. Explicit
+section visibility overrides `view.set-figure-legend-visibility`,
+which controls sections without their own placements.
 
 ## Data-Defined Node And Branch Styling
 

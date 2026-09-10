@@ -1,5 +1,14 @@
 # Gallery provenance
 
+## Example 2 source figure
+
+`example-2-silva.svg` is a native TreeViz SVG export of the saved SILVA
+taxonomy view. The export used the final 1182 x 981 pixel stage and retains the
+50 selected taxon labels and continuous count legend. The session's source
+record identifies the upper-left SILVA **Whole database** panel of Figure 4 in
+[Foster et al.](https://doi.org/10.1371/journal.pcbi.1005404) and SILVA release
+123.1.
+
 The ten catalog SVGs are TreeViz figure exports, not browser screenshots. They
 include the tree, metadata tracks, and figure legends from the linked saved
 sessions. Open the session in TreeViz to inspect the inputs and settings.

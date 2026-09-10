@@ -4,7 +4,9 @@ Use this reference for dense layouts, visual polish, and exported figures.
 
 ## QA Loop
 
-1. Apply one batch of changes, then wait for fonts and two animation frames as shown in `browser-api.md`.
+1. Apply one batch of changes. After restore, wait for `onReady`, fonts, and
+   stable camera and layout metrics across several animation frames. For later
+   edits, wait for fonts and stable metrics as shown in `browser-api.md`.
 2. Read `getDiagnostics()`.
 3. Read `getRenderDiagnostics()`.
 4. Read `getLayoutMetrics()`.
@@ -126,6 +128,7 @@ requested output.
 ## Final Checklist
 
 - Diagnostics contain no unresolved errors relevant to the requested figure.
+- The camera and layout metrics are stable after fonts load.
 - `labelsClipped` is zero.
 - Occupancy uses the available canvas; any remaining gap has a named cause.
 - Label collisions and track density are acceptable for the requested layout.

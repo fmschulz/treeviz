@@ -36,8 +36,10 @@ Mirusviricota tree from Extended Data Figure 9. You can inspect its 18 metadata
 tracks, fitted circular opening, and exported figure without installing
 TreeViz.
 
-The [example gallery](EXAMPLES.md) links the saved session, SVG figure, and
-source paper.
+The [example gallery](EXAMPLES.md) also contains the 3,843-taxon SILVA 123.1
+taxonomy reconstruction from Figure 4 of
+[Foster et al.](https://doi.org/10.1371/journal.pcbi.1005404). Each example
+links its saved session, SVG figure, and source paper.
 
 ## Reference and troubleshooting
 

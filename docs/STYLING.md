@@ -191,6 +191,25 @@ await window.__treeviz.execute('view.set-layout', {
 })
 ```
 
+Circular layouts can read imported angles from direct tree-node metadata. The
+selected attribute must contain degrees from 0 through 360. Values map into the
+current opening and rotation; invalid or missing values fall back to automatic
+placement for that node. Bound metadata-table columns are not used.
+
+```js
+await window.__treeviz.execute('view.set-layout', {
+  layout: 'circular',
+  circularOpeningAngle: 0,
+  circularRotation: 90,
+  circularAngleAttribute: 'paper_angle_degrees',
+  showScaleBar: false
+})
+```
+
+Pass `circularAngleAttribute: null` to return to automatic angles. Setting
+`showScaleBar: false` hides the distance scale without changing branch
+geometry.
+
 `leaf_spacing` (Controls: **Branch spacing**) sets how much room each leaf
 gets. In the rectangular layout it scales the row pitch. The radial layout has
 only a full turn to give, so there it shapes the angle split: each child is
@@ -395,6 +414,24 @@ await window.__treeviz.execute('tree.style-clade', {
 })
 ```
 
+Set `cladeLabelPlacement: 'node'` to center a horizontal annotation on
+an internal or terminal node. It uses the clade label's text, color, weight,
+font size, and offsets without reserving a label lane or drawing the white
+annotation backing. Terminal nodes get one label instead of a duplicate tip
+label. `cladeLabelFontSize` accepts fractional values from 1 to 96 pixels.
+
+```js
+await window.__treeviz.execute('tree.style-clade', {
+  stableKey,
+  patch: {
+    label: 'Bacillaceae',
+    cladeLabelPlacement: 'node',
+    cladeLabelFontSize: 4.5,
+    cladeLabelColor: '#111111'
+  }
+})
+```
+
 ## Legends And Attribute Names
 
 Attribute encodings (branch colour, node-circle colour, wedge fill from a
@@ -429,8 +466,19 @@ On the session document the `[[legend]]` tables compile to a top-level
 `[attribute_labels]` to a top-level `attributeLabels` map from key to name,
 and `figure_legend` to `view.figureLegendVisible`. No command edits `legends`
 or `attributeLabels`: set them in the document and load it with
-`session.restore`. `view.set-figure-legend-visibility` and
-`view.toggle-figure-legend` control the overlay.
+`session.restore`. Use `view.set-figure-legend-placement` to show, hide or move
+individual sections. Explicit section settings override the global
+`view.set-figure-legend-visibility` and `view.toggle-figure-legend` commands.
+
+Session JSON also accepts a continuous scale legend with `kind`, `title`,
+`axisLabel`, `colors`, `domain`, `sizeRange`, `transform`, `ticks`, and optional
+`scale`. `transform` is `linear` or `sqrt`. `scale` defaults to `1` and accepts
+finite values from `0.1` to `4`; it scales the ramp, spacing, strokes, axis,
+ticks, and text together. The standalone figure section is frameless and
+transparent, with its title centered above the ramp. The side Legend panel
+keeps its normal container. See [Browser API](API.md#continuous-attribute-legends)
+for the session shape and validation rules. TOML `[[legend]]` supports swatches
+only.
 
 ## Conditional Style Rules
 

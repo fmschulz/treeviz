@@ -21,26 +21,31 @@ discover public machine-readable files.
 
 Use the command schema to compare expected browser command ids with
 `window.__treeviz.commands()`. Use the session schema to validate generated
-`.treeviz.json` files. The example manifest lists the visible session, its
-thumbnail, counts, and provenance. File URL fields appear only for files that
-are published with the session.
+`.treeviz.json` files. The example manifest lists visible sessions,
+thumbnails, counts, and provenance. File URL fields appear only for files that
+are published with a session.
 
 Do not infer browser support from the published Python package. The hosted app
 and its schemas can be newer than `treeviz-phylo`.
 
 ## Example Catalog
 
-Read `/examples/manifest.json` for the current session and its provenance. It
-contains one visible entry:
+Read `/examples/manifest.json` for the current sessions and their provenance.
+The catalog includes:
 
 - **Example 1: Mirusviricota**: a fitted circular Extended Data Figure 9 tree
   with 1,204 tips and 18 metadata tracks. Source:
   [doi:10.1038/s41564-025-02190-6](https://doi.org/10.1038/s41564-025-02190-6).
+- **Example 2: SILVA taxonomy**: the upper-left SILVA **Whole database** panel
+  of Figure 4 with 3,843 taxa, 3,257 leaves, 513,121 bacterial 16S sequences,
+  count-scaled nodes and branches, and 50 selected labels. Source:
+  [doi:10.1371/journal.pcbi.1005404](https://doi.org/10.1371/journal.pcbi.1005404).
 
 Open the saved session with:
 
 ```text
 https://treeviz.newlineages.com/?session=/examples/example-1-mirusviricota/session.treeviz.json
+https://treeviz.newlineages.com/?session=/examples/example-2-silva/session.treeviz.json
 ```
 
 Use the manifest instead of assuming that separate tree, metadata, or TOML

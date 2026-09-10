@@ -40,6 +40,13 @@ the adjacent files.
 The public skill uses the hosted app. It does not include the browser build or
 frontend source.
 
+The hosted catalog includes Example 1: Mirusviricota and Example 2: SILVA
+taxonomy. Example 2 reconstructs the upper-left SILVA **Whole database** panel
+of Figure 4 from
+[Foster et al.](https://doi.org/10.1371/journal.pcbi.1005404), with imported
+node angles, count-scaled nodes and branches, 50 selected labels, and a
+continuous count legend.
+
 ## Restore the hosted example
 
 ```js
@@ -117,7 +124,10 @@ if (!svg.startsWith('<svg')) throw new Error('SVG export failed')
 
 Wait for dependent API calls, then let fonts and layout settle before reading
 metrics or exporting. `onReady` waits for the first frame after a load; it does
-not wait for later edits. Check diagnostics after each batch.
+not wait for later edits. After restore, wait for `document.fonts.ready` and for
+the camera and layout metrics to stop changing across several animation frames.
+A mounted editor can briefly report its previous viewport. Check diagnostics
+after each batch.
 
 ## Practical rules
 
@@ -129,6 +139,13 @@ not wait for later edits. Check diagnostics after each batch.
 - Use `categoryColors` when categorical colors must remain exact across uploads.
 - Use `displayMode: 'symbol'` or `'wedge'` on color-strip and bar tracks for compact lanes.
 - Use `view.set-tree-style-attributes` for data-defined node circles and branch width or color.
+- Use `tree.style-clade` with `cladeLabelPlacement: 'node'` for horizontal text
+  centered on internal or terminal nodes. `cladeLabelFontSize` accepts
+  fractional values from 1 to 96 pixels.
+- Use `view.set-layout` with `circularAngleAttribute` to read degrees from a
+  direct node metadata key. Opening and rotation still apply; `null` restores
+  automatic angles. Use `showScaleBar: false` to hide the distance scale
+  without changing geometry.
 - Use `view.set-conditional-style-rules` for metadata thresholds, ranks, missing values, and categories.
 - Use `nodemark.add` for pie, donut, or bar marks on bound internal nodes.
 - Store tip connections in `session.connections` and resolve endpoint diagnostics before export.
@@ -137,6 +154,9 @@ not wait for later edits. Check diagnostics after each batch.
   `alignment: 'label'` to draw circular tip-to-track guides.
 - Save a fitted view with `view.save`; its new id is in `ExecuteResult.value`.
 - Put explicit legends in `session.legends` and readable attribute names in `session.attributeLabels` before `session.restore`.
+- Use a `continuous-scale` session legend for a numeric size/color ramp. Its
+  optional `scale` defaults to `1` and accepts values from `0.1` to `4`. TOML
+  legends remain swatch lists.
 - Use `view.search` to find a taxon or clade by name.
 - Save durable work as `.treeviz.json`.
 - Read data exports from `ExecuteResult.value`; it contains `content`,

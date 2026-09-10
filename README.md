@@ -27,6 +27,13 @@ Mirusviricota Extended Data Figure 9 session from
 [doi:10.1038/s41564-025-02190-6](https://doi.org/10.1038/s41564-025-02190-6).
 The [examples page](docs/EXAMPLES.md) links this session and its SVG figure.
 
+[Example 2: SILVA taxonomy](https://treeviz.newlineages.com/?session=/examples/example-2-silva/session.treeviz.json)
+reconstructs the upper-left SILVA **Whole database** panel of Figure 4 from
+[Foster et al.](https://doi.org/10.1371/journal.pcbi.1005404). The session
+contains 3,843 taxa, including 3,257 leaves, and 513,121 bacterial 16S
+sequences. Node and branch styles encode sequence counts. It labels 50 selected
+taxa at their nodes.
+
 ## Python package
 
 The PyPI distribution is `treeviz-phylo`; the import name is `treeviz`.
