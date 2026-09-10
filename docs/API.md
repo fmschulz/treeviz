@@ -14,6 +14,7 @@ interface TreevizAPI {
   commands(): CommandDescriptor[]
   execute(id: string, args: unknown): Promise<ExecuteResult>
   getDiagnostics(): readonly Diagnostic[]
+  getRenderDiagnostics(): readonly RenderDiagnostic[]
   palettes(): PaletteRecord[]
   parseMetadata(source: string, format: 'tsv' | 'csv', rowKeyColumn: string): MetadataTable
   bindMetadata(tree: TreeDocument, metadata: MetadataTable, flags?: NormalizationFlags): LeafBinding
@@ -41,6 +42,12 @@ interface TreevizAPI {
 `commands()` returns the registered command descriptors, including each
 command's id, category, mutability, and argument schema. Use it as the source
 of truth when building an external tool.
+
+`version().session` is a legacy value of `1`. The document format is
+`getSession().version`, also published as `schemaVersions.session` in `/version.json`.
+`onReady` signals the first rendered frame after a session load. For later
+edits, wait for fonts and layout before reading metrics or exporting; see the
+[agent workflow](AGENTS.md).
 
 Underscored properties on `window.__treeviz` are internal integration hooks
 and are not stable. External tools should use `commands()`, `execute(...)`,
@@ -73,7 +80,8 @@ Command mutability has three values:
 `session.restore` takes the whole document, including the top-level `legends`
 (hand-written swatch legends, `[{ title, entries: [{ label, color }] }]`) and
 `attributeLabels` (node-meta key to display name). No command edits those two
-fields.
+fields. An optional `meta.description` string can record provenance in the
+saved `.treeviz.json` document.
 
 ## View Commands
 
@@ -81,7 +89,7 @@ fields.
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `view.pan`                            | `{ dx, dy }`                                                                                               | Pan the camera.                                                                |
 | `view.zoom`                           | `{ factor, panX?, panY? }`                                                                                 | Zoom the camera.                                                               |
-| `view.set-layout`                     | `{ layout, connectors?, branchScale?, branchScaleMode?, leafSpacing?, metadataScale?, metadataGap?, labelFontSize?, allowLabelOverlap? }` | Change layout, circular connector style, and optional density settings. |
+| `view.set-layout`                     | `{ layout, connectors?, circularOpeningAngle?, circularOpeningAutoFit?, circularRotation?, circularOpeningColor?, circularInteriorColor?, branchScale?, branchScaleMode?, leafSpacing?, metadataScale?, metadataGap?, labelFontSize?, allowLabelOverlap? }` | Change layout, circular opening and fills, connector style, and density settings. |
 | `view.set-scale-bar-position`         | `{ x, y }`                                                                                                 | Move the scale bar.                                                            |
 | `view.set-panel-position`             | `{ panel, x, y }`                                                                                          | Move `treeHud`, `viewControls`, `inspector`, `figureLegend`, or `utilityDock`. |
 | `view.set-panel-size`                 | `{ panel, width, height }`                                                                                 | Resize `viewControls`, `inspector`, or `utilityDock`.                          |
@@ -97,7 +105,7 @@ fields.
 | `view.set-label-font-size`            | `{ size }`                                                                                                 | Set label font size.                                                           |
 | `view.set-label-font-family`          | `{ family }`                                                                                               | Set label font family.                                                         |
 | `view.set-clade-annotation-font-size` | `{ size }`                                                                                                 | Set font size for all clade annotation labels.                                 |
-| `view.set-tip-alignment`              | `{ alignment: 'tip' \| 'label' }`                                                                          | Set rectangular label alignment.                                               |
+| `view.set-tip-alignment`              | `{ alignment: 'tip' \| 'label' }`                                                                          | Align rectangular labels or enable circular tip-to-track guides.               |
 | `view.set-branch-colour-attribute`    | `{ attribute: string \| null }`                                                                            | Color branches by a numeric metadata column or disable the mapping.            |
 | `view.set-internal-node-marker`       | `{ attribute?, encoding?, color?, categories? }`                                                           | Map support or internal-node metadata to split markers.                        |
 | `view.set-tree-style-attributes`      | `{ nodeDiameterAttribute?, nodeColorAttribute?, branchWidthAttribute?, branchColorAttribute? }`            | Map exact node-circle and branch style values to data attributes.              |
@@ -126,6 +134,47 @@ fields.
 | `view.delete`                         | `{ id }`                                                                                                   | Delete a saved view.                                                           |
 | `view.set-default`                    | `{ id: string \| null }`                                                                                   | Set or clear the default saved view.                                           |
 | `view.apply`                          | `{ id }`                                                                                                   | Apply a saved view.                                                            |
+
+### Circular opening and fills
+
+These `view.set-layout` arguments are saved in the session and named views.
+They affect circular layout only.
+
+| Argument | Values | Default |
+| --- | --- | --- |
+| `circularOpeningAngle` | Opening width in degrees, 0–350 | `0` (full circle) |
+| `circularOpeningAutoFit` | Fit the opening to horizontal track names, keeping their edge fixed | `false` |
+| `circularRotation` | Clockwise rotation in degrees, -180–180; zero centers the opening at the top | `0` |
+| `circularOpeningColor` | `#RRGGBB` or `null` for transparent | `null` |
+| `circularInteriorColor` | `#RRGGBB` or `null` for transparent | `null` |
+
+The interior fill sits behind branches and clade backgrounds and ends at the
+inner edge of the metadata rings. The opening fill extends to the outer ring.
+Without rings, both end at the tree's outer radius. A full circle omits the
+opening fill. Fill colors stay unchanged across themes and appear in Canvas,
+SVG, and PNG output.
+
+```js
+await window.__treeviz.execute('view.set-layout', {
+  layout: 'circular',
+  circularOpeningAngle: 90,
+  circularOpeningAutoFit: true,
+  circularRotation: 45,
+  circularOpeningColor: '#ffffff',
+  circularInteriorColor: '#ffffff'
+})
+await window.__treeviz.execute('view.set-tip-alignment', { alignment: 'label' })
+```
+
+Auto-fit closes the opposite edge to the measured track names while keeping
+the label edge fixed. It updates when names, visible tracks, ring widths, or
+the viewport change. Zoom and pan do not change the fit. With no readable
+names, auto-fit retains the manual opening.
+
+In circular layout, `alignment: 'label'` draws guides from terminal tips to
+the inner metadata edge, even when leaf labels are hidden. The guides require
+visible metadata. Use `'tip'` to turn them off. The same setting aligns labels
+in rectangular layout and is ignored in radial layout.
 
 ## Tree Commands
 
@@ -421,7 +470,8 @@ await api.execute('track.update', {
 | `export.metadata-tsv` | `{}`                                     | Return the current metadata table as TSV.            |
 
 Use `session.save` to download a full `.treeviz.json` session. Newick, Nexus,
-and metadata exports do not preserve the full visualization state.
+and metadata exports do not preserve the full visualization state. Each data
+export returns `{ content, filename, mimeType }` in `ExecuteResult.value`.
 
 ## Metadata Import Pattern
 
@@ -475,6 +525,10 @@ fills that intersect, and `wedgeBranchCrossings`, branches of other lineages
 that run through a wedge, both measured on the drawn polygons. Either above
 zero puts `metrics.wedge.overlap` in `warnings`. Both fields are absent when
 the figure draws no such wedge.
+
+`getRenderDiagnostics()` returns `{ code, message }` items that the last frame
+could not draw. Read it after the render when the requested figure includes
+connections, node marks, or other data-dependent layers.
 
 ## Diagnostics
 

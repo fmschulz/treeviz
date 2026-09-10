@@ -10,7 +10,7 @@ in the browser.
 [Read the documentation](https://fmschulz.github.io/treeviz/) ·
 [Browse the examples](https://fmschulz.github.io/treeviz/EXAMPLES/)
 
-![Circular bacterial tree with metadata rings and branch styling](docs/assets/gallery/bacterial-encoding-showcase.svg)
+![Circular Mirusviricota phylogeny with 18 metadata tracks](docs/assets/gallery/example-1-mirusviricota.svg)
 
 This repository contains the public documentation, example scripts, issue
 tracker, and agent skill. The browser app source is maintained separately.
@@ -22,10 +22,10 @@ hosted example or load a tree from your computer. Add a TSV or CSV table when
 you want to align metadata with the leaves. Save a `.treeviz.json` session to
 preserve the tree, metadata binding, tracks, edits, and view settings.
 
-The [getting-started tutorial](docs/GETTING_STARTED.md) uses a 42-species tree
-derived from GTDB release R232. The [examples page](docs/EXAMPLES.md) labels
-each dataset as sourced biological data, a synthetic feature demonstration, or
-a synthetic stress test.
+The [getting-started tutorial](docs/GETTING_STARTED.md) uses the 1,204-tip
+Mirusviricota Extended Data Figure 9 session from
+[doi:10.1038/s41564-025-02190-6](https://doi.org/10.1038/s41564-025-02190-6).
+The [examples page](docs/EXAMPLES.md) links this session and its SVG figure.
 
 ## Python package
 
@@ -64,7 +64,8 @@ rendering, and schema compatibility.
 The public skill at
 [`.agents/skills/treeviz-agent/`](.agents/skills/treeviz-agent/) teaches coding
 agents to import data, configure tracks, style clades, inspect diagnostics, tune
-layouts, and export figures through `window.__treeviz`.
+layouts, fit circular openings, save views, and export figures through
+`window.__treeviz`.
 
 Use the hosted runtime:
 

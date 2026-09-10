@@ -1,6 +1,6 @@
 ---
 name: treeviz-agent
-description: Use for agent-driven phylogenetic tree visualization in TreeViz: load Newick/Nexus/.treeviz.json sessions, import leaf or node metadata, choose row keys, plan tracks, style clades, add node marks, tip connections, legends and attribute names, tune layouts and label culling, check legibility at a zoom, search and inspect nodes, and export figures through the hosted TreeViz browser API.
+description: "Use for agent-driven phylogenetic tree visualization in TreeViz: load Newick/Nexus/.treeviz.json sessions, import leaf or node metadata, choose row keys, plan tracks, style clades, add node marks, tip connections, legends and attribute names, tune layouts and label culling, check legibility at a zoom, search and inspect nodes, and export figures through the hosted TreeViz browser API."
 ---
 
 # TreeViz Agent
@@ -36,13 +36,16 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
 6. Add or update tracks through `track.add`, `track.update`, and `track.reorder`.
 7. Apply clade styles, conditional rules, node marks, or session connections as needed.
 8. Tune layout with `view.set-layout`, automatic scale, spacing, labels, and legend commands.
-9. Re-check diagnostics and layout metrics after each logical batch.
+9. Let fonts and the rendered frame settle, then check `getDiagnostics()`, `getRenderDiagnostics()`, and layout metrics. See the waits in `references/browser-api.md`.
 10. Export evidence: `.treeviz.json` for state, SVG/PNG/PDF for figures, and screenshots when visual quality is the claim.
 
 ## Visualization Defaults
 
 - Start metadata-heavy figures in rectangular layout.
 - Try circular or radial layout only when labels and metadata remain readable.
+- For circular figures, set the opening angle, rotation, auto-fit, and optional
+  opening or interior fills through `view.set-layout`. Use
+  `view.set-tip-alignment` with `alignment: 'label'` for tip-to-track guides.
 - Shape radial collapsed-clade wedges with `view.set-collapsed-wedge-options`:
   fill source, opacity, gap, minimum body, outline, and data sizing.
 - Keep metadata tracks contiguous; use `metadataGap: 0` unless separation is useful.
@@ -94,8 +97,8 @@ Load only the reference needed for the task:
   and export QA.
 - `references/example-inputs.md`: deterministic 30-leaf and 100-leaf example recipes with metadata and support markers.
 - `references/large-taxonomy-trees.md`: large taxonomy-tree workflows, metadata-derived categories, rerooting, and dense exports.
-- `references/hosted-runtime.md`: hosted URLs, public files, current examples,
-  additional tree-of-life sessions, and live API smoke testing.
+- `references/hosted-runtime.md`: hosted URLs, public files, the current example,
+  and live API smoke testing.
 - `references/wrapper-api.md`: published Python 0.6.0 package and notebook workflows.
 
 ## Helper Scripts
@@ -109,6 +112,8 @@ Load only the reference needed for the task:
 
 - Always `await` API calls before issuing dependent commands.
 - Check `getDiagnostics()` after import and after major edits.
+- Check `getRenderDiagnostics()` after a render when the renderer may omit an
+  item, such as a connection with an unresolved endpoint.
 - Check `getLayoutMetrics()` after layout changes.
 - Judge legibility at the zoom the reader will use: labels hold their screen
   size above zoom 1, so `labelsVisible` and `labelsCulled` at fit differ from

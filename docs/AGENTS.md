@@ -2,8 +2,8 @@
 
 Use the hosted TreeViz API when a script or coding agent needs to build,
 inspect, or export a phylogenetic visualization. The API exposes command
-schemas, diagnostics, layout metrics, session state, and SVG export through
-`window.__treeviz`.
+schemas, diagnostics, render diagnostics, layout metrics, session state, and
+SVG export through `window.__treeviz`.
 
 ## Runtime
 
@@ -40,6 +40,22 @@ the adjacent files.
 The public skill uses the hosted app. It does not include the browser build or
 frontend source.
 
+## Restore the hosted example
+
+```js
+const api = window.__treeviz
+const response = await fetch('/examples/example-1-mirusviricota/session.treeviz.json')
+if (!response.ok) throw new Error(`session request failed: ${response.status}`)
+const snapshot = await response.json()
+await api.execute('session.restore', { snapshot })
+await new Promise(resolve => api.onReady(resolve))
+await document.fonts.ready
+await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+```
+
+The session's default saved view applies during restore. Add
+`skipAutoApplyDefault: true` only when you need the document's current view.
+
 ## Standard sequence
 
 ```js
@@ -72,18 +88,36 @@ await api.execute('session.import-metadata', {
 
 await api.applyTrackRecommendations(plan.recommendedTracks)
 
+await api.execute('view.set-layout', {
+  layout: 'circular',
+  circularOpeningAngle: 90,
+  circularOpeningAutoFit: true,
+  circularRotation: 45,
+  circularOpeningColor: '#ffffff',
+  circularInteriorColor: '#ffffff'
+})
+await api.execute('view.set-tip-alignment', { alignment: 'label' })
+
+const saved = await api.execute('view.save', { name: 'Circular view' })
+if (!saved.ok) throw new Error(saved.error.message)
+await api.execute('view.apply', { id: saved.value.id })
+
+await document.fonts.ready
+await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
 const diagnostics = api.getDiagnostics()
 if (diagnostics.some((item) => item.level === 'error')) {
   throw new Error('TreeViz diagnostics contain errors')
 }
 
+const renderDiagnostics = api.getRenderDiagnostics()
 const metrics = api.getLayoutMetrics()
 const svg = api.exportSvg()
 if (!svg.startsWith('<svg')) throw new Error('SVG export failed')
 ```
 
-Wait for each API call before issuing a dependent command. Check diagnostics
-after import and after each logical batch of edits.
+Wait for dependent API calls, then let fonts and layout settle before reading
+metrics or exporting. `onReady` waits for the first frame after a load; it does
+not wait for later edits. Check diagnostics after each batch.
 
 ## Practical rules
 
@@ -99,9 +133,14 @@ after import and after each logical batch of edits.
 - Use `nodemark.add` for pie, donut, or bar marks on bound internal nodes.
 - Store tip connections in `session.connections` and resolve endpoint diagnostics before export.
 - Keep `branchScaleMode` on `auto` unless the figure requires fixed geometry.
+- Use circular opening auto-fit when track names need a clear sector. Set
+  `alignment: 'label'` to draw circular tip-to-track guides.
+- Save a fitted view with `view.save`; its new id is in `ExecuteResult.value`.
 - Put explicit legends in `session.legends` and readable attribute names in `session.attributeLabels` before `session.restore`.
 - Use `view.search` to find a taxon or clade by name.
 - Save durable work as `.treeviz.json`.
+- Read data exports from `ExecuteResult.value`; it contains `content`,
+  `filename`, and `mimeType`. `session.save` starts a session download.
 
 ## Check the layout
 

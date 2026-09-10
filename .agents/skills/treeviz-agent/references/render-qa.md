@@ -4,13 +4,14 @@ Use this reference for dense layouts, visual polish, and exported figures.
 
 ## QA Loop
 
-1. Apply one logical batch of changes.
+1. Apply one batch of changes, then wait for fonts and two animation frames as shown in `browser-api.md`.
 2. Read `getDiagnostics()`.
-3. Read `getLayoutMetrics()`.
-4. Capture a screenshot or export SVG, PNG, or PDF.
-5. Inspect clipping, collisions, whitespace, legend placement, and track
+3. Read `getRenderDiagnostics()`.
+4. Read `getLayoutMetrics()`.
+5. Capture a screenshot or export SVG, PNG, or PDF.
+6. Inspect clipping, collisions, whitespace, legend placement, and track
    readability.
-6. Adjust and render again when the evidence still shows a problem.
+7. Adjust and render again when the evidence still shows a problem.
 
 Do not claim visual quality from configuration alone.
 
@@ -47,6 +48,13 @@ uses the shorter viewport side for both axes because the figure is round.
 - Start metadata-heavy figures in rectangular layout.
 - Try circular or radial layout only when labels, wedges, and legends remain
   readable.
+- In circular layout, use opening auto-fit when horizontal track names need a
+  clear sector. Check the fitted result after changing track names, visibility,
+  widths, or the viewport.
+- Check opening and interior fills in the final theme and export. TreeViz does
+  not adapt these colors when the theme changes.
+- When guides help connect dense tips to metadata rings, set tip alignment to
+  `label` and confirm that the guides stop at the inner metadata edge.
 - In radial, after collapsing many clades, check that wedges do not overlap
   (`collapsedWedgeAllowOverlap` is false by default; read `wedgeOverlapPairs`
   and `wedgeBranchCrossings` rather than judging by eye, since outlines lie
@@ -87,6 +95,7 @@ Open the app with `?api=1`, make the final change, then collect:
 ```js
 const evidence = {
   diagnostics: window.__treeviz.getDiagnostics(),
+  renderDiagnostics: window.__treeviz.getRenderDiagnostics(),
   metrics: window.__treeviz.getLayoutMetrics(),
   svg: window.__treeviz.exportSvg()
 }

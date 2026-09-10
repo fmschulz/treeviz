@@ -21,63 +21,30 @@ discover public machine-readable files.
 
 Use the command schema to compare expected browser command ids with
 `window.__treeviz.commands()`. Use the session schema to validate generated
-`.treeviz.json` files. The example manifest lists current sessions, source
-files, thumbnails, provenance, and synthetic-data labels.
+`.treeviz.json` files. The example manifest lists the visible session, its
+thumbnail, counts, and provenance. File URL fields appear only for files that
+are published with the session.
 
 Do not infer browser support from the published Python package. The hosted app
 and its schemas can be newer than `treeviz-phylo`.
 
 ## Example Catalog
 
-Read `/examples/manifest.json` instead of maintaining a fixed example list in
-agent prompts. Each entry gives the title, purpose, synthetic-data flag, leaf
-count, source, thumbnail, saved session, tree, metadata, and TOML
-configuration.
+Read `/examples/manifest.json` for the current session and its provenance. It
+contains one visible entry:
 
-Open a catalog session with its `sessionUrl`:
+- **Example 1: Mirusviricota**: a fitted circular Extended Data Figure 9 tree
+  with 1,204 tips and 18 metadata tracks. Source:
+  [doi:10.1038/s41564-025-02190-6](https://doi.org/10.1038/s41564-025-02190-6).
 
-```text
-https://treeviz.newlineages.com/?session=/examples/bacterial-starter/session.treeviz.json
-```
-
-The current catalog's `purpose` values describe the intended use:
-
-- `biological`: a biological-data example.
-- `feature-demo`: a demonstration of rendering or styling features.
-- `stress-test`: a scale and rendering test.
-
-Read the separate `synthetic` and `source` fields for data provenance. Do not
-treat a plausible synthetic value as a measurement. Use all three fields when
-writing figure captions or reports.
-
-## Additional Tree-of-Life Sessions
-
-Six hosted sessions hold a 1070-leaf GTDB marker tree with 84 collapsed phylum
-clades in radial layout. Open one with `?session=`:
+Open the saved session with:
 
 ```text
-https://treeviz.newlineages.com/?session=/sessions/rekhatree-tol-phyla.treeviz.json
+https://treeviz.newlineages.com/?session=/examples/example-1-mirusviricota/session.treeviz.json
 ```
 
-- `rekhatree-tol-phyla`: domain branch colours, footprint wedges.
-- `rekhatree-tol-phyla-pd`: wedge length from phylogenetic diversity, with
-  `sizeScale: 'log'`, `sizeTarget: 'length'`, `sizeRange: [40, 400]`.
-- `rekhatree-tol-phyla-cultured`: branches coloured by isolates per unit of
-  diversity, wedges filled from the branch colour.
-- `rekhatree-tol-phyla-muted`: muted branch colouring, footprint wedges.
-- `rekhatree-tol-phyla-domain-cultured`: domain branch and outline colours with
-  `fill: 'attribute'` from a second node-meta key at `fillOpacity: 0.85`.
-- `rekhatree-tol-phyla-labelled`: phylum labels at the wedge tips and isolate
-  circles, with `showLabels` and `showNodeCircles` on;
-  `collapsedWedgeLabelDeclutter: true` with leader lines,
-  `collapsedWedgeLabelOrientation: 'branch'` so each label reads along the
-  branch entering its phylum, `allowLabelOverlap: false`, three hand-written
-  `legends` (Domain; Isolate
-  genomes per phylum; Culturedness), `attributeLabels` for every node-meta
-  key, and `figureLegendVisible: true`.
-
-Read `getSession().view` after loading one to see the wedge options, node-meta
-colour keys, and clade styles that produce the figure.
+Use the manifest instead of assuming that separate tree, metadata, or TOML
+files exist for a session.
 
 ## Live API Smoke
 

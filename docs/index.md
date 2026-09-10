@@ -13,9 +13,10 @@ Save the complete visualization as a `.treeviz.json` session when another
 person needs to reopen the tree with the same metadata binding, tracks, edits,
 and view settings.
 
-![Circular bacterial tree with metadata rings and branch styling](assets/gallery/bacterial-encoding-showcase.svg)
+![Circular Mirusviricota phylogeny with 18 metadata tracks](assets/gallery/example-1-mirusviricota.svg)
 
-*A GTDB-derived bacterial topology with a family ring for 14 groups, genome-size symbols, GC-content shading, and metabolism categories. The displayed measurements are deterministic synthetic values; see [Examples](EXAMPLES.md#bacterial-encoding-showcase).*
+*The fitted Mirusviricota tree from Extended Data Figure 9 contains 1,204 tips
+and 18 metadata tracks. See [Example 1](EXAMPLES.md#example-1-mirusviricota).*
 
 ## Choose a workflow
 
@@ -30,14 +31,13 @@ and view settings.
 
 ## Start with sourced data
 
-The [getting-started tutorial](GETTING_STARTED.md) opens a 42-species bacterial
-tree derived from GTDB release R232. Its family strip uses the accompanying
-taxonomy table. You can inspect the inputs, change the layout, and export the
-figure without installing TreeViz.
+The [getting-started tutorial](GETTING_STARTED.md) opens the 1,204-tip
+Mirusviricota tree from Extended Data Figure 9. You can inspect its 18 metadata
+tracks, fitted circular opening, and exported figure without installing
+TreeViz.
 
-The [example gallery](EXAMPLES.md) separates sourced biological data from
-synthetic feature demonstrations and synthetic stress tests. Each catalog
-entry links to its saved session, input tree, metadata, and configuration.
+The [example gallery](EXAMPLES.md) links the saved session, SVG figure, and
+source paper.
 
 ## Reference and troubleshooting
 

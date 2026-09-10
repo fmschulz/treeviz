@@ -23,7 +23,13 @@ Use the live schema when an exact argument name matters.
 Restore a complete session document with:
 
 ```js
+const response = await fetch('/examples/example-1-mirusviricota/session.treeviz.json')
+if (!response.ok) throw new Error(`session request failed: ${response.status}`)
+const sessionDocument = await response.json()
 await window.__treeviz.execute('session.restore', { snapshot: sessionDocument })
+await new Promise(resolve => window.__treeviz.onReady(resolve))
+await document.fonts.ready
+await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
 ```
 
 Pass `skipAutoApplyDefault: true` only when the restored snapshot must not apply
@@ -31,14 +37,15 @@ its saved default view.
 
 ## Core Methods
 
-- `version()`: app and session-version information.
-- `onReady(cb)`: run a callback when the current render is ready.
+- `version()`: app version; its `session` field is a legacy value. Read `getSession().version` or `/version.json` for the session document format.
+- `onReady(cb)`: calls `cb` after the first rendered frame for a load, or immediately if that load is ready. For later edits, use the font/frame wait below.
 - `onChange(cb)`: subscribe to state changes.
 - `getSession()`: current session or `null`.
 - `commands()`: command descriptors and argument schemas.
 - `palettes()`: palette ids, colors, roles, aliases, and usage notes.
 - `execute(id, args)`: run a command.
-- `getDiagnostics()`: parse, binding, edit, and render diagnostics.
+- `getDiagnostics()`: parse, binding, edit, session, and export diagnostics.
+- `getRenderDiagnostics()`: items the last frame could not draw.
 - `planMetadataImport(source, format, prompt?)`: plan row-key binding and tracks.
 - `analyzeSessionMetadata(prompt?)`: plan tracks for loaded metadata.
 - `applyTrackRecommendations(recommendations)`: add planned tracks.
@@ -355,16 +362,51 @@ zoomed matches the screen.
 Keep automatic topology sizing unless fixed geometry is part of the request:
 
 ```js
-await api.execute('view.set-layout', { layout: 'rectangular' })
+await api.execute('view.set-layout', {
+  layout: 'circular',
+  circularOpeningAngle: 90,
+  circularOpeningAutoFit: true,
+  circularRotation: 45,
+  circularOpeningColor: '#ffffff',
+  circularInteriorColor: '#ffffff'
+})
+await api.execute('view.set-tip-alignment', { alignment: 'label' })
 await api.execute('view.set-branch-scale-mode', { mode: 'auto' })
 await api.execute('view.set-metadata-gap', { gap: 0 })
-await api.execute('view.set-leaf-spacing', { spacing: 0.8 })
 
+await document.fonts.ready
+await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
 const diagnostics = api.getDiagnostics()
+const renderDiagnostics = api.getRenderDiagnostics()
 const metrics = api.getLayoutMetrics()
 const svg = api.exportSvg()
 ```
 
 Calling `view.set-branch-scale` selects manual scale. After the final layout
-change, inspect diagnostics, layout metrics, and a screenshot or exported
-figure.
+change, inspect both diagnostic arrays, layout metrics, and a screenshot or
+exported figure.
+
+Circular opening arguments are saved in the session and in named views. The
+opening angle accepts 0 to 350 degrees, and rotation accepts -180 to 180
+degrees. Auto-fit adjusts the opening when track names, visible tracks, ring
+widths, or the viewport change. It keeps the label edge fixed and does not
+respond to zoom or pan. Opening and interior colors accept `#RRGGBB` or `null`.
+In circular layout, `alignment: 'label'` draws guides from tips to the inner
+edge of the visible metadata rings; use `'tip'` to turn them off.
+
+Save and reapply an exact view after fitting it:
+
+```js
+const saved = await api.execute('view.save', {
+  name: 'Example 1',
+  setAsDefault: true
+})
+if (!saved.ok) throw new Error(saved.error.message)
+const savedViewId = saved.value.id
+await api.execute('view.apply', { id: savedViewId })
+```
+
+`view.save` returns the new id in `ExecuteResult.value`. A default view applies
+when `session.restore` loads the session unless `skipAutoApplyDefault: true` is
+set. The four data export commands return `{ content, filename, mimeType }` in
+`ExecuteResult.value`. `session.save` starts a `.treeviz.json` download.

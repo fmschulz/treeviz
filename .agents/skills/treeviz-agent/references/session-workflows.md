@@ -26,11 +26,17 @@ resolution, and translating user intent into TreeViz commands.
 
 For a loaded session that already has metadata:
 
-1. Call `analyzeSessionMetadata(prompt)`.
-2. Review checks and recommended tracks.
-3. Rebind with `session.rebind` if matching is wrong or incomplete.
-4. Apply or adjust tracks.
-5. Save the revised session as `.treeviz.json`.
+1. Fetch the `.treeviz.json` file and pass the parsed document to
+   `session.restore`, or open its URL with `?session=`.
+2. Inspect the restored view, tracks, bindings, saved views, and diagnostics.
+3. Call `analyzeSessionMetadata(prompt)` when the user wants new track advice.
+4. Rebind with `session.rebind` if matching is wrong or incomplete.
+5. Apply or adjust tracks and layout settings.
+6. Save the revised session as `.treeviz.json`.
+
+The default saved view applies during restore. Pass
+`skipAutoApplyDefault: true` only when the document's current view must remain
+active.
 
 ## Metadata Rules
 
@@ -152,6 +158,16 @@ For repeatable file-based rerooting from metadata, use
   `view.set-leaf-spacing`, `view.set-metadata-gap`,
   `view.set-metadata-row-scale`, `view.toggle-label-overlap`,
   `view.set-scale-bar-position`.
+- Circular opening, rotation, fit, and fills: `view.set-layout` with
+  `circularOpeningAngle`, `circularOpeningAutoFit`, `circularRotation`,
+  `circularOpeningColor`, and `circularInteriorColor`.
+- Circular tip-to-track guides: `view.set-tip-alignment` with
+  `alignment: 'label'`; use `'tip'` to disable them.
+- Named views: `view.save`, `view.rename`, `view.set-default`, and `view.apply`.
+  Read the new id from `view.save` in `ExecuteResult.value`.
+- Session and data export: `session.save`, `export.newick`, `export.nexus`,
+  `export.leaf-names`, and `export.metadata-tsv`. Data exports return content,
+  filename, and MIME type in `ExecuteResult.value`.
 - Layout choice: circular gives every leaf an equal angular slot, so a clade's
   footprint tracks taxon count. Radial draws true branch lengths, so a clade
   with longer root-to-tip depths covers more area. Pick the layout by what the
