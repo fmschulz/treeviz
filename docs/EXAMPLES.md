@@ -5,6 +5,17 @@ tree, metadata binding, tracks, view, and diagnostics. The [live
 manifest](https://treeviz.newlineages.com/examples/manifest.json) is the
 machine-readable catalog.
 
+Each card lists the paper title, first author, citation year, figure and DOI.
+Expand **Recreate this style** in the landing gallery or Sessions panel for a
+reusable prompt with the required metadata formats. **Copy prompt** and
+**Download prompt** provide the same text. Give it to an AI assistant with
+your tree and metadata files. Restore the example session for the supplied
+figure. Use its prompt to apply the style to another data set.
+
+The prompts specify leaf tables, internal-node attributes, optional display
+coordinates and synthetic values. A leaf table alone does not supply values
+for internal nodes.
+
 ## Example 1: Mirusviricota
 
 **Sourced data · 1,204 tips · 18 metadata tracks · circular tree**
@@ -18,7 +29,8 @@ Its fitted circular opening keeps the metadata track names visible.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-1-mirusviricota/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-1-mirusviricota.svg) ·
-[Source paper](https://doi.org/10.1038/s41564-025-02190-6)
+[Source paper](https://doi.org/10.1038/s41564-025-02190-6) ·
+[Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-1-mirusviricota/recipe.md)
 
 ## Example 2: SILVA taxonomy
 
@@ -39,7 +51,8 @@ used by the source workflow. They were not measured from the saved 2017 plot.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-2-silva/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-2-silva.svg) ·
-[Source paper](https://doi.org/10.1371/journal.pcbi.1005404)
+[Source paper](https://doi.org/10.1371/journal.pcbi.1005404) ·
+[Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-2-silva/recipe.md)
 
 ## Example 3: TARA Oceans Metazoa
 
@@ -61,7 +74,8 @@ local geometry. The session retains these positions as editable node metadata.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-3-tara-metazoa/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-3-tara-metazoa.svg) ·
-[Source figure](https://doi.org/10.1371/journal.pcbi.1005404.g003)
+[Source figure](https://doi.org/10.1371/journal.pcbi.1005404.g003) ·
+[Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-3-tara-metazoa/recipe.md)
 
 ## Example 4: Archaeal gene acquisitions
 
@@ -87,4 +101,5 @@ table.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-4-archaeal-acquisitions/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-4-archaeal-acquisitions.svg) ·
-[Source paper](https://doi.org/10.1038/nature13805)
+[Source paper](https://doi.org/10.1038/nature13805) ·
+[Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/recipe.md)

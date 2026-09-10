@@ -42,6 +42,9 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
    [Example 4](https://doi.org/10.1038/nature13805) uses the published 178-tip
    source topology and branch agreement. Its pairwise transfer weights are
    explicitly synthetic because the source has no recoverable transfer matrix.
+   Read `/examples/manifest.json` for `source.publication` citations and
+   optional `recipe: { prompt, url }` entries. Adapt the input and styling
+   instructions to the supplied data; restore `sessionUrl` for the exact example.
 3. Inspect `getSession()`, `commands()`, `palettes()`, and `getDiagnostics()`.
 4. For metadata, call `planMetadataImport(source, format, prompt)` before import.
 5. Import metadata with the suggested row key, flags, and leaf identifier source.
