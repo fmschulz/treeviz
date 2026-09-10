@@ -40,3 +40,51 @@ used by the source workflow. They were not measured from the saved 2017 plot.
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-2-silva/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-2-silva.svg) ·
 [Source paper](https://doi.org/10.1371/journal.pcbi.1005404)
+
+## Example 3: TARA Oceans Metazoa
+
+**Sourced data · 550 taxa · 275 leaves · 20,212 OTUs · radial taxonomy**
+
+[![TARA Metazoa taxonomy with OTU-scaled circles, read-scaled branches and two numeric legends](assets/gallery/example-3-tara-metazoa.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-3-tara-metazoa/session.treeviz.json)
+
+This view reconstructs the upper Metazoa panel of
+[Figure 3a](https://doi.org/10.1371/journal.pcbi.1005404.g003) from the
+Metacoder paper. Circle sizes encode the 20,212 OTUs and branch widths encode
+250,296,231 reads. Colors show the percentage of OTUs with at least
+90% identity to their closest reference sequence, following the archived code.
+Two legends show independent percentage and count scales.
+
+Taxonomy, statistics, colors and the 73 selected labels come from the published
+TARA Oceans W5 data and plotting recipe. Display positions are reconstructed:
+named nodes align to the published raster and other nodes use the reconstructed
+local geometry. The session retains these positions as editable node metadata.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-3-tara-metazoa/session.treeviz.json) ·
+[SVG figure](assets/gallery/example-3-tara-metazoa.svg) ·
+[Source figure](https://doi.org/10.1371/journal.pcbi.1005404.g003)
+
+## Example 4: Archaeal gene acquisitions
+
+[![Archaeal tree with two metadata bands and synthetic transfer connections](assets/gallery/example-4-archaeal-acquisitions.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-4-archaeal-acquisitions/session.treeviz.json)
+
+This example reconstructs Figure 3 from
+[Nelson-Sathi et al.](https://doi.org/10.1038/nature13805), on page 4 of the
+[paper PDF](https://www.molevol.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Biologie/Institute/Molekulare_Evolution/Dokumente/Nelson-Sathi_2015_Nature.pdf#page=4).
+The published topology contains 134 archaeal genomes and 44 placeholder tips
+representing 22 bacterial groups. Branch greys encode agreement with 70
+single-gene trees; terminal colors inherit parent agreement for display.
+
+Twelve acquisition nodes connect to the bacterial groups through 264 straight
+lines. The pairwise weights are **synthetic** because the source supplements
+do not supply the transfer matrix. The session retains published group counts
+separately and records the paper's count discrepancies. Branch lengths and
+node angles are reconstructed display geometry. Both color scales have
+horizontal legends.
+
+Download the session to restore the full figure. The gallery also provides
+generated Newick, leaf metadata, node metadata and the synthetic transfer
+table.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-4-archaeal-acquisitions/session.treeviz.json) ·
+[SVG figure](assets/gallery/example-4-archaeal-acquisitions.svg) ·
+[Source paper](https://doi.org/10.1038/nature13805)

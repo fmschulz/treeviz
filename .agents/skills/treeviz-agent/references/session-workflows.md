@@ -167,6 +167,12 @@ For repeatable file-based rerooting from metadata, use
 - Authored circular angles: `view.set-layout` with
   `circularAngleAttribute: '<direct-node-meta-key>'`; pass `null` for automatic
   angles. The values are degrees from 0 through 360.
+- Imported radial positions: `view.set-layout` with both `radialXAttribute`
+  and `radialYAttribute`. Every node needs both direct metadata values as
+  finite numbers or nonempty numeric strings; positive Y points down. An
+  incomplete pair or invalid coordinate reports
+  `render.radial-coordinates-invalid` and uses automatic radial layout. Pass
+  both as `null` for automatic layout. Other layouts ignore these keys.
 - Scale visibility: `view.set-layout` with `showScaleBar`.
 - Circular tip-to-track guides: `view.set-tip-alignment` with
   `alignment: 'label'`; use `'tip'` to disable them.

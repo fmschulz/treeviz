@@ -40,12 +40,15 @@ the adjacent files.
 The public skill uses the hosted app. It does not include the browser build or
 frontend source.
 
-The hosted catalog includes Example 1: Mirusviricota and Example 2: SILVA
-taxonomy. Example 2 reconstructs the upper-left SILVA **Whole database** panel
-of Figure 4 from
+The catalog includes Example 1: Mirusviricota, Example 2: SILVA taxonomy and
+Example 3: TARA Oceans Metazoa. Example 2 reconstructs the upper-left SILVA
+**Whole database** panel of Figure 4 from
 [Foster et al.](https://doi.org/10.1371/journal.pcbi.1005404), with imported
 node angles, count-scaled nodes and branches, 50 selected labels, and a
-continuous count legend.
+continuous count legend. Example 3 reconstructs Figure 3a with 550 taxa,
+73 selected labels, imported radial coordinates and two legends with separate
+percentage and count axes. Its statistics come from the published data;
+its display positions are reconstructed.
 
 ## Restore the hosted example
 

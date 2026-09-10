@@ -34,6 +34,21 @@ contains 3,843 taxa, including 3,257 leaves, and 513,121 bacterial 16S
 sequences. Node and branch styles encode sequence counts. It labels 50 selected
 taxa at their nodes.
 
+[Example 3: TARA Oceans Metazoa](https://treeviz.newlineages.com/?session=/examples/example-3-tara-metazoa/session.treeviz.json)
+reconstructs [Metacoder Figure 3a](https://doi.org/10.1371/journal.pcbi.1005404.g003).
+It contains 550 taxa, 20,212 OTUs and 250,296,231 reads. Its imported radial
+coordinates align selected taxa to the paper, and two legends show the
+percentage and count scales. Display positions are reconstructed; the
+statistics come from the published data.
+
+[Example 4: Archaeal gene acquisitions](https://treeviz.newlineages.com/?session=/examples/example-4-archaeal-acquisitions/session.treeviz.json)
+reconstructs Figure 3 from
+[Nelson-Sathi et al.](https://doi.org/10.1038/nature13805). The published tree
+contains 134 archaeal genomes and 44 bacterial placeholder tips. Metadata
+bands, named internal-node connections and horizontal legends reproduce the
+figure's structure. The session and downloads identify the transfer weights
+as synthetic.
+
 ## Python package
 
 The PyPI distribution is `treeviz-phylo`; the import name is `treeviz`.

@@ -184,9 +184,9 @@ Import metadata keyed to named internal nodes with
 One mark definition applies to every bound internal-node row. Optional `sizeBy`
 and `maxRadius` control size.
 
-## Tip Connections
+## Connections
 
-Tip-to-tip links live in the session:
+Connections between leaves or named internal nodes live in the session:
 
 ```js
 {
@@ -195,10 +195,11 @@ Tip-to-tip links live in the session:
       id: 'hgt',
       title: 'Transfer',
       visible: true,
+      geometry: 'straight',
       pairs: [
         {
-          from: 'A',
-          to: 'D',
+          from: 'Archaeal_clade',
+          to: 'Bacterial_leaf',
           label: 'putative transfer',
           color: '#0072b2',
           width: 2,
@@ -212,8 +213,13 @@ Tip-to-tip links live in the session:
 
 Add connections to a `.treeviz.json` document, then call
 `session.restore` with `{ snapshot: sessionDocument }`.
-Diagnostics report unresolved endpoints, same-leaf pairs, and endpoints hidden
-inside collapsed or hidden clades.
+Names match exactly and case-sensitively. A leaf match takes precedence;
+otherwise, an internal-node name must be unique. `geometry` defaults to
+`ribbon`, a bowed tapered path. `straight` draws a constant-width line.
+Check `connections.ambiguous-endpoint`, `connections.unbound-endpoint`,
+`connections.hidden-endpoint`, and `connections.collapsed-endpoint` before
+export. `connections.self-link` and `connections.coincident-endpoints` also
+omit their pairs.
 
 ## Clade Resolution And Styling
 
@@ -354,13 +360,19 @@ in both the figure and export; pass `x` and `y` together to move it. Explicit
 section visibility overrides `view.set-figure-legend-visibility`.
 
 For numeric size/color encodings, session JSON also accepts
-`{ kind: 'continuous-scale', title, axisLabel, colors, domain, sizeRange, transform, ticks, scale? }`.
-`transform` is `linear` or `sqrt`. Optional `scale` defaults to `1`, accepts
-finite values from `0.1` to `4`, and scales the ramp, spacing, stroke, axis,
-ticks, and text. The standalone figure section is frameless and transparent,
-with a centered regular-weight title above the ramp; the side panel keeps its
-container. The legend describes display values already stored on nodes and
-branches. It does not compute them. TOML legends define swatches only.
+`{ kind: 'continuous-scale', title, axisLabel, colors, domain, sizeRange, transform, ticks, scale?, orientation? }`.
+`orientation` defaults to `vertical`; `horizontal` runs low-to-high
+left-to-right. `sizeRange` must be nondecreasing with a positive maximum, so
+equal positive values draw a rectangular ramp. Optional `scale` defaults to
+`1`, accepts finite values from `0.1` to `4`, and scales the ramp and text.
+The legend describes stored display values; it does not compute them. TOML
+legends define swatches only.
+
+Add `secondaryAxis: { axisLabel, domain, transform, ticks }` for a separate
+numeric scale. Horizontal primary labels are upright below the ramp and
+secondary labels are upright above it; vertical axes are left and right. Each
+axis uses its own domain and transform. Domains must increase, square-root
+domains must be nonnegative, and ticks must lie inside their own domains.
 
 ## Search, Hover And Zoom
 
@@ -425,6 +437,16 @@ the current opening and rotation; opening 0 with rotation 90 gives clockwise
 angles from the right. Keep values in traversal order for arc connectors and
 collapsed spans. Pass `null` to clear the setting. Rectangular and radial
 layouts ignore it.
+
+For imported radial positions, set `radialXAttribute` and `radialYAttribute`
+through `view.set-layout`. They select direct node metadata, with positive Y
+pointing down. Every node needs both values as finite numbers or nonempty
+numeric strings. An incomplete key pair, or any missing, Boolean, blank,
+nonnumeric, or nonfinite coordinate, uses automatic radial layout and reports
+`render.radial-coordinates-invalid`. Imported positions ignore branch lengths
+and spacing. Pass both keys as `null`, or set both **Controls > Layout**
+selectors to **Automatic**, to clear them. Circular and rectangular layouts
+ignore the keys.
 
 Save and reapply an exact view after fitting it:
 

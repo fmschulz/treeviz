@@ -37,9 +37,14 @@ tracks, fitted circular opening, and exported figure without installing
 TreeViz.
 
 The [example gallery](EXAMPLES.md) also contains the 3,843-taxon SILVA 123.1
-taxonomy reconstruction from Figure 4 of
+taxonomy from Figure 4 and the 550-taxon TARA Metazoa tree from Figure 3a of
 [Foster et al.](https://doi.org/10.1371/journal.pcbi.1005404). Each example
 links its saved session, SVG figure, and source paper.
+
+Example 4 reconstructs the archaeal acquisition network in Figure 3 of
+[Nelson-Sathi et al.](https://doi.org/10.1038/nature13805). It combines the
+published topology and gene-tree agreement values with synthetic transfer
+weights. The session and downloads identify the synthetic values.
 
 ## Reference and troubleshooting
 

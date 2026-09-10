@@ -32,8 +32,16 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
 2. Import a tree or restore a `.treeviz.json` session. Example 1:
    Mirusviricota has 18 tracks and a fitted circular opening. Example 2: SILVA
    taxonomy has imported node angles, count-scaled nodes and branches, 50
-   centered labels, and a continuous count legend. Both sessions cite their
-   source paper by DOI.
+   centered labels, and a continuous count legend.
+   [Example 3](https://doi.org/10.1371/journal.pcbi.1005404.g003): TARA Oceans
+   Metazoa has 550 taxa, including 275 terminal taxa, 20,212 OTUs,
+   250,296,231 reads, 73 labels, imported radial X/Y coordinates, and separate
+   percentage/count axes. It uses real source data. Its display geometry was
+   reconstructed and aligned to the paper raster because the original
+   force-layout coordinates are unavailable.
+   [Example 4](https://doi.org/10.1038/nature13805) uses the published 178-tip
+   source topology and branch agreement. Its pairwise transfer weights are
+   explicitly synthetic because the source has no recoverable transfer matrix.
 3. Inspect `getSession()`, `commands()`, `palettes()`, and `getDiagnostics()`.
 4. For metadata, call `planMetadataImport(source, format, prompt)` before import.
 5. Import metadata with the suggested row key, flags, and leaf identifier source.
@@ -80,6 +88,14 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
   values fall back per node. Keep angles in traversal order for arc connectors
   and collapsed spans. Pass `null` to restore automatic angles. Rectangular and
   radial layouts ignore this setting.
+- For a source radial layout, select `radialXAttribute` and `radialYAttribute`
+  through `view.set-layout`, or use **Node X coordinate** and **Node Y
+  coordinate** under **Controls > Layout**. Every node needs both direct
+  metadata values as finite numbers or nonempty numeric strings; positive Y
+  points down. An incomplete pair or invalid coordinate uses automatic radial
+  layout and reports `render.radial-coordinates-invalid`. Pass both keys as
+  `null`, or set both selectors to **Automatic**, to clear them. Circular and
+  rectangular layouts ignore them.
 - For one-off webapp edits, use Controls > Exact styling for data attributes,
   Style clade for clade branch/label styling, and Inspector for direct
   selected-node circle diameter/color and branch width/color.
@@ -87,8 +103,12 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
   ranks, missing values, and category conditions.
 - Use `session.import-node-metadata` and `nodemark.add` for pie, donut, or bar
   marks at named internal nodes.
-- Put tip-to-tip connections in the saved session and resolve endpoint
-  diagnostics before export.
+- Put connections in the saved session. Endpoints use exact leaf names or
+  unique internal-node names, with leaf names taking precedence. Set
+  `geometry: 'straight'` for constant-width lines; the default `ribbon` is
+  bowed and tapered. Resolve ambiguous, unbound, hidden, and collapsed
+  endpoint diagnostics before export. Preserve unique internal labels when
+  preparing a topology for clade endpoints.
 - Use explicit legend titles and item labels when exporting publication figures.
   Place, move or hide sections with `view.set-figure-legend-placement` and
   `{ sectionKey, visible, x, y }`. Custom legend keys are `custom:0`,
@@ -100,9 +120,14 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
   should open with the legend shown.
 - For a combined numeric size/color legend, use a session JSON
   `continuous-scale` legend with `title`, `axisLabel`, `colors`, `domain`,
-  `sizeRange`, `transform`, `ticks`, and optional `scale`. `scale` defaults to
-  `1` and accepts `0.1` to `4`. It scales the ramp, spacing, stroke, axis,
-  ticks, and text. TOML legends define swatches only.
+  nondecreasing `sizeRange` with a positive maximum, `transform`, `ticks`, and
+  optional `scale` and `orientation`. `orientation: 'horizontal'` runs low to
+  high left-to-right. `scale` defaults to `1` and accepts `0.1` to `4`. TOML
+  legends define swatches only.
+- Add `secondaryAxis: { axisLabel, domain, transform, ticks }` to a continuous
+  legend when color and size need separate numeric scales. Horizontal primary
+  labels are upright below and secondary labels are upright above; vertical
+  axes are left and right. See `references/browser-api.md`.
 - On crowded radial figures set `collapsedWedgeLabelDeclutter: true` and
   `allowLabelOverlap: false`; culled labels return as the reader zooms in.
   `collapsedWedgeLabelOrientation: 'branch'` reads each label along the

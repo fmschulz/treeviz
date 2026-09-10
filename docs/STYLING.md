@@ -210,13 +210,25 @@ Pass `circularAngleAttribute: null` to return to automatic angles. Setting
 `showScaleBar: false` hides the distance scale without changing branch
 geometry.
 
+For a radial tree with saved source positions, select **Node X coordinate**
+and **Node Y coordinate** in **Controls > Layout**. These use direct node
+metadata. Every node needs both coordinates as finite numbers or nonempty
+numeric strings; positive Y points down. The API uses `radialXAttribute` and
+`radialYAttribute` in `view.set-layout`. Choose **Automatic** for both fields
+to resume automatic placement. An incomplete key pair, or any missing,
+Boolean, blank, nonnumeric, or nonfinite coordinate, uses automatic placement
+and reports `render.radial-coordinates-invalid`. The camera still supports
+zoom, pan, and fit.
+Rectangular and circular layouts ignore the two coordinate fields.
+
 `leaf_spacing` (Controls: **Branch spacing**) sets how much room each leaf
 gets. In the rectangular layout it scales the row pitch. The radial layout has
 only a full turn to give, so there it shapes the angle split: each child is
 weighted by its leaf count raised to this power. Above 1 the wide clades take
 more of the turn, which keeps the drawing compact so it renders larger and
 crowded regions gain room; below 1 the shares even out and wide clades reach
-further, inflating the drawing.
+further, inflating the drawing. Imported radial positions ignore this setting
+and the branch-length mode.
 
 ```toml
 [view]
@@ -432,6 +444,17 @@ await window.__treeviz.execute('tree.style-clade', {
 })
 ```
 
+## Connections
+
+A connection set can draw bowed tapered ribbons or straight constant-width
+lines. Set `geometry: 'straight'` on the session connection set; the default is
+`ribbon`. Pair-level `color`, `width`, and `opacity` apply to either geometry.
+
+Endpoints use exact, case-sensitive node names. A leaf match takes precedence;
+otherwise, an internal-node name must be unique. Hidden, collapsed, ambiguous,
+and unbound endpoints are omitted and reported through render diagnostics. See
+[Connections](API.md#connections) for the JSON shape and diagnostic codes.
+
 ## Legends And Attribute Names
 
 Attribute encodings (branch colour, node-circle colour, wedge fill from a
@@ -472,13 +495,14 @@ individual sections. Explicit section settings override the global
 
 Session JSON also accepts a continuous scale legend with `kind`, `title`,
 `axisLabel`, `colors`, `domain`, `sizeRange`, `transform`, `ticks`, and optional
-`scale`. `transform` is `linear` or `sqrt`. `scale` defaults to `1` and accepts
-finite values from `0.1` to `4`; it scales the ramp, spacing, strokes, axis,
-ticks, and text together. The standalone figure section is frameless and
-transparent, with its title centered above the ramp. The side Legend panel
-keeps its normal container. See [Browser API](API.md#continuous-attribute-legends)
-for the session shape and validation rules. TOML `[[legend]]` supports swatches
-only.
+`scale` and `orientation`. `orientation` is `vertical` by default. A horizontal
+ramp runs from low to high left-to-right, with the primary ticks and axis label
+upright below it. An optional secondary axis is upright above it. The size
+range is nondecreasing and must have a positive maximum; equal positive values
+draw a rectangular ramp. `scale` defaults to `1` and accepts finite values from
+`0.1` to `4`; it scales the ramp, spacing, strokes, axes, ticks, and text. See
+[Browser API](API.md#continuous-attribute-legends) for the session shape and
+validation rules. TOML `[[legend]]` supports swatches only.
 
 ## Conditional Style Rules
 

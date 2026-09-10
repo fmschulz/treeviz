@@ -91,7 +91,7 @@ record provenance in the saved `.treeviz.json` document.
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `view.pan`                            | `{ dx, dy }`                                                                                               | Pan the camera.                                                                |
 | `view.zoom`                           | `{ factor, panX?, panY? }`                                                                                 | Zoom the camera.                                                               |
-| `view.set-layout`                     | `{ layout, connectors?, circularOpeningAngle?, circularOpeningAutoFit?, circularRotation?, circularAngleAttribute?, circularOpeningColor?, circularInteriorColor?, branchScale?, branchScaleMode?, leafSpacing?, metadataScale?, metadataGap?, labelFontSize?, allowLabelOverlap?, showScaleBar? }` | Change layout, circular angles and fills, connector style, density settings, and scale visibility. |
+| `view.set-layout`                     | `{ layout, connectors?, circularOpeningAngle?, circularOpeningAutoFit?, circularRotation?, circularAngleAttribute?, radialXAttribute?, radialYAttribute?, circularOpeningColor?, circularInteriorColor?, branchScale?, branchScaleMode?, leafSpacing?, metadataScale?, metadataGap?, labelFontSize?, allowLabelOverlap?, showScaleBar? }` | Change layout, imported node positions, circular angles and fills, connector style, density settings, and scale visibility. |
 | `view.set-scale-bar-position`         | `{ x, y }`                                                                                                 | Move the scale bar.                                                            |
 | `view.set-panel-position`             | `{ panel, x, y }`                                                                                          | Move `treeHud`, `viewControls`, `inspector`, `figureLegend`, or `utilityDock`. |
 | `view.set-panel-size`                 | `{ panel, width, height }`                                                                                 | Resize `viewControls`, `inspector`, or `utilityDock`.                          |
@@ -212,6 +212,34 @@ in sessions and named views. Rectangular and radial layouts ignore it.
 Reordering children leaves imported angles attached to their nodes; clear the
 setting to lay out the new order.
 
+### Imported radial positions
+
+`radialXAttribute` and `radialYAttribute` select direct node metadata for a
+radial layout. Supply both keys. Every node must have both coordinates as
+finite numbers or nonempty numeric strings. TreeViz draws straight edges
+between those positions and derives collapsed clade outlines from the same
+coordinates. Positive Y points down the screen.
+
+```js
+await window.__treeviz.execute('view.set-layout', {
+  layout: 'radial',
+  radialXAttribute: 'paper_x',
+  radialYAttribute: 'paper_y',
+  showScaleBar: false
+})
+```
+
+If exactly one key is set, or any node has a missing, Boolean, blank,
+nonnumeric, or nonfinite coordinate, TreeViz uses automatic radial layout and
+reports `render.radial-coordinates-invalid`. Bound metadata-table columns do
+not supply positions. Branch lengths and branch spacing do not move imported
+positions. The camera still supports zoom, pan, and fit.
+
+Pass both attributes as `null`, or choose **Automatic** in both **Node X
+coordinate** and **Node Y coordinate** selectors under **Controls > Layout**,
+to restore automatic radial layout. The selections persist in sessions, named
+views, and undo history. Rectangular and circular layouts ignore them.
+
 ## Tree Commands
 
 | Command                                     | Args                             | Effect                                                      |
@@ -308,11 +336,12 @@ await api.execute('view.set-internal-node-marker', {
 
 ## Continuous Attribute Legends
 
-`session.legends` accepts custom swatches and continuous size/color scales. A
-continuous scale draws a vertical ramp with its smaller value at the top.
-`sizeRange` gives the top and bottom widths in pixels, and `colors` supplies
-evenly spaced color stops. Tick positions use the selected `linear` or `sqrt`
-transform.
+`session.legends` accepts custom swatches and continuous size/color scales.
+`orientation` accepts `vertical` (the default) or `horizontal`. A vertical
+ramp runs from the smaller value at the top to the larger value at the bottom;
+a horizontal ramp runs from left to right. `sizeRange` gives the ramp thickness
+at those endpoints, and `colors` supplies evenly spaced color stops. Tick
+positions use the selected `linear` or `sqrt` transform.
 
 For a loaded session whose node and branch attributes encode sequence counts:
 
@@ -343,13 +372,47 @@ await api.execute('session.restore', {
 })
 ```
 
-The domain must increase, size values must be nonnegative and increase, ticks
-must fall within the domain, and a square-root domain must be nonnegative.
+The domain must increase, ticks must fall within it, and a square-root domain
+must be nonnegative. `sizeRange` must be nondecreasing and its maximum must be
+positive. Equal positive endpoints draw a constant-thickness rectangular ramp.
 
 `scale` is optional, defaults to `1`, and accepts finite values from `0.1` to
 `4`. It scales the ramp, spacing, stroke, axis, ticks, and text. A standalone
 continuous figure legend has no frame or fill. Its regular-weight title is
 centered above the ramp. The side Legend panel keeps its normal container.
+
+Add `secondaryAxis: { axisLabel, domain, transform, ticks }` for a separate
+scale on the right. Each axis positions ticks using its own domain and
+transform. For percentage colors with count-scaled sizes, use a primary
+`domain: [0, 100]` and `transform: 'linear'`, with a count domain and
+`transform: 'sqrt'` in `secondaryAxis`:
+
+```js
+{
+  kind: 'continuous-scale',
+  title: 'Edges',
+  axisLabel: 'Percent of OTUs identified',
+  colors: ['#a000a0', '#ff6f3c', '#ffd21f', '#c8c8c8'],
+  domain: [0, 100],
+  sizeRange: [0.48, 32],
+  transform: 'linear',
+  ticks: [0, 50, 100],
+  orientation: 'horizontal',
+  secondaryAxis: {
+    axisLabel: 'Number of reads',
+    domain: [302, 250000000],
+    transform: 'sqrt',
+    ticks: [302, 62600000, 250000000]
+  }
+}
+```
+
+Axis transforms affect tick positions. Color stops and ramp thickness vary
+linearly along the ramp. On a horizontal legend, the primary ticks and label
+are upright below the ramp; the secondary ticks and label are upright above
+it. On a vertical legend, the primary axis is on the left and the secondary
+axis is on the right. Both axis domains must increase, square-root domains
+must be nonnegative, and each tick must be within its own domain.
 
 The legend describes an encoding; it does not calculate node or branch
 attributes. Use the same transform and domain when computing those display
@@ -462,27 +525,54 @@ column, with `normalize: true` rescaling each row to fill the track.
 
 ### Connections
 
-Connections draw tip-to-tip links for horizontal transfer, recombination,
-host-parasite pairs, and gene duplication. They are stored on the session as
-`connections: [{ id, title, visible, pairs }]`, where each pair is
-`{ from, to, label?, color?, width?, opacity? }` naming two leaves. Connection
-TSV files may include a `label` column. The figure legend groups pairs by color.
-It names each group with the first non-empty label for that color, or with the
-color value when no label is present.
+Connections join leaves or named internal nodes. Store them on the session as
+`connections: [{ id, title, visible, geometry?, pairs }]`. `geometry` is
+`'ribbon'` by default; `'straight'` draws constant-width line segments. Each
+pair is `{ from, to, label?, color?, width?, opacity? }`.
 
-Each link is a quadratic curve. Its control point lies on the left-hand
-`(-dy, dx)` perpendicular from source to target, and its offset scales with the
-chord length. Short links use a 3 px minimum sagitta. Reciprocal links bow to
-opposite sides of their shared chord.
+```js
+const session = api.getSession()
+await api.execute('session.restore', {
+  snapshot: {
+    ...session,
+    connections: [{
+      id: 'acquisitions',
+      title: 'Gene acquisitions',
+      visible: true,
+      geometry: 'straight',
+      pairs: [{
+        from: 'Archaeal_clade',
+        to: 'Bacterial_leaf',
+        label: 'illustrative transfer',
+        color: '#b24a3a',
+        width: 1.5,
+        opacity: 0.6
+      }]
+    }]
+  }
+})
+```
+
+Ribbon links are bowed, filled, tapered paths. Straight links are native line
+operations. Both use the pair's color, width, and opacity. Connection TSV files
+may include `label`, `color`, `width`, and `opacity` columns. The figure legend
+groups pairs by color and uses the first non-empty label for each color.
 
 For `#rgb` and `#rrggbb` colors, opacity below 1 is encoded as `rgba(...)`; the
 default opacity is 0.45. Other color syntaxes pass through unchanged. The layer
 is named `connections`, so an export carries `data-tv-layer="connections"`.
 
-An endpoint that matches no leaf produces a diagnostic naming it and the pair is
-not drawn. A pair whose endpoints resolve to the same leaf produces a diagnostic
-and is not drawn. An endpoint inside a collapsed or hidden clade drops its curve
-with a diagnostic rather than drawing to a stale position.
+Endpoint matching is exact and case-sensitive. A leaf-name match takes
+precedence over an internal node with the same name. Otherwise, exactly one
+internal node must have that name. Use unique internal names when connections
+target clades.
+
+TreeViz omits a pair and reports `connections.ambiguous-endpoint` when several
+internal nodes match, `connections.unbound-endpoint` when no node matches,
+`connections.hidden-endpoint` when an endpoint is hidden or lies below a hidden
+clade, and `connections.collapsed-endpoint` when a collapsed clade leaves no
+rendered position for the endpoint. `connections.self-link` and
+`connections.coincident-endpoints` also omit their pairs.
 
 ### Node Marks
 

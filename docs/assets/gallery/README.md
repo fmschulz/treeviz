@@ -1,5 +1,26 @@
 # Gallery provenance
 
+## Example 4 source figure
+
+`example-4-archaeal-acquisitions.svg` is a native TreeViz export at 1382 x 931
+pixels. It reconstructs Figure 3 of
+[Nelson-Sathi et al.](https://doi.org/10.1038/nature13805) with the published
+178-tip topology and agreement values computed from 70 single-gene trees.
+Twelve acquisition nodes connect to 22 bacterial groups. Their 264 weights
+are synthetic, generated with seed 20150101. The supplements do not supply the
+pairwise matrix. Node geometry is reconstructed from topology and PDF vector
+landmarks. Terminal branch colors inherit parent agreement for display.
+The source PDF and its raster are not redistributed here.
+
+## Example 3 source figure
+
+`example-3-tara-metazoa.svg` is a native TreeViz export at 1382 x 931 pixels.
+The saved view contains 550 taxa, 73 selected labels and separate OTU/read
+legends with independent percentage and count axes. Taxonomy and statistics
+come from TARA Oceans W5 through the archived Metacoder recipe. Coordinates
+combine a reconstructed igraph layout with named node centers read from the
+published raster of [Figure 3a](https://doi.org/10.1371/journal.pcbi.1005404.g003).
+
 ## Example 2 source figure
 
 `example-2-silva.svg` is a native TreeViz SVG export of the saved SILVA
@@ -9,11 +30,11 @@ record identifies the upper-left SILVA **Whole database** panel of Figure 4 in
 [Foster et al.](https://doi.org/10.1371/journal.pcbi.1005404) and SILVA release
 123.1.
 
-The ten catalog SVGs are TreeViz figure exports, not browser screenshots. They
+The ten recipe SVGs are TreeViz figure exports. They
 include the tree, metadata tracks, and figure legends from the linked saved
 sessions. Open the session in TreeViz to inspect the inputs and settings.
 
-## Current example catalog
+## CLI recipe figures
 
 The SVGs were exported on 2026-09-08 from a TreeViz 0.8.2 review build based on
 source commit `b2a4d102bce6820154d71ded0602c5ce727b7890` plus the reviewed catalog
@@ -39,10 +60,9 @@ padding on each side. The dimensions below are the resulting SVG `width` and
 | `agent-clade-playground.svg` | `/examples/agent-clade-playground/session.treeviz.json` | Generated 100-tip topology, taxonomy, and measurements | 1203.485 x 1031 |
 | `gradient-node-branch-styling.svg` | `/examples/gradient-node-branch-styling/session.treeviz.json` | Generated nine-tip topology and styling values | 985.928 x 684.231 |
 
-`large-bacterial-tree.svg` is 5,951,837 bytes. The gallery embeds
-`large-bacterial-tree.png`, a native TreeViz PNG export at 908 x 641 pixels and
-72 DPI, to avoid loading the full SVG while scrolling. The PNG is 655,814
-bytes; the gallery also links the vector figure.
+`large-bacterial-tree.svg` is 5,951,837 bytes. The PNG version,
+`large-bacterial-tree.png`, is a native TreeViz export at 908 x 641 pixels and
+72 DPI. Its size is 655,814 bytes.
 
 The [live example manifest](https://treeviz.newlineages.com/examples/manifest.json)
 records each example's current source files, purpose, synthetic-data flag, and
