@@ -1,6 +1,6 @@
 # Examples
 
-The visible catalog contains saved TreeViz sessions. Open one to inspect its
+The visible catalog contains six saved TreeViz sessions. Open one to inspect its
 tree, metadata binding, tracks, view, and diagnostics. The [live
 manifest](https://treeviz.newlineages.com/examples/manifest.json) is the
 machine-readable catalog.
@@ -128,3 +128,32 @@ separates published data from reconstructed coordinates and styling.
 [SVG figure](assets/gallery/example-5-tree-of-life.svg) ·
 [Source paper](https://doi.org/10.1038/nmicrobiol.2016.48) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-5-tree-of-life/recipe.md)
+
+## Example 6: S. aureus CC398
+
+**Sourced metadata · 3,128 tips · rectangular tree**
+
+[![Rectangular S. aureus CC398 tree with geography, host, typing, antimicrobial-resistance and virulence tracks](https://treeviz.newlineages.com/examples/example-6-cc398/thumbnail.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-6-cc398/session.treeviz.json)
+
+This saved view reconstructs Figure 2 from
+[Fernandez et al. (2024)](https://doi.org/10.1038/s41467-024-49644-9).
+The editable rectangular session contains 3,128 tips with matching metadata
+rows. Molecular annotations come from Supplementary Data 1; continent and host
+display groups follow the figure's colored cells. The fixture records differences
+between the supplement and the plotted annotations.
+
+No original Newick or table of dated branch lengths was found.
+The fixture uses an approximate topology and display branch distances recovered
+from the vector figure. These distances reproduce the printed geometry; they
+are not evolutionary distances or time estimates.
+
+The figure labels two tips `SAMN39605011`. Figure row 2231 is associated with
+Supplementary Data 1 accession `SAMN39605010` because its vector profile is
+compatible and it is the only workbook accession left after mapping the other
+rows. The profile alone is not unique. The metadata and audit mark this inference. The two tree keys
+have explicit figure-row suffixes so their annotations bind separately.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-6-cc398/session.treeviz.json) ·
+[SVG figure](https://treeviz.newlineages.com/examples/example-6-cc398/thumbnail.svg) ·
+[Source paper](https://doi.org/10.1038/s41467-024-49644-9) ·
+[Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-6-cc398/recipe.md)
