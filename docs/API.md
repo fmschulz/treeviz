@@ -272,6 +272,10 @@ views, and undo history. Rectangular and circular layouts ignore them.
 - Clade underlay: `cladeBackground`. `cladeLabelBackground` is still accepted
   as a legacy alias.
 - Collapsed wedge fill: `wedgeFill`, read from the clade's own entry only.
+- Two-color fills: `cladeBackgroundGradient` and `wedgeFillGradient`, each
+  `{ startColor, endColor }`. Colors interpolate from the clade root toward its
+  descendants. Endpoints accept `#rrggbb` and `rgba(r,g,b,a)`. These fields
+  apply only to the selected clade.
 - Node/leaf markers: `internalDotSize`, `leafShape`,
   `nodeCircleDiameter`, `nodeCircleColor`.
 
@@ -292,6 +296,15 @@ labels reserve readable white backing before metadata tracks: a measured column
 in rectangular layout and a measured radial lane in circular/radial layouts. The
 reserved space follows the label text and `cladeLabelFontSize`, so tracks start
 after the label box as clade labels grow or shrink.
+
+`cladeBackgroundGradient` draws a background without a separate solid
+`cladeBackground`. A gradient takes precedence over the corresponding solid
+fill. `wedgeFillGradient` also replaces the global wedge fill mode and its
+opacity. Use `rgba(r,g,b,a)` endpoints for translucent gradients. If the root
+and descendant extents coincide, both renderers use a solid `endColor` fill.
+Pass an explicit `undefined` for a gradient field through the JavaScript API
+to remove it while preserving the other clade styles. Canvas and SVG exports
+use the same gradient direction and extent.
 
 Set `cladeLabelPlacement: 'node'` to center horizontal text on an internal or
 terminal node. It uses the annotation text, color, weight, size, and offsets,

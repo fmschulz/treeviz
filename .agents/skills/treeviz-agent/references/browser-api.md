@@ -251,6 +251,13 @@ collapsed clade it recolours the wedge outline and `patch.wedgeFill` sets the
 wedge fill. The region `patch.cladeBackground` draws is itself a click target:
 left-click selects the clade, right-click opens its menu.
 
+Set `patch.cladeBackgroundGradient` or `patch.wedgeFillGradient` to `{ startColor: '#ffffff', endColor: '#8f85b5' }`.
+The gradient runs from the clade root toward its descendants and applies only
+to that clade. A background gradient needs no solid background. A wedge
+gradient overrides the solid fill, mode and mode opacity. Endpoints accept
+`#rrggbb` and `rgba(r,g,b,a)`; use the latter for alpha. An explicit `undefined`
+removes a gradient through the JavaScript API. Coincident root and descendant extents render as solid `endColor` in Canvas and SVG.
+
 For text centered on a node, set `patch.cladeLabelPlacement: 'node'`. It uses
 `patch.label`, `cladeLabelFontSize` (fractional 1–96 px), `cladeLabelColor`,
 `cladeLabelBold`, and the offsets. It works on internal and terminal nodes,

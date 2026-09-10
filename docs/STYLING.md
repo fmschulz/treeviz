@@ -294,6 +294,14 @@ clade_background_outline = "hull"      # or "fitted"
   tint); a fill that carries its own data reads better around 0.8. A collapsed
   clade's own `wedgeFill` clade style (Style > Wedge fill on a right-clicked
   wedge) replaces the mode's fill for that wedge.
+- The local `wedgeFillGradient` style accepts `{ startColor, endColor }` and
+  takes precedence over the solid fill, mode and opacity. Its colors interpolate
+  from the clade root to the outer edge. `cladeBackgroundGradient` uses the same
+  two-color form for an expanded clade's background. In TOML use
+  `wedge_fill_gradient` or `clade_background_gradient`, with `start_color` and
+  `end_color`. These styles are set through the API or config; they do not
+  inherit to child clades. Endpoints accept `#rrggbb` and `rgba(r,g,b,a)`; use
+  the latter for alpha. A zero-length gradient renders as solid `endColor`.
 - `collapsed_wedge_size_attribute` replaces the footprint width with a data
   value: the wedge runs out to its footprint depth and its outer-edge width is
   the value mapped (as-is, or after `log10`) from the range of values across

@@ -103,3 +103,28 @@ table.
 [SVG figure](assets/gallery/example-4-archaeal-acquisitions.svg) ·
 [Source paper](https://doi.org/10.1038/nature13805) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/recipe.md)
+
+## Example 5: A new view of the tree of life
+
+[![Expanded tree of life with selected lineage labels and fading clade colors](assets/gallery/example-5-tree-of-life.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-5-tree-of-life/session.treeviz.json)
+
+This view reconstructs Figure 1 from [Hug et al. (2016)](https://doi.org/10.1038/nmicrobiol.2016.48).
+The published ribosomal-protein tree contains 3,083 tips spanning Bacteria,
+Archaea and Eukaryota. The session preserves its topology, terminal names,
+and branch lengths; the source Newick has no support values. All 3,083 tips
+remain expanded.
+
+An equal-angle phylogram reconstructs the geometry because exact coordinates
+cannot be recovered from the flattened PDF vectors. The session renders 135
+source concepts as 137 lineage and domain text rows, plus two convention notes,
+and uses 167 white-to-color clade backgrounds. Labels retain the paper's 2016
+taxonomy, typography and markers. The source legend guides their interpretation;
+cultivation status was not checked independently. The gradients reconstruct
+source colors and do not encode measurements. The source audit records the label
+mappings, including the 614 leaves without a specific-lineage assignment. It
+separates published data from reconstructed coordinates and styling.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-5-tree-of-life/session.treeviz.json) ·
+[SVG figure](assets/gallery/example-5-tree-of-life.svg) ·
+[Source paper](https://doi.org/10.1038/nmicrobiol.2016.48) ·
+[Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-5-tree-of-life/recipe.md)

@@ -42,6 +42,7 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
    [Example 4](https://doi.org/10.1038/nature13805) uses the published 178-tip
    source topology and branch agreement. Its pairwise transfer weights are
    explicitly synthetic because the source has no recoverable transfer matrix.
+   [Example 5](https://doi.org/10.1038/nmicrobiol.2016.48) retains the published 3,083-tip tree of life with reconstructed radial positions and clade backgrounds.
    Read `/examples/manifest.json` for `source.publication` citations and
    optional `recipe: { prompt, url }` entries. Adapt the input and styling
    instructions to the supplied data; restore `sessionUrl` for the exact example.
