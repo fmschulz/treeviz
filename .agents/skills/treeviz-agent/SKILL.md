@@ -44,6 +44,10 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
    explicitly synthetic because the source has no recoverable transfer matrix.
    [Example 5](https://doi.org/10.1038/nmicrobiol.2016.48) retains the published 3,083-tip tree of life with reconstructed radial positions and clade backgrounds.
    [Example 6](https://doi.org/10.1038/s41467-024-49644-9) provides a rectangular 3,128-tip *S. aureus* CC398 reconstruction with Supplementary Data 1 annotations. Its topology and drawing distances are approximate, one annotation match is inferred, and the original dated tree file was not found.
+   Examples 7–9 use a [PhyloPhlAn source backbone](https://doi.org/10.1038/ncomms3304),
+   [bioreactor MAGs](https://doi.org/10.1038/s41522-025-00679-w) with vector-derived
+   heatmap colors, and an [HMP/MetaHIT taxonomic cladogram](https://doi.org/10.1038/nmeth.2066).
+   Read each provenance audit before reusing reconstructed geometry or derived annotations.
    Read `/examples/manifest.json` for `source.publication` citations and
    optional `recipe: { prompt, url }` entries. Adapt the input and styling
    instructions to the supplied data; restore `sessionUrl` for the exact example.

@@ -1,6 +1,6 @@
 # Examples
 
-The visible catalog contains six saved TreeViz sessions. Open one to inspect its
+The visible catalog contains nine saved TreeViz sessions. Open one to inspect its
 tree, metadata binding, tracks, view, and diagnostics. The [live
 manifest](https://treeviz.newlineages.com/examples/manifest.json) is the
 machine-readable catalog.
@@ -157,3 +157,63 @@ have explicit figure-row suffixes so their annotations bind separately.
 [SVG figure](https://treeviz.newlineages.com/examples/example-6-cc398/thumbnail.svg) ·
 [Source paper](https://doi.org/10.1038/s41467-024-49644-9) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-6-cc398/recipe.md)
+
+## Example 7: PhyloPhlAn microbial tree of life
+
+[![PhyloPhlAn source backbone with taxonomy and marker completeness annotations](https://treeviz.newlineages.com/examples/example-7-phylophlan/thumbnail.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-7-phylophlan/session.treeviz.json)
+
+This view adapts Figure 1 from [Segata et al. (2013)](https://doi.org/10.1038/ncomms3304).
+It retains the preserved PhyloPhlAn backbone's 3,171 tip names, branch lengths,
+support values and unresolved splits. Annotations show taxonomy and marker
+completeness. Layout and colors are adapted for TreeViz.
+
+The published figure adds 566 genomes to this backbone. Their placements were
+not recovered, so the example contains 3,171 of the figure's 3,737 genomes.
+The source tree and its MIT notice accompany the session and metadata downloads.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-7-phylophlan/session.treeviz.json) ·
+[SVG figure](https://treeviz.newlineages.com/examples/example-7-phylophlan/thumbnail.svg) ·
+[Source paper](https://doi.org/10.1038/ncomms3304) ·
+[Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-7-phylophlan/recipe.md)
+
+## Example 8: Bioreactor MAGs
+
+[![Bioreactor MAG tree with published bin statistics and reconstructed heatmap colors](https://treeviz.newlineages.com/examples/example-8-reactor-stability/thumbnail.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-8-reactor-stability/session.treeviz.json)
+
+This view reconstructs Figure 7 from [Mills et al. (2025)](https://doi.org/10.1038/s41522-025-00679-w).
+The 183 plotted bins use the supplement's taxonomy, GC content and completeness.
+Topology and branch distances come from the vector figure. These distances
+describe the drawing, not evolutionary change.
+
+The matching MAG tree and per-sample abundance matrix were not supplied.
+Heatmap cells retain their published colors as display categories; no abundance
+measurements are inferred from them. The metadata, legends and provenance audit
+identify this limit.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-8-reactor-stability/session.treeviz.json) ·
+[SVG figure](https://treeviz.newlineages.com/examples/example-8-reactor-stability/thumbnail.svg) ·
+[Source paper](https://doi.org/10.1038/s41522-025-00679-w) ·
+[Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-8-reactor-stability/recipe.md)
+
+## Example 9: HMP and MetaHIT gut microbiota
+
+[![Gut microbiota taxonomic cladogram with HMP and MetaHIT cohort annotations](https://treeviz.newlineages.com/examples/example-9-metaphlan/thumbnail.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-9-metaphlan/session.treeviz.json)
+
+This view adapts Figure 3a from [Segata et al. (2012)](https://doi.org/10.1038/nmeth.2066).
+The archived MetaPhlAn table contains 139 HMP and 85 MetaHIT samples. Its
+taxonomic lineages define the tree. Branch lengths count taxonomy steps;
+they are not evolutionary distances. Abundance and cohort annotations derive
+from the source profiles, and the layout is reconstructed.
+
+The table contains 290 taxa and 135 terminal clades, including 123 species-level rows.
+The paper reports 102 species for the combined cohorts; 102 instead matches
+HMP alone in the archived table. The example retains all source rows and
+records this discrepancy.
+
+The original profiles accompany the session, tree, leaf and node metadata and provenance
+audit so the cohort calculations can be checked.
+
+[Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-9-metaphlan/session.treeviz.json) ·
+[SVG figure](https://treeviz.newlineages.com/examples/example-9-metaphlan/thumbnail.svg) ·
+[Source paper](https://doi.org/10.1038/nmeth.2066) ·
+[Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-9-metaphlan/recipe.md)
