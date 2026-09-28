@@ -29,28 +29,13 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
 ## Core Workflow
 
 1. Open TreeViz with `?api=1` and wait for `window.__treeviz`.
-2. Import a tree or restore a `.treeviz.json` session. Example 1:
-   Mirusviricota has 18 tracks and a fitted circular opening. Example 2: SILVA
-   taxonomy has imported node angles, count-scaled nodes and branches, 50
-   centered labels, and a continuous count legend.
-   [Example 3](https://doi.org/10.1371/journal.pcbi.1005404.g003): TARA Oceans
-   Metazoa has 550 taxa, including 275 terminal taxa, 20,212 OTUs,
-   250,296,231 reads, 73 labels, imported radial X/Y coordinates, and separate
-   percentage/count axes. It uses real source data. Its display geometry was
-   reconstructed and aligned to the paper raster because the original
-   force-layout coordinates are unavailable.
-   [Example 4](https://doi.org/10.1038/nature13805) uses the published 178-tip
-   source topology and branch agreement. Its pairwise transfer weights are
-   explicitly synthetic because the source has no recoverable transfer matrix.
-   [Example 5](https://doi.org/10.1038/nmicrobiol.2016.48) retains the published 3,083-tip tree of life with reconstructed radial positions and clade backgrounds.
-   [Example 6](https://doi.org/10.1038/s41467-024-49644-9) provides a rectangular 3,128-tip *S. aureus* CC398 reconstruction with Supplementary Data 1 annotations. Its topology and drawing distances are approximate, one annotation match is inferred, and the original dated tree file was not found.
-   Examples 7–9 use a [PhyloPhlAn source backbone](https://doi.org/10.1038/ncomms3304),
-   [bioreactor MAGs](https://doi.org/10.1038/s41522-025-00679-w) with vector-derived
-   heatmap colors, and an [HMP/MetaHIT taxonomic cladogram](https://doi.org/10.1038/nmeth.2066).
-   Read each provenance audit before reusing reconstructed geometry or derived annotations.
-   Read `/examples/manifest.json` for `source.publication` citations and
-   optional `recipe: { prompt, url }` entries. Adapt the input and styling
-   instructions to the supplied data; restore `sessionUrl` for the exact example.
+2. Import a tree or restore a `.treeviz.json` session. For the hosted examples, read
+   `/examples/manifest.json` for `source.publication` citations, optional
+   `recipe: { prompt, url }` entries, and each `sessionUrl`, and read the Example
+   Catalog in `references/hosted-runtime.md` for what each example contains. Read each
+   provenance audit before reusing reconstructed geometry or derived annotations.
+   Adapt the input and styling instructions to the supplied data; restore
+   `sessionUrl` for the exact example.
 3. Inspect `getSession()`, `commands()`, `palettes()`, and `getDiagnostics()`.
 4. For metadata, call `planMetadataImport(source, format, prompt)` before import.
 5. Import metadata with the suggested row key, flags, and leaf identifier source.
@@ -154,8 +139,8 @@ Load only the reference needed for the task:
   and export QA.
 - `references/example-inputs.md`: deterministic 30-leaf and 100-leaf example recipes with metadata and support markers.
 - `references/large-taxonomy-trees.md`: large taxonomy-tree workflows, metadata-derived categories, rerooting, and dense exports.
-- `references/hosted-runtime.md`: hosted URLs, public files, the current example,
-  and live API smoke testing.
+- `references/hosted-runtime.md`: hosted URLs, public files, the example
+  catalog and its session URLs, and live API smoke testing.
 - `references/wrapper-api.md`: published Python 0.6.0 package and notebook workflows.
 
 ## Helper Scripts

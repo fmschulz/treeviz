@@ -30,18 +30,43 @@ and its schemas can be newer than `treeviz-phylo`.
 
 ## Example Catalog
 
-Read `/examples/manifest.json` for the current sessions and their provenance.
-The catalog includes:
+Read `/examples/manifest.json` for the current sessions, their `sessionUrl`
+values, and their provenance. The catalog includes:
 
-- **Example 1: Mirusviricota**: a fitted circular Extended Data Figure 9 tree
-  with 1,204 tips and 18 metadata tracks. Source:
+- **Example 1: Mirusviricota**: a circular Extended Data Figure 9 tree with
+  1,204 tips, 18 metadata tracks, and a fitted circular opening. Source:
   [doi:10.1038/s41564-025-02190-6](https://doi.org/10.1038/s41564-025-02190-6).
 - **Example 2: SILVA taxonomy**: the upper-left SILVA **Whole database** panel
   of Figure 4 with 3,843 taxa, 3,257 leaves, 513,121 bacterial 16S sequences,
-  count-scaled nodes and branches, and 50 selected labels. Source:
+  imported node angles, count-scaled nodes and branches, 50 centered labels,
+  and a continuous count legend. Source:
   [doi:10.1371/journal.pcbi.1005404](https://doi.org/10.1371/journal.pcbi.1005404).
+- **Example 3: TARA Oceans Metazoa**
+  ([figure](https://doi.org/10.1371/journal.pcbi.1005404.g003)): 550 taxa,
+  including 275 terminal taxa, 20,212 OTUs, 250,296,231 reads, 73 labels,
+  imported radial X/Y coordinates, and separate percentage/count axes. It uses
+  real source data. Its display geometry was reconstructed and aligned to the
+  paper raster because the original force-layout coordinates are unavailable.
+- **Example 4** ([source](https://doi.org/10.1038/nature13805)): the published
+  178-tip source topology and branch agreement. Its pairwise transfer weights
+  are explicitly synthetic because the source has no recoverable transfer
+  matrix.
+- **Example 5** ([source](https://doi.org/10.1038/nmicrobiol.2016.48)): the
+  published 3,083-tip tree of life with reconstructed radial positions and
+  clade backgrounds.
+- **Example 6** ([source](https://doi.org/10.1038/s41467-024-49644-9)): a
+  rectangular 3,128-tip *S. aureus* CC398 reconstruction with Supplementary
+  Data 1 annotations. Its topology and drawing distances are approximate, one
+  annotation match is inferred, and the original dated tree file was not found.
+- **Examples 7–9**: a [PhyloPhlAn source backbone](https://doi.org/10.1038/ncomms3304),
+  [bioreactor MAGs](https://doi.org/10.1038/s41522-025-00679-w) with
+  vector-derived heatmap colors, and an
+  [HMP/MetaHIT taxonomic cladogram](https://doi.org/10.1038/nmeth.2066).
 
-Open the saved session with:
+Read each provenance audit before reusing reconstructed geometry or derived
+annotations.
+
+Open the first two saved sessions with (the manifest's `sessionUrl` gives the rest):
 
 ```text
 https://treeviz.newlineages.com/?session=/examples/example-1-mirusviricota/session.treeviz.json

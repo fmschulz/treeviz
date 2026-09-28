@@ -27,13 +27,14 @@ such a figure should follow automatic sizing.
 ## Install
 
 ```bash
-pip install treeviz-phylo==0.6.0
+uv add treeviz-phylo==0.6.0                            # in a uv project
+uv run --with treeviz-phylo==0.6.0 python script.py    # one-off script
 ```
 
 Notebook support:
 
 ```bash
-pip install "treeviz-phylo[notebook]==0.6.0"
+uv add "treeviz-phylo[notebook]==0.6.0"
 ```
 
 Import:

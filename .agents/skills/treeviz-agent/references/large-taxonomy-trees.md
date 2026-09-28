@@ -67,7 +67,7 @@ Use the helper script for repeatable rerooting. Run it from the installed
 `treeviz-agent` skill directory:
 
 ```bash
-python scripts/reroot-newick-by-metadata.py \
+uv run python scripts/reroot-newick-by-metadata.py \
   --tree input.contree \
   --metadata metadata.tsv \
   --output rerooted.contree \
