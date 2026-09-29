@@ -26,19 +26,20 @@ leaves.
 
 ## Configure the view
 
-Metadata tracks encode table values next to leaves: color strips for
-categories, gradients and heatmaps for continuous values, bars for numeric
-comparisons, text tracks for labels, binary dots for presence and absence.
-The **Tracks** panel lists each track by title. Expand a track to edit its
-columns, palette, width, and other settings; the first track is open when the
-panel appears. The same panel adds and removes tracks.
+Metadata tracks show table values beside the leaves. Categories get color
+strips, continuous values get gradients and heatmaps, numeric comparisons get
+bars, labels get text tracks, and presence and absence get binary dots. In the
+**Tracks** panel, each track appears under its title. Expand one to edit its
+columns, palette, width, and other settings. When the panel appears, the first
+track is already open. You add and remove tracks from the same panel.
 
-The stage toolbar switches layout, turns **Auto size** on or off, fits the
-tree, searches taxa and clades, shows or hides branch lengths, and opens the
-panels. It also sets tip alignment in the rectangular layout, switches arc or
-straight connectors in the circular layout, and saves and restores named views. The **Controls** panel starts
-with quick actions for label and metadata-track visibility, followed by four
-groups:
+From the stage toolbar you can switch the layout, turn **Auto size** on or
+off, fit the tree, search taxa and clades, show or hide branch lengths, and
+open the panels. The toolbar holds a few layout-specific settings as well: tip
+alignment in the rectangular layout, and arc or straight connectors in the
+circular layout. It is also where you save and restore named views. The
+**Controls** panel opens with quick actions for label and metadata-track
+visibility. Four groups follow them:
 
 - **Layout**: zoom, automatic collapse threshold, and scale-bar visibility.
   Rectangular and circular layouts add **Collapsed clade spacing**
@@ -70,12 +71,14 @@ Collapsed-wedge controls appear under **Branches & nodes** in the radial
 layout. They include shape, fill source and opacity, gap, minimum body, overlap
 policy, data-driven size, background outline, and label placement.
 
-Any label can be dragged: press on the text and move it. The offset is stored
-on that clade, so it survives saving and appears in exports.
+You can drag any label to a new position by pressing on its text and moving
+it. The offset is stored on that clade, which means it survives saving and
+appears in exports.
 
-For one-off edits, select a leaf or internal node and use the Inspector's
-branch, circle, and label controls. Saved views keep more than one arrangement
-of the same session. Every option is listed in [Tree styling](STYLING.md).
+To change a single node, select a leaf or internal node and adjust it with
+the Inspector's branch, circle, and label controls. Saved views let you keep
+more than one arrangement of the same session. [Tree styling](STYLING.md)
+lists every option.
 
 The **Legend** panel lists the legends derived from tracks, markers, node marks
 and connections, then any hand-written legends stored on the session
@@ -97,10 +100,11 @@ stays where you put it when you open a panel or edit the document; the view
 refits only when a session loads or the layout changes. In the rectangular
 layout the fitted view includes collapsed wedge tips and their labels.
 
-Hovering a leaf, an internal node or a collapsed wedge shows a tooltip: the
-label or name, `N leaves` for a wedge, `Branch length x`, `Support y`, then the
-node's attributes under their display names, with a swatch for color values.
-Hovering or selecting a collapsed wedge outlines its polygon.
+Hover over a leaf, an internal node or a collapsed wedge to see a tooltip.
+It shows the label or name, `N leaves` for a wedge, `Branch length x` and
+`Support y`, followed by the node's attributes under their display names.
+Color values come with a swatch. When you hover over or select a collapsed
+wedge, its polygon is outlined.
 
 A collapsed clade's label sits past its wedge tip. Two controls under
 **Collapsed wedges** set its placement:
