@@ -10,7 +10,7 @@ example sessions. The hosted browser does not load TOML directly. Use the
 corresponding panel or browser API command, or open the compiled
 `.treeviz.json` session.
 
-## Palette Registry
+## Palette registry
 
 The web app ships a small static palette registry. Inspect it from the browser
 API:
@@ -43,7 +43,7 @@ Legacy spellings such as `viridis`, `tableau10`, `category10`, and
 `diverging-rdbu` are accepted as aliases. New examples should use the ids in
 the table.
 
-## Track Palettes
+## Track palettes
 
 Browser API:
 
@@ -66,7 +66,7 @@ tracks = [
 For exact category colors, use `categoryColors` in a session or command patch.
 Exact colors are preserved in saved sessions and legends.
 
-## Compact Track Symbols And Wedges
+## Compact track symbols and wedges
 
 Categorical `color-strip` tracks can keep their default strip display or render
 each category as compact symbols or wedges:
@@ -124,16 +124,16 @@ Read the track ids from `getSession().tracks`. Supported symbols are `circle`,
 `square`, `triangle`, `diamond`, `plus`, and `dash`; legends preserve category
 labels and interval labels for symbols and wedges.
 
-## Exact Node And Branch Styling
+## Exact node and branch styling
 
-Two Controls entries colour branches. **Colour branches by** lists both the
-numeric metadata columns, which map onto a colour scale, and any tree-node
-metadata key whose values are colours (Newick `[&key=#rrggbb]` comments), which
-apply as exact colours; a session that ships several colourings, such as one by
+Two Controls entries color branches. **Colour branches by** lists both the
+numeric metadata columns, which map onto a color scale, and any node
+metadata key whose values are colors (Newick `[&key=#rrggbb]` comments), which
+apply as exact colors; a session that ships several colorings, such as one by
 domain and one by a measured quantity, switches between them here. **Exact
-styling** exposes the same exact-colour attribute alongside the width and node
+styling** exposes the same exact-color attribute alongside the width and node
 circle attributes. Setting one clears the other, so a scale and an exact
-colouring never compete.
+coloring never compete.
 
 Map data attributes to node circles and branch strokes through the browser API:
 
@@ -150,21 +150,21 @@ await window.__treeviz.execute('view.set-pretty-terminal-branches', {
 })
 ```
 
-Diameter and branch-width values are pixels. Internal nodes read tree metadata
-such as Newick/Nexus annotations; terminal leaves read tree metadata first and
+Diameter and branch-width values are pixels. Internal nodes read node attributes
+such as Newick/Nexus annotations; terminal leaves read node attributes first and
 then the bound metadata row. `view.set-tree-style-attributes` sets the four
 attribute mappings. Pretty terminal branches are a separate view command.
 
-Branch colours extend upward. An internal node whose children all resolve to
-the same colour takes that colour, so a monophyletic group is painted up to and
+Branch colors extend upward. An internal node whose children all resolve to
+the same color takes that color, so a monophyletic group is painted up to and
 including the stem of its last common ancestor, and a group that is not
 monophyletic is painted up to each of its largest monophyletic parts. A child
-without a colour stops the extension. Internal nodes with their own colour value
-keep it, and that value counts as the colour of their subtree. A colour set on a
-clade by hand (Style > Branch colour in the browser, or a `[[branch_rule]]`
-`color`) wins over every data-derived colour on that clade and its descendants,
-so recolouring a wedge or clade always shows; Reset clade style brings the data
-colour back.
+without a color stops the extension. Internal nodes with their own color value
+keep it, and that value counts as the color of their subtree. A color set on a
+clade by hand (Style > Branch color in the browser, or a `[[branch_rule]]`
+`color`) wins over every data-derived color on that clade and its descendants,
+so recoloring a wedge or clade always shows; Reset clade style brings the data
+color back.
 
 ## Layouts
 
@@ -174,9 +174,7 @@ at its own length in its own direction and no point is privileged as the root.
 
 `circular` takes a connector style. `arc` (the default) draws the polar elbow,
 an arc across each node's children with a radial spoke out to each one.
-`straight` joins parent to child directly and is the layout TreeViz offered as
-`radial` through 0.3.1; sessions saved before that release are migrated onto it
-automatically.
+`straight` joins parent to child directly.
 
 ```toml
 [view]
@@ -191,7 +189,7 @@ await window.__treeviz.execute('view.set-layout', {
 })
 ```
 
-Circular layouts can read imported angles from direct tree-node metadata. The
+Circular layouts can read imported angles from node attributes. The
 selected attribute must contain degrees from 0 through 360. Values map into the
 current opening and rotation; invalid or missing values fall back to automatic
 placement for that node. Bound metadata-table columns are not used.
@@ -208,7 +206,7 @@ await window.__treeviz.execute('view.set-layout', {
 
 Pass `circularAngleAttribute: null` to return to automatic angles. Setting
 `showScaleBar: false` hides the distance scale without changing branch
-geometry.
+geometry. The TOML equivalent is `show_scale_bar = false` under `[view]`.
 
 For a radial tree with saved source positions, select **Node X coordinate**
 and **Node Y coordinate** in **Controls > Layout**. These use direct node
@@ -236,11 +234,11 @@ layout = "radial"
 leaf_spacing = 1.6
 ```
 
-## Collapsed Clades
+## Collapsed clades
 
 Collapse a clade from the browser (`tree.collapse-clade`) or from a config
 attribute. With `collapse_attribute`, every non-root internal node whose
-tree-node metadata value for that key is truthy (present and not `""`, `"0"`,
+node attribute value for that key is truthy (present and not `""`, `"0"`,
 or `"false"`) compiles to a collapsed clade. This reaches nodes that name-based
 `[[branch_rule]]` selectors cannot, such as many clades sharing one name.
 
@@ -248,46 +246,46 @@ or `"false"`) compiles to a collapsed clade. This reaches nodes that name-based
 [view]
 collapse_attribute = "collapse"
 collapsed_wedge_shape = "rounded"      # or "triangle"
-collapsed_wedge_fill = "background"    # "branch", or "attribute" to fill from a node-meta colour key
-collapsed_wedge_fill_attribute = "fc"  # node-meta colour key the "attribute" fill reads
+collapsed_wedge_fill = "background"    # or "branch", or "attribute" (color from a node attribute)
+collapsed_wedge_fill_attribute = "fc"  # color attribute that the "attribute" fill reads
 collapsed_wedge_fill_opacity = 0.28    # branch/attribute fill opacity; raise it when the fill carries data
-collapsed_wedge_gap = 6                # px kept between neighbouring wedges
+collapsed_wedge_gap = 6                # px kept between neighboring wedges
 collapsed_wedge_min_body = 5           # px half-width floor
+collapsed_wedge_min_body_from_branch = false  # true: body never thinner than the entering branch
 collapsed_wedge_allow_overlap = false  # true keeps crowded wedges as first shaped
-collapsed_wedge_size_attribute = "pd"  # size wedges from node metadata instead
+collapsed_wedge_size_attribute = "pd"  # size wedges from node attributes instead
 collapsed_wedge_size_scale = "log"     # "linear" or "log" (log10)
 collapsed_wedge_size_target = "width"  # or "length" to size the wedge's reach
 collapsed_wedge_size_range = [10, 80]  # px, outer-edge width or length
 clade_background_outline = "hull"      # or "fitted"
 ```
 
-- `rounded` (default) insets each wedge by half the gap so neighbours stay
-  apart, thickens footprints thinner than the minimum body so a two-tip clade
-  reads as a rod rather than a line, rounds the outline, and shrinks a wedge
-  that still meets a neighbour or a branch of another lineage. `triangle`
-  draws the plain triangle from the clade root to the extreme tips; it still
-  gets the minimum body where a two-tip clade would otherwise be a hairline.
-  The outline is painted inside the fill's edge and never reaches into a
-  neighbouring wedge. Its width follows the branch stroke up to 60% of the
-  wedge's inradius (the radius of the largest circle that fits inside the
-  wedge), so a thin wedge keeps a visible fill at any stroke width; the
-  hover and selection outlines take the same cap. A short stem from the clade
-  root along the wedge axis continues the incoming branch in its colour and
-  width and closes the notch where the branch meets the wedge tip. It is
-  capped at four stroke widths, so it never covers a thin wedge, and keeps its
-  screen length as the view zooms. Circular sectors and rectangular wedges
-  have no stem.
+- `rounded` (default) insets each wedge by half the gap so neighbors stay
+  apart. It rounds the outline and shrinks a wedge that still meets a
+  neighbor or a branch of another lineage.
+- `triangle` draws the plain triangle from the clade root to the extreme tips.
+- Either shape thickens a footprint thinner than the minimum body, so a
+  two-tip clade reads as a rod rather than a line.
+- The outline is painted inside the fill's edge and never reaches into a
+  neighboring wedge. Its width follows the branch stroke, capped so a thin
+  wedge keeps a visible fill. Hover and selection outlines use the same cap.
+- `collapsed_wedge_min_body_from_branch = true` (session
+  `collapsedWedgeMinBodyFromBranch`, default `false`) outlines each wedge at
+  the stroke width of the branch that enters it. It widens the wedge until two
+  such outlines and a hairline of fill fit inside, also under crowding. A wedge
+  too short to hold them keeps the capped outline. Width-sized wedges are
+  exempt, since their outer edge carries the value.
 - Gap, minimum body and size range are pixels at full tree scale. When a larger
-  label font takes more of the radius, the tree and every wedge, sized or
-  footprint-shaped, shrink by the same factor. A wedge keeps the gap from its
-  neighbours and from the centre line of any branch of another lineage. The
-  branch stroke plays no part. The body is the same at every branch width; a
-  wide stroke eats into the gap, not into the fill.
+  label font takes more of the radius, the tree and every wedge shrink by the
+  same factor.
+- A wedge keeps the gap from its neighbors and from the center line of any
+  branch of another lineage. The branch stroke plays no part: a wide stroke
+  eats into the gap, not into the fill.
 - `collapsed_wedge_fill` picks the fill. `background` (default) takes the
-  nearest enclosing `clade_background`, or the branch colour where there is
-  none. `branch` takes the wedge's own branch colour, translucent, which tells
+  nearest enclosing `clade_background`, or the branch color where there is
+  none. `branch` takes the wedge's own branch color, translucent, which tells
   wedges apart when several sit on one painted clade. `attribute` reads the
-  fill from `collapsed_wedge_fill_attribute`, a node-meta colour key, so the
+  fill from `collapsed_wedge_fill_attribute`, a node attribute holding a color, so the
   fill can encode something other than the outline; a clade without a value
   under that key keeps the `background` fill. `collapsed_wedge_fill_opacity`
   sets the translucency of the `branch` and `attribute` fills (default 0.28, a
@@ -310,18 +308,24 @@ clade_background_outline = "hull"      # or "fitted"
   wedge.
 - `collapsed_wedge_size_target` chooses the dimension. `width` (default) puts
   the value in the outer edge. A radial fan constrains that: the angular room
-  around each clade belongs to its neighbours, so widths that collide are all
+  around each clade belongs to its neighbors, so widths that collide are all
   scaled down by one shared factor, keeping their proportions exact while the
   absolute pixel mapping shrinks. `length` puts the value in the reach from the
   clade root to the base and keeps each clade's own angular slot, so a
   colliding wedge is pulled back on its own and the mapping is left alone. It
-  gives up length against neighbouring wedges and branches of other lineages
+  gives up length against neighboring wedges and branches of other lineages
   down to its footprint depth, then narrows its base about the axis down to
   the minimum body. An obstacle it cannot clear even then is left in place
   and counted by `getLayoutMetrics()` as `wedgeOverlapPairs` and
   `wedgeBranchCrossings`; see [Browser API](API.md#layout-qa-pattern).
   `collapsed_wedge_allow_overlap = true` keeps the mapped sizes and permits the
   overlap.
+- `collapsedWedgeLengthMode` sets the length of a width-sized wedge. It has no
+  TOML key; set it with the `lengthMode` argument of
+  `view.set-collapsed-wedge-options`. `footprint` (default) runs the wedge out
+  to its footprint depth. `max-path` runs it out to the longest summed
+  root-to-tip path in the clade. `max-path` applies only in the radial layout
+  with branch lengths shown and `collapsed_wedge_size_target = "width"`.
 - `clade_background_outline` picks how a `clade_background` is outlined in the
   radial layout. `hull` (default) draws the convex hull of the clade with a
   faint outline. `fitted` draws a soft buffer that follows the branches and
@@ -331,31 +335,31 @@ clade_background_outline = "hull"      # or "fitted"
 Each key has a camelCase counterpart on the session view for
 `session.restore`: `collapsedWedgeShape`, `collapsedWedgeFill`,
 `collapsedWedgeFillAttribute`, `collapsedWedgeFillOpacity`,
-`collapsedWedgeGap`, `collapsedWedgeMinBody`, `collapsedWedgeAllowOverlap`,
+`collapsedWedgeGap`, `collapsedWedgeMinBody`,
+`collapsedWedgeMinBodyFromBranch`, `collapsedWedgeAllowOverlap`,
 `collapsedWedgeSizeAttribute`, `collapsedWedgeSizeScale`,
 `collapsedWedgeSizeTarget`, `collapsedWedgeSizeRange`,
 `cladeBackgroundOutline`, `collapsedWedgeLabelDeclutter`,
 `collapsedWedgeLabelOrientation`, `allowLabelOverlap`, and `showNodeCircles`.
-The command
-`view.set-collapsed-wedge-options` patches the same settings under short
-names: `shape`, `fill`, `fillAttribute`, `fillOpacity`, `gap`, `minBody`,
-`allowOverlap`, `sizeAttribute`, `sizeScale`, `sizeTarget`, `sizeRange`,
-`outline`, `labelDeclutter`, `labelOrientation`.
+The command `view.set-collapsed-wedge-options` patches these wedge settings
+under short names: `shape`, `fill`, `fillAttribute`, `fillOpacity`, `gap`,
+`minBody`, `allowOverlap`, `sizeAttribute`, `sizeScale`, `sizeTarget`,
+`lengthMode`, `sizeRange`, `outline`, `labelDeclutter`, `labelOrientation`.
 A data-defined node circle (`node_diameter_attribute`) on a collapsed clade is
 drawn just past the wedge's outer edge; `show_node_circles = false` (Controls >
 Show node circles) hides every data-defined circle without unsetting the
-attribute. A collapsed clade whose root node is named is labelled just past the
+attribute. A collapsed clade whose root node is named is labeled just past the
 wedge tip whenever labels are shown (Controls > Show labels); the section
-[Label Colour, Direction, And Position](#label-colour-direction-and-position)
+[Label color, direction, and position](#label-color-direction-and-position)
 covers which way it reads. Leaf labels must stay unique, so a single-taxon clade
 drawn as a leaf gets a readable name through a `[[branch_rule]]` with a `label`
 selector and a `clade_label`, which replaces the leaf's displayed name.
 
-## Label Colour, Direction, And Position
+## Label color, direction, and position
 
-`label_color` on a `[[branch_rule]]` sets the text colour of every label in the
+`label_color` on a `[[branch_rule]]` sets the text color of every label in the
 matched subtree: leaf labels, and the wedge label of any collapsed clade inside
-it. One rule per domain colours a whole tree of life.
+it.
 
 ```toml
 [[branch_rule]]
@@ -374,7 +378,7 @@ length or angle setting can fix.
 along the line of its branch until it clears (along its bearing when that line
 is blocked, or under the **Outward** direction), so its leader continues the
 branch and crowded labels stack in rings. A pushed label gets a thin leader
-line back to its wedge, in the label's own colour:
+line back to its wedge, in the label's own color:
 
 ```toml
 [view]
@@ -389,9 +393,10 @@ direction**) sets which way the label reads; the seat is the wedge tip under
 either value. `branch` (default, **Along branch**) turns the text to the
 branch that enters the clade, for every clade whose root has a parent, so the
 labels of a figure read the way their branches run. `bearing` (**Outward**)
-turns it out from the centre of the drawing, like a spoke. A declutter push
-moves the label out along its bearing from the centre under either value,
-with the leader back to where it would have sat. A clade whose root has no
+turns it out from the center of the drawing, like a spoke. A declutter push
+moves the label along its entering branch under `branch`, and outward along
+its bearing when that line is blocked or under `bearing`. A leader joins the
+label to where it would have sat. A clade whose root has no
 parent reads outward under both.
 
 ```toml
@@ -402,7 +407,7 @@ collapsed_wedge_label_orientation = "bearing"
 `allow_label_overlap = false` (Controls: **Auto-cull overlaps**; view
 `allowLabelOverlap`) drops a label that would land on one already drawn. The
 culler judges a collapsed clade's label at its decluttered seat, so a pushed
-label that clears its neighbours is kept. Culled labels return as the view
+label that clears its neighbors is kept. Culled labels return as the view
 zooms in: above zoom 1 labels keep their screen size while the tree grows,
 so room opens between them. Default `true`.
 
@@ -413,7 +418,7 @@ allow_label_overlap = false
 ```
 
 Text on the far side of the figure turns around so it is never upside down. A
-clade sitting where that rule turns over reads against its neighbours.
+clade sitting where that rule turns over reads against its neighbors.
 `label_flip` reverses the choice for one label:
 
 ```toml
@@ -434,11 +439,28 @@ await window.__treeviz.execute('tree.style-clade', {
 })
 ```
 
-Set `cladeLabelPlacement: 'node'` to center a horizontal annotation on
-an internal or terminal node. It uses the clade label's text, color, weight,
-font size, and offsets without reserving a label lane or drawing the white
-annotation backing. Terminal nodes get one label instead of a duplicate tip
-label. `cladeLabelFontSize` accepts fractional values from 1 to 96 pixels.
+`cladeLabelPlacement` sets where a clade annotation sits. In TOML, set
+`clade_label_placement` on a `[[branch_rule]]`; it accepts the same values.
+**Style clade > Clade annotation** offers `clade` and `node`.
+
+- `clade` (default) places the label past the clade's tips, with a white
+  backing and a reserved label lane before metadata tracks.
+- `node` centers a horizontal annotation on an internal or terminal node. It
+  uses the clade label's text, color, weight, font size, and offsets without
+  reserving a label lane or drawing the white backing. A terminal node gets
+  one label instead of a duplicate tip label.
+- `background-top`, `background-top-left`, `background-top-right`,
+  `background-left`, and `background-right` apply in the radial layout to a
+  clade with a drawn background, solid or gradient. The label sits unrotated
+  at that seat on the background. It replaces a collapsed clade's wedge label,
+  so the name is not drawn twice. Other layouts treat these values as `clade`.
+
+`cladeLabelFontSize` accepts fractional values from 1 to 96 pixels.
+
+`cladeBackgroundPadding` sets the padding of one clade's fitted radial
+background (`clade_background_outline = "fitted"`) in pixels. It accepts
+nonnegative values. Omit it for automatic padding. It is a clade style field
+for sessions and `tree.style-clade`; it has no TOML key.
 
 ```js
 await window.__treeviz.execute('tree.style-clade', {
@@ -463,14 +485,16 @@ otherwise, an internal-node name must be unique. Hidden, collapsed, ambiguous,
 and unbound endpoints are omitted and reported through render diagnostics. See
 [Connections](API.md#connections) for the JSON shape and diagnostic codes.
 
-## Legends And Attribute Names
+## Legends and attribute names
 
-Attribute encodings (branch colour, node-circle colour, wedge fill from a
-node-meta key) carry no legend of their own, and the Controls pickers list
-their keys as written in the tree. `[[legend]]` tables add hand-written swatch
-lists after the legends derived from tracks, markers, node marks and
+Attribute encodings (branch color, node-circle color, wedge fill from a
+node attribute) carry no legend of their own, and the Controls pickers list
+their keys as written in the tree. `[[legend]]` tables add hand-written
+legends after the legends derived from tracks, markers, node marks and
 connections; they appear in the Legend panel, the in-figure legend and
-exports. `[attribute_labels]` maps a node-meta key to the name the pickers and
+exports. A legend's `shape` is `square` (default, a swatch list) or `circle`.
+Circle entries accept an optional `size`, the circle diameter in pixels
+(default 10). `[attribute_labels]` maps a node attribute to the name the pickers and
 hover tooltips show, as `Name (key)`. `figure_legend = true` opens the
 in-figure legend when the session loads.
 
@@ -479,9 +503,9 @@ in-figure legend when the session loads.
 figure_legend = true
 
 [attribute_labels]
-vc = "Domain colour"
-cc = "Culturedness colour"
-fcol = "Isolate colour"
+vc = "Domain color"
+cc = "Culturedness color"
+fcol = "Isolate color"
 
 [[legend]]
 title = "Domain"
@@ -493,7 +517,7 @@ entries = [
 ```
 
 On the session document the `[[legend]]` tables compile to a top-level
-`legends` array of `{ title, entries: [{ label, color }] }`,
+`legends` array of `{ title, shape?, entries: [{ label, color, size? }] }`,
 `[attribute_labels]` to a top-level `attributeLabels` map from key to name,
 and `figure_legend` to `view.figureLegendVisible`. No command edits `legends`
 or `attributeLabels`: set them in the document and load it with
@@ -501,18 +525,20 @@ or `attributeLabels`: set them in the document and load it with
 individual sections. Explicit section settings override the global
 `view.set-figure-legend-visibility` and `view.toggle-figure-legend` commands.
 
-Session JSON also accepts a continuous scale legend with `kind`, `title`,
-`axisLabel`, `colors`, `domain`, `sizeRange`, `transform`, `ticks`, and optional
-`scale` and `orientation`. `orientation` is `vertical` by default. A horizontal
+Session JSON also accepts a continuous scale legend with
+`kind: 'continuous-scale'`, `title`, `axisLabel`, `colors`, `domain`, `sizeRange`, `transform`, `ticks`, and optional
+`scale`, `orientation`, and `secondaryAxis`. `orientation` is `vertical` by default. A horizontal
 ramp runs from low to high left-to-right, with the primary ticks and axis label
-upright below it. An optional secondary axis is upright above it. The size
+upright below it. The optional `secondaryAxis` (`axisLabel`, `domain`,
+`transform`, `ticks`) is drawn upright above it. The size
 range is nondecreasing and must have a positive maximum; equal positive values
 draw a rectangular ramp. `scale` defaults to `1` and accepts finite values from
 `0.1` to `4`; it scales the ramp, spacing, strokes, axes, ticks, and text. See
 [Browser API](API.md#continuous-attribute-legends) for the session shape and
-validation rules. TOML `[[legend]]` supports swatches only.
+validation rules. TOML `[[legend]]` supports square and circle legends only,
+not continuous scales.
 
-## Conditional Style Rules
+## Conditional style rules
 
 Use conditional style rules when metadata values need thresholds, bins, or
 category logic instead of exact visual values. Rules are ordered; later rules
@@ -564,7 +590,7 @@ Supported conditions:
 - `regex`: JavaScript regular expression pattern and optional flags.
 
 `branch-color` rules extend to ancestors the same way `branch_color_attribute`
-does (see "Exact Node And Branch Styling").
+does (see [Exact node and branch styling](#exact-node-and-branch-styling)).
 
 Rendered targets are `branch-color`, `branch-width`, `node-color`, `node-size`,
 `internal-marker-color`, `internal-marker-size`, `label-color`,

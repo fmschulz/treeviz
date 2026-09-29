@@ -1,4 +1,4 @@
-# Use TreeViz From Python
+# Use TreeViz from Python
 
 `treeviz-phylo` builds TreeViz-native `.treeviz.json` sessions from Python
 scripts and notebooks. It handles tree input, metadata binding, schema
@@ -10,8 +10,7 @@ ships Python helpers and the TreeViz session schema.
 
 !!! note "Published package compatibility"
     The examples on this page target `treeviz-phylo` 0.8.2, the current PyPI
-    release. Its session schema matches the hosted app, so sessions saved from
-    the app validate in Python. Browser-side styling is documented in
+    release. Browser-side styling is documented in
     [Tree styling](STYLING.md) and [Browser API](API.md).
 
 ## Install
@@ -20,10 +19,11 @@ ships Python helpers and the TreeViz session schema.
 pip install treeviz-phylo
 ```
 
-Notebook extra:
+Optional extras:
 
 ```bash
-pip install "treeviz-phylo[notebook]"
+pip install "treeviz-phylo[notebook]"   # IPython display for notebook views
+pip install "treeviz-phylo[dataframe]"  # pandas, for DataFrame metadata
 ```
 
 Import name:
@@ -32,7 +32,7 @@ Import name:
 import treeviz
 ```
 
-## Schema Compatibility
+## Schema compatibility
 
 `validate_session` checks a session against the schema bundled in the package.
 The 0.8.2 package schema matches the schema of the hosted app, so a session
@@ -46,7 +46,7 @@ curl -A treeviz-docs -o treeviz-session.schema.json \
 
 and pass that file to `jsonschema.validate`.
 
-## Minimal Session
+## Minimal session
 
 ```python
 from treeviz import build_session, save_session, validate_session, view_session
@@ -72,7 +72,7 @@ view.url
 
 Open the saved `.treeviz.json` in the browser, or display `view` in a notebook.
 
-## Notebook Use
+## Notebook use
 
 ```python
 from IPython.display import display
@@ -98,7 +98,7 @@ if view.fragment is None:
     save_session(view.session, "large-session.treeviz.json")
 ```
 
-## Tree Inputs
+## Tree inputs
 
 `build_session(...)`, `view_tree(...)`, and `render_tree(...)` accept:
 
@@ -110,12 +110,12 @@ if view.fragment is None:
 Passing a list of trees to `build_session(...)` returns a list of independent
 session dictionaries.
 
-## Metadata Inputs
+## Metadata inputs
 
 Metadata can be:
 
 - a list or iterable of row dictionaries;
-- a pandas `DataFrame`;
+- a pandas `DataFrame` (install the `dataframe` extra);
 - a CSV or TSV file path;
 - `None`.
 
@@ -136,7 +136,7 @@ session = build_session("(A,B);", metadata=metadata, row_key_column="sample_id")
 If `row_key_column` is omitted, the package chooses the metadata column with
 the most exact leaf-name matches.
 
-## Track Definitions
+## Track definitions
 
 Tracks map metadata columns to visual encodings.
 
@@ -146,6 +146,7 @@ Tracks map metadata columns to visual encodings.
 | `gradient` | `column_key` | continuous values |
 | `heatmap` | `column_keys` | multiple continuous columns |
 | `bar` | `column_key` | continuous bar tracks |
+| `stacked_bar` | `column_keys` | per-tip composition, one segment per column |
 | `text` | `column_key` | labels from metadata |
 | `binary_dots` | `column_key` | boolean presence/absence symbols |
 
@@ -165,7 +166,7 @@ tracks = [
 Underscores and hyphens are both accepted in track kinds:
 `color_strip` and `color-strip` are equivalent.
 
-## View Settings
+## View settings
 
 Pass a `view` dictionary to set layout defaults:
 
@@ -186,19 +187,66 @@ session = build_session(tree, metadata=metadata, tracks=tracks, view=view)
 
 The browser can further adjust and save view settings.
 
-### Newer Browser Styling
+### Browser styling fields
 
 The hosted app can map metadata to exact node circles and branch width/color,
 apply conditional rules, draw compact symbol or wedge lanes, and style terminal
 branches. `treeviz-phylo` 0.8.2 validates these view fields in Python; pass
-them through the `view` argument or apply them
-later through `window.__treeviz`. Metadata branch colours extend to the MRCA
-stem of each same-coloured clade (see [Tree styling](STYLING.md)). Hand-written
-legends (`legends`) and attribute display names (`attributeLabels`) validate
-too; add them to a saved session, or write them in a TOML config
-(see [Legends and attribute names](STYLING.md#legends-and-attribute-names)).
+them through the `view` argument or apply them later through `window.__treeviz`.
+Metadata branch colors extend to the MRCA stem of each same-colored clade (see
+[Tree styling](STYLING.md)).
 
-## Tree Inspection
+## Session fields
+
+`build_session(...)`, `view_tree(...)`, and `render_tree(...)` take
+keyword-only arguments for the optional session fields:
+
+| Argument | Session field | Content |
+| --- | --- | --- |
+| `legends` | `legends` | Swatch legends: `[{"title": ..., "entries": [{"label": ..., "color": ...}]}]`. |
+| `attribute_labels` | `attributeLabels` | Node-metadata key to the display name the app's pickers show. |
+| `connections` | `connections` | Link sets: `[{"pairs": [{"from": ..., "to": ...}]}]`. `id`, `title`, `visible`, and `geometry` are optional. |
+| `node_metadata` | `nodeMetadata` | Rows that describe internal nodes, as records, a `DataFrame`, or a path. Rows bind by internal node label or by an `mrca_of` column of `|`-separated leaf names. |
+| `node_row_key_column` | | Key column of `node_metadata`. Default: the first column. |
+| `node_marks` | `nodeMarks` | Pie marks from `node_metadata` columns: `[{"columns": [...]}]`, with optional `style`, `palette`, `size_by`, and `max_radius`. |
+| `saved_views` | `views` | Named views: `[{"name": ..., "view": {...}}]`. Each `view` is applied on top of the session view. |
+| `binding_flags` | binding flags | How leaf labels match metadata row keys. The default trims whitespace. `case_insensitive`, `strip_underscores`, and `strip_quoted_label_decorations` are opt-in. |
+
+```python
+from treeviz import build_session, validate_session
+
+session = build_session(
+    "((A,B)AB,(C,D)CD)root;",
+    metadata=[
+        {"id": "A", "group": "alpha", "gc": 0.4, "at": 0.6},
+        {"id": "B", "group": "alpha", "gc": 0.5, "at": 0.5},
+        {"id": "C", "group": "beta", "gc": 0.3, "at": 0.7},
+        {"id": "D", "group": "beta", "gc": 0.6, "at": 0.4},
+    ],
+    row_key_column="id",
+    tracks=[
+        {"kind": "color_strip", "column_key": "group", "title": "Group"},
+        {"kind": "stacked_bar", "column_keys": ["gc", "at"], "title": "Composition"},
+    ],
+    legends=[{"title": "Group", "entries": [{"label": "alpha", "color": "#1b9e77"}]}],
+    attribute_labels={"soil": "Soil samples"},
+    connections=[{"pairs": [{"from": "A", "to": "D"}]}],
+    node_metadata=[
+        {"node": "AB", "soil": 3, "marine": 1},
+        {"node": "CD", "soil": 0, "marine": 4},
+    ],
+    node_row_key_column="node",
+    node_marks=[{"columns": ["soil", "marine"]}],
+    saved_views=[{"name": "Circular", "view": {"layout": "circular"}}],
+    binding_flags={"case_insensitive": True},
+)
+validate_session(session)
+```
+
+A TOML config can also define legends and attribute names; see
+[Legends and attribute names](STYLING.md#legends-and-attribute-names).
+
+## Tree inspection
 
 ```python
 from treeviz import binding_diagnostics, leaf_names, tree_stats
@@ -211,11 +259,13 @@ binding_diagnostics(session)
 `binding_diagnostics(session)` reports unmatched leaves, unmatched rows, and
 duplicate row keys.
 
-## Static Export
+## Static export
 
 `render_tree(...)` writes a temporary `.treeviz.json` session and calls a
 compatible external renderer command. It supports `svg`, `png`, and `pdf`.
 Neither the PyPI package nor this public repository installs that renderer.
+`auto_crop=None` (the default) follows the renderer default, which fits the
+output to its content. Pass `auto_crop=False` for a fixed-viewport output.
 
 ```python
 from treeviz import render_tree
@@ -243,20 +293,20 @@ browser app.
 
 | Function | Purpose |
 | --- | --- |
-| `build_session(tree, metadata=None, tracks=None, view=None, name=None, row_key_column=None)` | Build one session dictionary, or a list of sessions when `tree` is a list. |
+| `build_session(tree, metadata=None, tracks=None, view=None, name=None, row_key_column=None, *, legends=None, attribute_labels=None, connections=None, node_metadata=None, node_row_key_column=None, node_marks=None, saved_views=None, binding_flags=None)` | Build one session dictionary, or a list of sessions when `tree` is a list. |
 | `validate_session(session, schema_path=None)` | Validate a session against the packaged JSON schema. |
 | `save_session(session, path)` | Write a `.treeviz.json` session and return the output path. |
-| `load_session(path, validate=True, schema_path=None)` | Read a saved session; validation is enabled by default. |
-| `view_tree(tree, metadata=None, tracks=None, view=None, open_browser=True, app_url=..., name=None, row_key_column=None)` | Build a session and return a notebook/browser view object. |
+| `load_session(path, *, validate=True, schema_path=None)` | Read a saved session; validation is enabled by default. |
+| `view_tree(tree, metadata=None, tracks=None, view=None, open_browser=True, app_url=..., name=None, row_key_column=None, *, ...)` | Build a session and return a notebook/browser view object. Takes the same keyword-only arguments as `build_session`. |
 | `view_session(session, open_browser=True, app_url=...)` | Return a notebook/browser view for an existing session. |
 | `session_url(session, app_url=...)` | Return the hosted TreeViz URL for a session. |
 | `leaf_names(tree_or_session)` | Return terminal leaf labels. |
 | `tree_stats(tree_or_session)` | Return topology and branch-length summary statistics. |
 | `binding_diagnostics(session)` | Return metadata binding diagnostics. |
-| `render_tree(tree, metadata=None, tracks=None, view=None, format="svg", output=None, command=None, width=None, height=None, auto_crop=False, crop_padding=None, metrics=None, cwd=None)` | Render SVG, PNG, or PDF through an external renderer command. |
+| `render_tree(tree, metadata=None, tracks=None, view=None, format="svg", output=None, command=None, width=None, height=None, auto_crop=None, crop_padding=None, metrics=None, cwd=None, *, ...)` | Render SVG, PNG, or PDF through an external renderer command. Takes the same keyword-only arguments as `build_session`. |
 | `TreeVizSession(session, app_url=...)` | Notebook-friendly view object with `.url`, `.fragment`, and `._repr_html_()`. |
 
-## Runnable Example Script
+## Runnable example script
 
 A clone of this repository includes a script that imports the package, builds
 30- and 100-leaf examples, validates metadata binding, and writes sessions:
@@ -268,7 +318,7 @@ python examples/plot_treeviz_examples.py --out treeviz-example-output
 ```
 
 It writes `lineage_30.treeviz.json` (rectangular, metadata tracks, binary leaf
-symbols, support markers, numeric branch colouring), `clade_100.treeviz.json`
+symbols, support markers, numeric branch coloring), `clade_100.treeviz.json`
 (circular, the same features), a `_bare` twin of each without metadata, and
 `summary.json` with leaf counts, binding diagnostics, and hosted URLs. Open the
 `.treeviz.json` files in the browser, or pass

@@ -6,7 +6,7 @@ binary dots, branch coloring, clade resolution, and legends.
 The hosted browser can also map metadata columns to exact terminal-node circles
 and terminal-branch styles.
 
-## Table Shape
+## Table shape
 
 Use one header row and one row per leaf.
 
@@ -20,7 +20,7 @@ C	Beta	soil	0.08	yes	candidate
 One column must identify the tree leaf. In the example above, `leaf_id` should
 match the leaf labels in the tree.
 
-## Row-Key Column
+## Row-key column
 
 The row-key column is the metadata column used to bind rows to tree leaves.
 Pass it explicitly when you can.
@@ -60,7 +60,7 @@ exact leaf-name matches. In the browser API, call
 `suggestedBinding.rowKeyColumn` to `session.import-metadata`. Explicit row keys
 keep workflows reproducible.
 
-## Matching Rules
+## Matching rules
 
 TreeViz tries exact matches first. During browser import, the metadata planner
 can suggest normalization when it improves binding:
@@ -73,7 +73,7 @@ can suggest normalization when it improves binding:
 Unmatched leaves are tree leaves without metadata rows. Unmatched rows are
 metadata rows that do not bind to any tree leaf.
 
-## Duplicates And Missing Keys
+## Duplicates and missing keys
 
 Row keys should be unique. Duplicate row keys are warnings in the browser
 import review, and the last row wins.
@@ -82,7 +82,7 @@ Rows with blank row keys cannot be bound. The browser skips them and reports a
 warning. In Python, a missing or blank row key raises a `ValueError` so invalid
 sessions fail early.
 
-## Values And Types
+## Values and types
 
 Cells may contain strings, numbers, booleans, or blanks. Blank cells are
 treated as missing values.
@@ -96,7 +96,7 @@ TreeViz infers column types:
 | `categorical` | `Alpha`, `Beta`, `soil`, `water` | color strip |
 | `text` | labels, notes, long identifiers | text |
 
-## Track Definitions In Python
+## Track definitions in Python
 
 ```python
 tracks = [
@@ -111,7 +111,7 @@ tracks = [
 `color_strip` and `binary_dots` may also be written as `color-strip` and
 `binary-dots`. The Python package normalizes underscores to hyphens.
 
-## Style Columns
+## Style columns
 
 Metadata columns can drive terminal-node circles and terminal-branch styling:
 
@@ -135,25 +135,32 @@ await api.execute('view.set-tree-style-attributes', {
 await api.execute('view.set-pretty-terminal-branches', { enabled: true })
 ```
 
-Terminal leaves use tree node metadata first and then the bound metadata row.
-Internal nodes only use tree node metadata. Branch style values are keyed by
+Node attributes are key-value pairs stored on tree nodes, for example values
+from Newick or Nexus comments. They are separate from the node metadata table
+(`session.import-node-metadata`), which binds TSV rows to internal nodes for
+node marks and node search.
+
+Terminal leaves use node attributes first and then the bound metadata row.
+Internal nodes only use node attributes. Branch style values are keyed by
 the child node, so a row for `A1` styles the branch entering `A1`.
 
-A node-meta key can carry a display name through `[attribute_labels]` in a
+A node attribute can carry a display name through `[attribute_labels]` in a
 TOML config (session `attributeLabels`); the Controls pickers and hover
 tooltips then show `Name (key)`. See
 [Legends and attribute names](STYLING.md#legends-and-attribute-names).
 
 See [Tree styling](STYLING.md) for current browser examples.
 
-## File Formats
+## File formats
 
 - `.tsv` and `.tab`: simple tab-separated metadata. Tabs and newlines always
   separate cells and rows.
 - `.csv`: CSV with quoted fields.
-- `.gz`: accepted by the browser when the filename ends in `.gz`.
 
 Use CSV when fields need quoting, commas, or embedded newlines.
+
+Gzipped files (`*.tsv.gz`, `*.tab.gz`, `*.csv.gz`) are decompressed in the
+browser.
 
 ## Validation
 

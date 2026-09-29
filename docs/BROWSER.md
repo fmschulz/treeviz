@@ -1,77 +1,74 @@
-# Browser Usage
+# Browser usage
 
 TreeViz runs as a static browser app.
 
 ## Open
 
-```text
-https://treeviz.newlineages.com/
-```
+- [https://treeviz.newlineages.com/](https://treeviz.newlineages.com/) opens
+  the app.
+- [https://treeviz.newlineages.com/?api=1](https://treeviz.newlineages.com/?api=1)
+  also exposes the `window.__treeviz` browser API.
+- [https://treeviz.newlineages.com/?mode=headless&api=1](https://treeviz.newlineages.com/?mode=headless&api=1)
+  is a render-only mode for automation. It exposes the same API.
 
-API-enabled mode:
-
-```text
-https://treeviz.newlineages.com/?api=1
-```
-
-Headless automation mode:
-
-```text
-https://treeviz.newlineages.com/?mode=headless&api=1
-```
-
-## Load Data
+## Load data
 
 TreeViz accepts:
 
-- Newick and Nexus tree files;
+- Newick (including IQ-TREE `.contree`) and Nexus tree files;
 - `.treeviz.json` sessions;
-- TSV/CSV metadata tables with one header row.
+- TSV/CSV metadata tables with one header row;
+- gzipped (`.gz`) copies of any of these files.
 
 Drop files onto the page or use the file picker. Load the tree first, then
 the metadata, and choose the row-key column that matches metadata rows to tree
 leaves.
 
-## Configure The View
+## Configure the view
 
-Metadata tracks encode table values next to leaves: colour strips for
+Metadata tracks encode table values next to leaves: color strips for
 categories, gradients and heatmaps for continuous values, bars for numeric
 comparisons, text tracks for labels, binary dots for presence and absence.
 The **Tracks** panel lists each track by title. Expand a track to edit its
 columns, palette, width, and other settings; the first track is open when the
 panel appears. The same panel adds and removes tracks.
 
-The stage toolbar switches layout, shows or hides branch lengths, sets tip
-alignment, fits the tree, and opens the panels. The **Controls** panel starts
+The stage toolbar switches layout, turns **Auto size** on or off, fits the
+tree, searches taxa and clades, shows or hides branch lengths, and opens the
+panels. It also sets tip alignment in the rectangular layout, switches arc or
+straight connectors in the circular layout, and saves and restores named views. The **Controls** panel starts
 with quick actions for label and metadata-track visibility, followed by four
 groups:
 
 - **Layout**: zoom, automatic collapse threshold, and scale-bar visibility.
-  Circular layout also provides opening, rotation, imported node angles, and
-  opening/interior fill controls. **Node angles (degrees)** lists numeric
-  attributes stored directly on tree nodes; **Automatic** uses TreeViz's
-  computed angles.
+  Rectangular and circular layouts add **Collapsed clade spacing**
+  (**Proportional** or **Compact**). Circular layout also provides opening,
+  rotation, imported node angles, **Auto-fit to labels**, **Tip-to-track
+  guides**, and opening/interior fill controls. **Node angles (degrees)** lists
+  numeric attributes stored directly on tree nodes; **Automatic** uses
+  TreeViz's computed angles. Radial layout provides **Node X coordinate** and
+  **Node Y coordinate**, which read display positions from node attributes.
 - **Labels**: label font and size, support labels, and **Auto-cull overlaps**.
   Auto-cull overlaps (TOML
   `allow_label_overlap = false`) drops a label that would land on one already
   drawn; zooming in brings it back.
 - **Branches & nodes**: **Tree width**, **Branch stroke width**, **Branch
-  spacing**, **Colour by**, **Exact styling**, node circles, and **Pretty
-  terminal branches**. Branch spacing scales row pitch in the rectangular
+  spacing**, **Pretty terminal branches**, **Show node circles**, **Colour
+  by**, **Exact styling**, and **Split circles**. Branch spacing scales row pitch in the rectangular
   layout. In the radial layout it shapes the angular split so crowded clades
   can receive more room. **Colour by** maps a numeric metadata column onto a
-  scale or applies exact colours stored in node metadata. **Exact styling**
-  maps node-circle diameter or colour and branch width or colour from data
-  attributes. Wedge outlines follow the branch colour.
+  scale or applies exact colors stored in node attributes. **Exact styling**
+  maps node-circle diameter or color and branch width or color from data
+  attributes. **Split circles** draws internal-node markers from support
+  values or a numeric node attribute, and appears when internal nodes other than
+  the root carry one. Wedge outlines follow the
+  branch color.
 - **Metadata**: adjust metadata-track widths, row height, and gap. Add, remove,
   and edit the tracks themselves in **Tracks**.
 
 Collapsed-wedge controls appear under **Branches & nodes** in the radial
 layout. They include shape, fill source and opacity, gap, minimum body, overlap
 policy, data-driven size, background outline, and label placement.
-
-The Controls panel scrolls when it is taller than the stage; a thin scrollbar
-marks the rows below the fold.
 
 Any label can be dragged: press on the text and move it. The offset is stored
 on that clade, so it survives saving and appears in exports.
@@ -102,21 +99,21 @@ layout the fitted view includes collapsed wedge tips and their labels.
 
 Hovering a leaf, an internal node or a collapsed wedge shows a tooltip: the
 label or name, `N leaves` for a wedge, `Branch length x`, `Support y`, then the
-node's attributes under their display names, with a swatch for colour values.
-Hovering or selecting a collapsed wedge outlines its polygon. The outline lies
-inside the wedge and takes the same width cap as the wedge's own outline, so
-it never crosses a neighbour and a thin wedge keeps its fill.
+node's attributes under their display names, with a swatch for color values.
+Hovering or selecting a collapsed wedge outlines its polygon.
 
-A collapsed clade's label sits past its wedge tip and reads along the branch
-that enters the clade, walked back until 12 px of branch are in view so a stub
-of a final segment does not turn it (**Collapsed wedge label direction**: **Along branch**,
-the default) or out from the centre of the drawing (**Outward**; TOML
-`collapsed_wedge_label_orientation = "bearing"`). With **Collapsed wedge
-labels** set to **Leader lines** (`collapsed_wedge_label_declutter`), a label
-that would land on another is pushed out along the line of its branch and joined
-to its wedge by a thin leader line in the label's colour; **At wedge tip** seats every label at
-its tip. See
-[Tree styling](STYLING.md#label-colour-direction-and-position).
+A collapsed clade's label sits past its wedge tip. Two controls under
+**Collapsed wedges** set its placement:
+
+- **Label direction**: **Along branch** (the default) reads along the branch
+  that enters the clade. **Outward** reads out from the center of the drawing.
+  TOML key: `collapsed_wedge_label_orientation` (`"branch"` or `"bearing"`).
+- **Wedge labels**: **At wedge tip** (the default) seats every label at its
+  tip. **Leader lines** pushes a label that would land on another out along its
+  branch and joins it to the wedge with a thin line in the label's color. TOML
+  key: `collapsed_wedge_label_declutter` (`false` or `true`).
+
+See [Tree styling](STYLING.md#label-color-direction-and-position).
 
 The search field (**Search taxa and clades…**) matches leaf names, leaf labels
 and collapsed-clade labels. A hit inside a collapsed clade lands on that
@@ -124,7 +121,7 @@ clade's wedge. **Enter** zooms to the active hit (to at least 2x);
 **Shift+Enter** and the arrow keys step through the hits; **Escape** clears
 the search.
 
-## Save And Export
+## Save and export
 
 Use `.treeviz.json` to preserve the full visualization. Use SVG, PNG, or PDF
 for figures. Use Newick, Nexus, and metadata TSV exports for downstream data
@@ -132,7 +129,7 @@ exchange.
 
 See [Exports](EXPORTS.md) for format guidance.
 
-## Public Machine-Readable Files
+## Public machine-readable files
 
 The deployed app publishes:
 

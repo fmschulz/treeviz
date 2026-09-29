@@ -1,9 +1,9 @@
-# Agent Automation
+# Agent automation
 
 Use the hosted TreeViz API when a script or coding agent needs to build,
 inspect, or export a phylogenetic visualization. The API exposes command
 schemas, diagnostics, render diagnostics, layout metrics, session state, and
-SVG export through `window.__treeviz`.
+SVG and PNG export through `window.__treeviz`.
 
 ## Runtime
 
@@ -40,15 +40,7 @@ the adjacent files.
 The public skill uses the hosted app. It does not include the browser build or
 frontend source.
 
-The catalog includes Example 1: Mirusviricota, Example 2: SILVA taxonomy and
-Example 3: TARA Oceans Metazoa. Example 2 reconstructs the upper-left SILVA
-**Whole database** panel of Figure 4 from
-[Foster et al.](https://doi.org/10.1371/journal.pcbi.1005404), with imported
-node angles, count-scaled nodes and branches, 50 selected labels, and a
-continuous count legend. Example 3 reconstructs Figure 3a with 550 taxa,
-73 selected labels, imported radial coordinates and two legends with separate
-percentage and count axes. Its statistics come from the published data;
-its display positions are reconstructed.
+The hosted examples are described in [Examples](EXAMPLES.md).
 
 ## Restore the hosted example
 
@@ -58,9 +50,7 @@ const response = await fetch('/examples/example-1-mirusviricota/session.treeviz.
 if (!response.ok) throw new Error(`session request failed: ${response.status}`)
 const snapshot = await response.json()
 await api.execute('session.restore', { snapshot })
-await new Promise(resolve => api.onReady(resolve))
-await document.fonts.ready
-await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+await api.whenSettled()
 ```
 
 The session's default saved view applies during restore. Add
@@ -112,58 +102,46 @@ const saved = await api.execute('view.save', { name: 'Circular view' })
 if (!saved.ok) throw new Error(saved.error.message)
 await api.execute('view.apply', { id: saved.value.id })
 
-await document.fonts.ready
-await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+const { metrics, renderDiagnostics } = await api.whenSettled()
 const diagnostics = api.getDiagnostics()
 if (diagnostics.some((item) => item.level === 'error')) {
   throw new Error('TreeViz diagnostics contain errors')
 }
 
-const renderDiagnostics = api.getRenderDiagnostics()
-const metrics = api.getLayoutMetrics()
-const svg = api.exportSvg()
-if (!svg.startsWith('<svg')) throw new Error('SVG export failed')
+const { dataUrl, width, height } = await api.exportImage({ scale: 2 })
 ```
 
-Wait for dependent API calls, then let fonts and layout settle before reading
-metrics or exporting. `onReady` waits for the first frame after a load; it does
-not wait for later edits. After restore, wait for `document.fonts.ready` and for
-the camera and layout metrics to stop changing across several animation frames.
-A mounted editor can briefly report its previous viewport. Check diagnostics
-after each batch.
+Await each command, then `await api.whenSettled()` before reading metrics or
+exporting. It resolves once fonts are loaded and the rendered frame matches the
+latest edit, and returns the layout metrics and render diagnostics for that
+frame. Check diagnostics after each batch. See
+[Wait for the render](API.md#wait-for-the-render) and
+[Export an image](API.md#export-an-image).
 
 ## Practical rules
 
 - Load or restore a session before metadata, tracks, or styling.
-- Read `commands()` when an exact command id or argument schema matters.
-- Read `palettes()` for palette ids and exact color sets.
+- Read `commands()` or `describeCommand(id)` when an exact command id or
+  argument schema matters, and `validate(id, args)` to check a call without
+  running it.
 - Call `planMetadataImport(...)` before importing metadata from text.
-- Use stable keys from the session tree for clade edits.
-- Use `categoryColors` when categorical colors must remain exact across uploads.
-- Use `displayMode: 'symbol'` or `'wedge'` on color-strip and bar tracks for compact lanes.
-- Use `view.set-tree-style-attributes` for data-defined node circles and branch width or color.
-- Use `tree.style-clade` with `cladeLabelPlacement: 'node'` for horizontal text
-  centered on internal or terminal nodes. `cladeLabelFontSize` accepts
-  fractional values from 1 to 96 pixels.
-- Use `view.set-layout` with `circularAngleAttribute` to read degrees from a
-  direct node metadata key. Opening and rotation still apply; `null` restores
-  automatic angles. Use `showScaleBar: false` to hide the distance scale
-  without changing geometry.
-- Use `view.set-conditional-style-rules` for metadata thresholds, ranks, missing values, and categories.
-- Use `nodemark.add` for pie, donut, or bar marks on bound internal nodes.
-- Store tip connections in `session.connections` and resolve endpoint diagnostics before export.
-- Keep `branchScaleMode` on `auto` unless the figure requires fixed geometry.
-- Use circular opening auto-fit when track names need a clear sector. Set
-  `alignment: 'label'` to draw circular tip-to-track guides.
-- Save a fitted view with `view.save`; its new id is in `ExecuteResult.value`.
-- Put explicit legends in `session.legends` and readable attribute names in `session.attributeLabels` before `session.restore`.
-- Use a `continuous-scale` session legend for a numeric size/color ramp. Its
-  optional `scale` defaults to `1` and accepts values from `0.1` to `4`. TOML
-  legends remain swatch lists.
-- Use `view.search` to find a taxon or clade by name.
+- Get stable keys with `findNodes(...)` by name, regex, or metadata value. It
+  matches every node; `view.search` matches only leaves and collapsed clades.
+- Group related edits with `executeBatch(...)` so a failed step rolls back the
+  whole batch.
+- `await api.whenSettled()` after each visual change, then read
+  `getDiagnostics()` and the returned metrics. Use `getDiagnostics({ since })`
+  to see what one batch added.
+- Read `describeFigure()` for a compact summary of the current figure.
+- Put legends and attribute display names in the session document before
+  `session.restore`; no command edits them.
+- Export the figure with `exportImage()` after the final layout change and
+  inspect it before reporting that the figure is ready.
 - Save durable work as `.treeviz.json`.
-- Read data exports from `ExecuteResult.value`; it contains `content`,
-  `filename`, and `mimeType`. `session.save` starts a session download.
+
+Command arguments, track options, legends, connections, and node marks are
+documented in the [Browser API](API.md) reference. Styling recipes are in
+[Tree styling](STYLING.md).
 
 ## Check the layout
 
@@ -174,12 +152,11 @@ Read `getLayoutMetrics()` after the latest visual change. Start with
 For circular and radial layouts, occupancy is measured against the shorter
 viewport side because the figure is round. Metrics describe the current camera.
 Labels keep their screen size above zoom 1, so the fitted view and a 2x view can
-have different `labelsVisible` and `labelsCulled` counts. Zoom, wait for the
-render, and read the metrics again.
+have different `labelsVisible` and `labelsCulled` counts. Zoom, await
+`whenSettled()`, and read the returned metrics again.
 
-Radial figures with collapsed wedges also report `wedgeOverlapPairs` and
-`wedgeBranchCrossings`. Either count above zero adds `metrics.wedge.overlap` to
-`warnings`.
+Radial figures with collapsed wedges also report wedge overlap counts; see
+[Layout QA pattern](API.md#layout-qa-pattern).
 
 Inspect the final exported SVG, PNG, or PDF before reporting that a figure is
 ready.

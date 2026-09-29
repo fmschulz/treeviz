@@ -15,8 +15,7 @@ and view settings.
 
 ![Circular Mirusviricota phylogeny with 18 metadata tracks](assets/gallery/example-1-mirusviricota.svg)
 
-*The fitted Mirusviricota tree from Extended Data Figure 9 contains 1,204 tips
-and 18 metadata tracks. See [Example 1](EXAMPLES.md#example-1-mirusviricota).*
+*The fitted Mirusviricota tree. See [Example 1](EXAMPLES.md#example-1-mirusviricota).*
 
 ## Choose a workflow
 
@@ -31,10 +30,9 @@ and 18 metadata tracks. See [Example 1](EXAMPLES.md#example-1-mirusviricota).*
 
 ## Start with sourced data
 
-The [getting-started tutorial](GETTING_STARTED.md) opens the 1,204-tip
-Mirusviricota tree from Extended Data Figure 9. You can inspect its 18 metadata
-tracks, fitted circular opening, and exported figure without installing
-TreeViz.
+The [getting-started tutorial](GETTING_STARTED.md) opens the Mirusviricota
+tree from Example 1. You can inspect its metadata tracks, fitted circular
+opening, and exported figure without installing TreeViz.
 
 The [example gallery](EXAMPLES.md) also contains the 3,843-taxon SILVA 123.1
 taxonomy from Figure 4 and the 550-taxon TARA Metazoa tree from Figure 3a of
