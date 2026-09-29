@@ -5,14 +5,9 @@ pipeline.
 
 ## Compatibility
 
-The current PyPI release is `treeviz-phylo` 0.6.0. It bundles an older TreeViz
-session schema than the hosted app. The live schema additionally supports
-`legends`, `attributeLabels`, `showNodeCircles`,
-`collapsedWedgeFillAttribute`, `collapsedWedgeFillOpacity`,
-`collapsedWedgeLabelDeclutter`, `collapsedWedgeLabelOrientation`, and the
-`attribute` value of `collapsedWedgeFill`. Validate an app-saved session against
-`https://treeviz.newlineages.com/treeviz-session.schema.json` when it uses
-those fields.
+The current PyPI release is `treeviz-phylo` 0.8.2. Its bundled session schema
+matches the hosted app 0.8.2, so sessions saved from the app, including
+`legends` and `attributeLabels`, validate with `validate_session`.
 
 Sessions written by 0.3.1 still load, and a 0.3.1 `radial` layout opens as
 `circular` with straight connectors. The package validates other current view
@@ -27,14 +22,14 @@ such a figure should follow automatic sizing.
 ## Install
 
 ```bash
-uv add treeviz-phylo==0.6.0                            # in a uv project
-uv run --with treeviz-phylo==0.6.0 python script.py    # one-off script
+uv add treeviz-phylo==0.8.2                            # in a uv project
+uv run --with treeviz-phylo==0.8.2 python script.py    # one-off script
 ```
 
 Notebook support:
 
 ```bash
-uv add "treeviz-phylo[notebook]==0.6.0"
+uv add "treeviz-phylo[notebook]==0.8.2"
 ```
 
 Import:

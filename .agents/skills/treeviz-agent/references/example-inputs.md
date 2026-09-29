@@ -9,7 +9,7 @@ The public repository includes the runnable
 source. In a repository checkout, run:
 
 ```bash
-uv run --with treeviz-phylo==0.6.0 python examples/plot_treeviz_examples.py --out treeviz-example-output
+uv run --with treeviz-phylo==0.8.2 python examples/plot_treeviz_examples.py --out treeviz-example-output
 ```
 
 ## `lineage_30`
@@ -62,7 +62,7 @@ Static rendering is disabled by default. If the environment provides a
 compatible renderer:
 
 ```bash
-uv run --with treeviz-phylo==0.6.0 python examples/plot_treeviz_examples.py \
+uv run --with treeviz-phylo==0.8.2 python examples/plot_treeviz_examples.py \
   --out treeviz-example-output \
   --render \
   --renderer-command /path/to/treeviz-renderer
