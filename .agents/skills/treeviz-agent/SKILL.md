@@ -141,7 +141,7 @@ Load only the reference needed for the task:
 - `references/large-taxonomy-trees.md`: large taxonomy-tree workflows, metadata-derived categories, rerooting, and dense exports.
 - `references/hosted-runtime.md`: hosted URLs, public files, the example
   catalog and its session URLs, and live API smoke testing.
-- `references/wrapper-api.md`: published Python 0.6.0 package and notebook workflows.
+- `references/wrapper-api.md`: published Python 0.8.2 package and notebook workflows.
 
 ## Helper Scripts
 

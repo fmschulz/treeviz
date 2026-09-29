@@ -9,11 +9,9 @@ The package does not vendor the TreeViz browser app or frontend source. It
 ships Python helpers and the TreeViz session schema.
 
 !!! note "Published package compatibility"
-    The examples on this page target `treeviz-phylo` 0.6.0, the current PyPI
-    release. View fields such as `conditionalStyleRules`,
-    `branchColorAttribute`, `allowLabelOverlap` and `figureLegendVisible`
-    validate in Python. Fields the app writes but the package schema lacks are
-    listed under Schema Compatibility. Browser-side styling is documented in
+    The examples on this page target `treeviz-phylo` 0.8.2, the current PyPI
+    release. Its session schema matches the hosted app, so sessions saved from
+    the app validate in Python. Browser-side styling is documented in
     [Tree styling](STYLING.md) and [Browser API](API.md).
 
 ## Install
@@ -37,15 +35,9 @@ import treeviz
 ## Schema Compatibility
 
 `validate_session` checks a session against the schema bundled in the package.
-The 0.6.0 package schema does not include fields the current hosted app writes:
-the view fields `showNodeCircles`, `collapsedWedgeFillAttribute`,
-`collapsedWedgeFillOpacity`, `collapsedWedgeLabelDeclutter` and
-`collapsedWedgeLabelOrientation`, the `attribute` value of
-`collapsedWedgeFill`, and the top-level `legends` and
-`attributeLabels`. A session saved from the app with any of them fails
-`validate_session` with an `additionalProperties` or `enum` error. Sessions
-built by the package itself validate. To check a saved app session, validate
-it against the live schema instead:
+The 0.8.2 package schema matches the schema of the hosted app, so a session
+saved from the app validates with `validate_session`. To check a session
+against the live schema directly, download it:
 
 ```bash
 curl -A treeviz-docs -o treeviz-session.schema.json \
@@ -198,13 +190,12 @@ The browser can further adjust and save view settings.
 
 The hosted app can map metadata to exact node circles and branch width/color,
 apply conditional rules, draw compact symbol or wedge lanes, and style terminal
-branches. `treeviz-phylo` 0.6.0 validates these view fields in Python; pass
+branches. `treeviz-phylo` 0.8.2 validates these view fields in Python; pass
 them through the `view` argument or apply them
 later through `window.__treeviz`. Metadata branch colours extend to the MRCA
 stem of each same-coloured clade (see [Tree styling](STYLING.md)). Hand-written
-legends (`legends`) and attribute display names (`attributeLabels`) are
-app-side fields; add them to a saved session for the hosted app after
-`validate_session`, or write them in a TOML config
+legends (`legends`) and attribute display names (`attributeLabels`) validate
+too; add them to a saved session, or write them in a TOML config
 (see [Legends and attribute names](STYLING.md#legends-and-attribute-names)).
 
 ## Tree Inspection
