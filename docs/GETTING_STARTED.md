@@ -14,28 +14,28 @@ context.
 
 ## 2. Check the metadata tracks
 
-Open **Tracks**. Each track is listed by title. Expand a track to inspect its
-source column, palette, and width. The rings stay aligned with the terminal tips
-as you zoom or pan.
+Open **Tracks** to see every track listed by title. Expanding a track shows its
+source column, palette, and width. As you zoom or pan, the rings keep their
+alignment with the terminal tips.
 
 ## 3. Inspect the tree
 
-Hover a tip to read its name, branch length, support value, and any attributes
-stored on the tree node. Metadata-table values appear in the tracks, not in the
-tooltip. Use search to
-focus a named tip or clade. Press **Escape** to clear the search and **F** to fit
-the whole tree.
+Hovering over a tip shows its name, branch length, support value, and any
+attributes stored on the tree node. Values from the metadata table appear in the
+tracks rather than in the tooltip. To focus a named tip or clade, use search.
+Press **Escape** when you want to clear the search, and press **F** to fit the
+whole tree.
 
 ## 4. Inspect the fitted opening
 
-Open **Controls**, then **Layout**. The circular opening leaves space for the
-horizontal track names. **Auto-fit to labels** recalculates the opening when
-track names, visible tracks, ring widths, or the viewport change. Zoom and pan
-do not change the fitted opening.
+Under **Controls**, open **Layout**. The opening in the circular layout makes
+room for the horizontal track names. With **Auto-fit to labels**, the opening is
+recalculated whenever the track names, visible tracks, ring widths, or viewport
+change. Zooming and panning leave the fitted opening as it is.
 
-Turn **Tip-to-track guides** on to draw guides from terminal tips to the inner
-metadata edge. Turn it off when the tracks are already easy to follow. Opening
-and interior fill colors are also under **Layout**.
+Turning on **Tip-to-track guides** draws guides from terminal tips to the inner
+metadata edge. When the tracks are already easy to follow, you can leave it off.
+The fill colors for the opening and the interior sit under **Layout** as well.
 
 ## 5. Export or save
 
