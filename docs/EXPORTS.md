@@ -12,46 +12,66 @@ Use `.treeviz.json` when the output must preserve the full visualization:
 - view settings, layout, panel positions, and saved views;
 - clade styles, selections, and annotations.
 
-Session JSON is the recommended exchange format between the browser, Python
-scripts, notebooks, and agents.
+Session JSON is the exchange format between the browser, Python scripts,
+notebooks, and agents.
 
-## Figure Formats
+## Figure formats
 
-Use SVG, PNG, or PDF for figures.
+The **Images** section of the **Export** panel writes SVG, PNG, and PDF
+figures. Each image export is
+cropped to the visible content.
 
-- SVG is best for vector editing and publication layout.
-- PNG is best for quick review, web display, and screenshots.
-- PDF is best when a downstream workflow expects page-based output.
+- SVG keeps text, paths, and shapes as editable vectors. **Copy SVG** puts the
+  same SVG on the clipboard.
+- PNG is a raster image. **PNG options** set the resolution to 72, 150, 300,
+  or 600 DPI (default 300) and can make the background transparent.
+- PDF keeps the vector figure on a page. **PDF options** set the page to
+  **Fit to tree** (default, the page matches the cropped figure), **Letter**,
+  or **A4**. Letter and A4 pages take **Portrait** or **Landscape** and center
+  the figure on the page.
+
+**Include tracks (images)** lists the visible metadata tracks. Clear a track's
+checkbox to leave it out of SVG, PNG, and PDF exports. The session is not
+changed.
 
 SVG export follows the on-screen rule for zoom: above zoom 1 text, strokes and
 node marks are scaled so the file matches what the screen shows; at zoom 1 and
 below the SVG is the unzoomed figure. The in-figure legend, including
 hand-written `legends`, is part of the export when it is displayed.
 
-Inside the SVG one `<g data-tv-id="zoom-group">` carries the camera transform
-and holds a `<g data-tv-layer="…">` group per draw layer. A collapsed wedge
-outline in the radial layout lies inside the wedge fill. The path is stroked at
-twice the configured width and clipped to its own shape through a `<clipPath>`
-minted for that wedge, so the half of the stroke that would fall outside is
-cut away.
-
 For automated rendering, inspect the output after the final layout change.
 Whitespace, clipped labels, or unreadable metadata tracks should be fixed in
 the layout before the figure is considered final.
 
-## Data Formats
+## Data formats
 
-Use Newick or Nexus exports when downstream tools only need the tree. Use
-metadata TSV export when downstream tools need the current metadata table.
+The **Data** section of the **Export** panel runs these commands. Each one
+returns `{ content, filename, mimeType }` in `ExecuteResult.value` when called
+through `window.__treeviz.execute`.
 
-Newick, Nexus, and metadata exports do not preserve the full TreeViz visual
-state. Use `.treeviz.json` when visual state matters.
+| Command | Output | Arguments |
+| --- | --- | --- |
+| `export.newick` | Newick tree | none |
+| `export.nexus` | Nexus tree | optional `taxaBlock` |
+| `export.leaf-names` | leaf names under one clade as `txt`, `csv`, or `tsv` | `stableKey`, `format`, `includeMetadata` |
+| `export.metadata-tsv` | current metadata table as TSV | none |
 
-Cells in CSV and TSV exports (leaf names and metadata values) that begin with
-`=`, `+`, `-`, or `@` are prefixed with an apostrophe so spreadsheet apps
-display them literally instead of running them as formulas.
+`export.leaf-names` writes one name per line for `txt`. For `csv` and `tsv`
+it writes a `leaf_name` header row, and `includeMetadata: true` adds the
+binding's `row_key` and `confidence` columns. The panel exports the whole
+tree; **Export leaf names…** in a clade's context menu exports that clade.
 
-## Python Static Export
+Newick, Nexus, leaf-name, and metadata exports do not preserve the TreeViz
+visual state. Use `.treeviz.json` when visual state matters.
+
+CSV and TSV leaf-name exports and the metadata TSV export guard against
+spreadsheet formulas. A cell that begins with `=`, `+`, `-` or `@` gets a leading apostrophe, so
+spreadsheet apps display it literally. Leaf-name exports also guard a leading
+tab or carriage return; the metadata TSV replaces tabs and line breaks inside
+cells with spaces. Numeric metadata values are written unchanged. TXT leaf-name
+exports are not guarded.
+
+## Python static export
 
 The Python package can call a compatible external renderer. Neither the PyPI
 package nor this public repository installs one.

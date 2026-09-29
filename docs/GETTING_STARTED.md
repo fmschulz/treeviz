@@ -1,4 +1,4 @@
-# Getting Started
+# Getting started
 
 This tutorial opens a sourced Mirusviricota tree, inspects its metadata tracks
 and fitted circular layout, and exports a figure. It runs in the hosted browser
@@ -20,7 +20,9 @@ as you zoom or pan.
 
 ## 3. Inspect the tree
 
-Hover a tip to read its name, branch length, and metadata values. Use search to
+Hover a tip to read its name, branch length, support value, and any attributes
+stored on the tree node. Metadata-table values appear in the tracks, not in the
+tooltip. Use search to
 focus a named tip or clade. Press **Escape** to clear the search and **F** to fit
 the whole tree.
 
@@ -37,13 +39,16 @@ and interior fill colors are also under **Layout**.
 
 ## 5. Export or save
 
-Open **Export** and choose a format:
+Open **Export** and choose an action:
 
-- **SVG** for an editable vector figure.
-- **PNG** for a raster image.
-- **PDF** for a printable page.
-- **TreeViz session** to preserve the tree, metadata, tracks, edits, view
+- **Export SVG** for an editable vector figure.
+- **Export PNG (N DPI)** for a raster image at the selected resolution.
+- **Export PDF** for a printable page.
+- **Export Session (JSON)** to preserve the tree, metadata, tracks, edits, view
   settings, and saved views.
+
+The **Data** section exports the tree as Newick or Nexus, the leaf names, and
+the metadata table as TSV.
 
 The `.treeviz.json` session is the editable TreeViz record. Figure exports do
 not preserve the interactive state.

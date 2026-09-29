@@ -1,16 +1,22 @@
 # Examples
 
-The visible catalog contains nine saved TreeViz sessions. Open one to inspect its
+The example gallery lists nine saved sessions. Open one to inspect its
 tree, metadata binding, tracks, view, and diagnostics. The [live
 manifest](https://treeviz.newlineages.com/examples/manifest.json) is the
 machine-readable catalog.
 
-Each card lists the paper title, first author, citation year, figure and DOI.
+Each gallery card lists the paper title, first author, citation year, figure
+and DOI. It links **Session**, **Tree**, **Metadata** and, where one exists,
+**Config**.
 Expand **Recreate this style** in the landing gallery or Sessions panel for a
 reusable prompt with the required metadata formats. **Copy prompt** and
 **Download prompt** provide the same text. Give it to an AI assistant with
-your tree and metadata files. Restore the example session for the supplied
-figure. Use its prompt to apply the style to another data set.
+your tree and metadata files. To reproduce the published figure, open its
+session. To apply the style to your own data, use the prompt.
+
+Each example below lists its data, tip count and layout, then links the
+session, the SVG figure, the source paper, the style prompt and the hosted
+files.
 
 The prompts specify leaf tables, internal-node attributes, optional display
 coordinates and synthetic values. A leaf table alone does not supply values
@@ -18,30 +24,33 @@ for internal nodes.
 
 ## Example 1: Mirusviricota
 
-**Sourced data · 1,204 tips · 18 metadata tracks · circular tree**
+**Sourced data · 1,204 tips · circular tree**
 
 [![Circular Mirusviricota phylogeny with 18 metadata tracks](assets/gallery/example-1-mirusviricota.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-1-mirusviricota/session.treeviz.json)
 
 This is the saved TreeViz view of the Mirusviricota phylogeny from Extended
 Data Figure 9 in
-[doi:10.1038/s41564-025-02190-6](https://doi.org/10.1038/s41564-025-02190-6).
-Its fitted circular opening keeps the metadata track names visible.
+[Medvedeva et al. (2026)](https://doi.org/10.1038/s41564-025-02190-6).
+It has 18 metadata tracks, and its fitted circular opening keeps their names
+visible.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-1-mirusviricota/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-1-mirusviricota.svg) ·
-[Source paper](https://doi.org/10.1038/s41564-025-02190-6) ·
+[Medvedeva et al. (2026)](https://doi.org/10.1038/s41564-025-02190-6) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-1-mirusviricota/recipe.md)
+
+Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-1-mirusviricota/session.treeviz.json) · [tree.nwk](https://treeviz.newlineages.com/examples/example-1-mirusviricota/tree.nwk) · [metadata.tsv](https://treeviz.newlineages.com/examples/example-1-mirusviricota/metadata.tsv) · [metadata-audit.json](https://treeviz.newlineages.com/examples/example-1-mirusviricota/metadata-audit.json)
 
 ## Example 2: SILVA taxonomy
 
-**Sourced data · 3,843 taxa · 3,257 leaves · 513,121 bacterial 16S sequences · circular taxonomy**
+**Sourced data · 3,257 tips · circular tree**
 
 [![SILVA taxonomy with sequence-count-scaled nodes, branches, and selected taxon labels](assets/gallery/example-2-silva.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-2-silva/session.treeviz.json)
 
 This saved view reconstructs the upper-left SILVA **Whole database** panel of
 Figure 4 from
-[Foster et al.](https://doi.org/10.1371/journal.pcbi.1005404), using the SILVA
-123.1 taxonomy. Node diameters, branch widths, and colors encode the 513,121
+[Foster et al. (2017)](https://doi.org/10.1371/journal.pcbi.1005404), using the
+3,843-taxon SILVA 123.1 taxonomy. Node diameters, branch widths, and colors encode the 513,121
 bacterial 16S sequences assigned across the taxonomy. The view labels 50
 selected taxa.
 
@@ -51,18 +60,20 @@ used by the source workflow. They were not measured from the saved 2017 plot.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-2-silva/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-2-silva.svg) ·
-[Source paper](https://doi.org/10.1371/journal.pcbi.1005404) ·
+[Foster et al. (2017)](https://doi.org/10.1371/journal.pcbi.1005404) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-2-silva/recipe.md)
+
+Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-2-silva/session.treeviz.json) · [tree.nwk](https://treeviz.newlineages.com/examples/example-2-silva/tree.nwk) · [metadata.tsv](https://treeviz.newlineages.com/examples/example-2-silva/metadata.tsv) · [data-audit.json](https://treeviz.newlineages.com/examples/example-2-silva/data-audit.json)
 
 ## Example 3: TARA Oceans Metazoa
 
-**Sourced data · 550 taxa · 275 leaves · 20,212 OTUs · radial taxonomy**
+**Sourced data · 275 tips · radial tree**
 
 [![TARA Metazoa taxonomy with OTU-scaled circles, read-scaled branches and two numeric legends](assets/gallery/example-3-tara-metazoa.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-3-tara-metazoa/session.treeviz.json)
 
-This view reconstructs the upper Metazoa panel of
-[Figure 3a](https://doi.org/10.1371/journal.pcbi.1005404.g003) from the
-Metacoder paper. Circle sizes encode the 20,212 OTUs and branch widths encode
+This view reconstructs the upper Metazoa panel of Figure 3a from
+[Foster et al. (2017)](https://doi.org/10.1371/journal.pcbi.1005404.g003). The
+taxonomy has 550 taxa. Circle sizes encode the 20,212 OTUs and branch widths encode
 250,296,231 reads. Colors show the percentage of OTUs with at least
 90% identity to their closest reference sequence, following the archived code.
 Two legends show independent percentage and count scales.
@@ -70,22 +81,26 @@ Two legends show independent percentage and count scales.
 Taxonomy, statistics, colors and the 73 selected labels come from the published
 TARA Oceans W5 data and plotting recipe. Display positions are reconstructed:
 named nodes align to the published raster and other nodes use the reconstructed
-local geometry. The session retains these positions as editable node metadata.
+local geometry. The session retains these positions as editable node attributes.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-3-tara-metazoa/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-3-tara-metazoa.svg) ·
-[Source figure](https://doi.org/10.1371/journal.pcbi.1005404.g003) ·
+[Foster et al. (2017)](https://doi.org/10.1371/journal.pcbi.1005404.g003) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-3-tara-metazoa/recipe.md)
 
+Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-3-tara-metazoa/session.treeviz.json) · [tree.nwk](https://treeviz.newlineages.com/examples/example-3-tara-metazoa/tree.nwk) · [metadata.tsv](https://treeviz.newlineages.com/examples/example-3-tara-metazoa/metadata.tsv) · [layout-landmarks.json](https://treeviz.newlineages.com/examples/example-3-tara-metazoa/layout-landmarks.json) · [data-audit.json](https://treeviz.newlineages.com/examples/example-3-tara-metazoa/data-audit.json)
+
 ## Example 4: Archaeal gene acquisitions
+
+**Sourced topology, synthetic transfer weights · 178 tips · circular tree**
 
 [![Archaeal tree with two metadata bands and synthetic transfer connections](assets/gallery/example-4-archaeal-acquisitions.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-4-archaeal-acquisitions/session.treeviz.json)
 
 This example reconstructs Figure 3 from
-[Nelson-Sathi et al.](https://doi.org/10.1038/nature13805), on page 4 of the
+[Nelson-Sathi et al. (2015)](https://doi.org/10.1038/nature13805), on page 4 of the
 [paper PDF](https://www.molevol.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Biologie/Institute/Molekulare_Evolution/Dokumente/Nelson-Sathi_2015_Nature.pdf#page=4).
 The published topology contains 134 archaeal genomes and 44 placeholder tips
-representing 22 bacterial groups. Branch greys encode agreement with 70
+representing 22 bacterial groups. Branch grays encode agreement with 70
 single-gene trees; terminal colors inherit parent agreement for display.
 
 Twelve acquisition nodes connect to the bacterial groups through 264 straight
@@ -95,16 +110,19 @@ separately and records the paper's count discrepancies. Branch lengths and
 node angles are reconstructed display geometry. Both color scales have
 horizontal legends.
 
-Download the session to restore the full figure. The gallery also provides
-generated Newick, leaf metadata, node metadata and the synthetic transfer
-table.
+The session restores the full figure. `transfer-metadata.tsv` holds the
+synthetic transfer table.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-4-archaeal-acquisitions/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-4-archaeal-acquisitions.svg) ·
-[Source paper](https://doi.org/10.1038/nature13805) ·
+[Nelson-Sathi et al. (2015)](https://doi.org/10.1038/nature13805) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/recipe.md)
 
-## Example 5: A new view of the tree of life
+Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/session.treeviz.json) · [tree.nwk](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/tree.nwk) · [metadata.tsv](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/metadata.tsv) · [node-metadata.tsv](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/node-metadata.tsv) · [transfer-metadata.tsv](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/transfer-metadata.tsv) · [archaeal-groups.tsv](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/archaeal-groups.tsv) · [source-backbone.newick](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/source-backbone.newick) · [layout-landmarks.json](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/layout-landmarks.json) · [data-audit.json](https://treeviz.newlineages.com/examples/example-4-archaeal-acquisitions/data-audit.json)
+
+## Example 5: Tree of life
+
+**Sourced data · 3,083 tips · radial tree**
 
 [![Expanded tree of life with selected lineage labels and fading clade colors](assets/gallery/example-5-tree-of-life.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-5-tree-of-life/session.treeviz.json)
 
@@ -120,18 +138,20 @@ source concepts as 137 lineage and domain text rows, plus two convention notes,
 and uses 167 white-to-color clade backgrounds. Labels retain the paper's 2016
 taxonomy, typography and markers. The source legend guides their interpretation;
 cultivation status was not checked independently. The gradients reconstruct
-source colors and do not encode measurements. The source audit records the label
+source colors and do not encode measurements. The data audit (`data-audit.json`) records the label
 mappings, including the 614 leaves without a specific-lineage assignment. It
 separates published data from reconstructed coordinates and styling.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-5-tree-of-life/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-5-tree-of-life.svg) ·
-[Source paper](https://doi.org/10.1038/nmicrobiol.2016.48) ·
+[Hug et al. (2016)](https://doi.org/10.1038/nmicrobiol.2016.48) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-5-tree-of-life/recipe.md)
+
+Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-5-tree-of-life/session.treeviz.json) · [tree.nwk](https://treeviz.newlineages.com/examples/example-5-tree-of-life/tree.nwk) · [metadata.tsv](https://treeviz.newlineages.com/examples/example-5-tree-of-life/metadata.tsv) · [node-metadata.tsv](https://treeviz.newlineages.com/examples/example-5-tree-of-life/node-metadata.tsv) · [source-tree.nwk](https://treeviz.newlineages.com/examples/example-5-tree-of-life/source-tree.nwk) · [data-audit.json](https://treeviz.newlineages.com/examples/example-5-tree-of-life/data-audit.json)
 
 ## Example 6: S. aureus CC398
 
-**Sourced metadata · 3,128 tips · rectangular tree**
+**Sourced metadata, reconstructed tree · 3,128 tips · rectangular tree**
 
 [![Rectangular S. aureus CC398 tree with geography, host, typing, antimicrobial-resistance and virulence tracks](https://treeviz.newlineages.com/examples/example-6-cc398/thumbnail.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-6-cc398/session.treeviz.json)
 
@@ -150,15 +170,19 @@ are not evolutionary distances or time estimates.
 The figure labels two tips `SAMN39605011`. Figure row 2231 is associated with
 Supplementary Data 1 accession `SAMN39605010` because its vector profile is
 compatible and it is the only workbook accession left after mapping the other
-rows. The profile alone is not unique. The metadata and audit mark this inference. The two tree keys
+rows. The profile alone is not unique. The metadata and data audit mark this inference. The two tree keys
 have explicit figure-row suffixes so their annotations bind separately.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-6-cc398/session.treeviz.json) ·
 [SVG figure](https://treeviz.newlineages.com/examples/example-6-cc398/thumbnail.svg) ·
-[Source paper](https://doi.org/10.1038/s41467-024-49644-9) ·
+[Fernandez et al. (2024)](https://doi.org/10.1038/s41467-024-49644-9) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-6-cc398/recipe.md)
 
+Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-6-cc398/session.treeviz.json) · [tree.nwk](https://treeviz.newlineages.com/examples/example-6-cc398/tree.nwk) · [metadata.tsv](https://treeviz.newlineages.com/examples/example-6-cc398/metadata.tsv) · [figure-tree.nwk](https://treeviz.newlineages.com/examples/example-6-cc398/figure-tree.nwk) · [data-audit.json](https://treeviz.newlineages.com/examples/example-6-cc398/data-audit.json)
+
 ## Example 7: PhyloPhlAn microbial tree of life
+
+**Sourced data · 3,171 tips · circular tree**
 
 [![PhyloPhlAn source backbone with taxonomy and marker completeness annotations](https://treeviz.newlineages.com/examples/example-7-phylophlan/thumbnail.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-7-phylophlan/session.treeviz.json)
 
@@ -169,14 +193,19 @@ completeness. Layout and colors are adapted for TreeViz.
 
 The published figure adds 566 genomes to this backbone. Their placements were
 not recovered, so the example contains 3,171 of the figure's 3,737 genomes.
-The source tree and its MIT notice accompany the session and metadata downloads.
+The source tree (`source-tree.nwk`) and its MIT license notice
+(`SOURCE-LICENSE.txt`) are hosted with the session.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-7-phylophlan/session.treeviz.json) ·
 [SVG figure](https://treeviz.newlineages.com/examples/example-7-phylophlan/thumbnail.svg) ·
-[Source paper](https://doi.org/10.1038/ncomms3304) ·
+[Segata et al. (2013)](https://doi.org/10.1038/ncomms3304) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-7-phylophlan/recipe.md)
 
+Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-7-phylophlan/session.treeviz.json) · [tree.nwk](https://treeviz.newlineages.com/examples/example-7-phylophlan/tree.nwk) · [metadata.tsv](https://treeviz.newlineages.com/examples/example-7-phylophlan/metadata.tsv) · [source-tree.nwk](https://treeviz.newlineages.com/examples/example-7-phylophlan/source-tree.nwk) · [SOURCE-LICENSE.txt](https://treeviz.newlineages.com/examples/example-7-phylophlan/SOURCE-LICENSE.txt) · [data-audit.json](https://treeviz.newlineages.com/examples/example-7-phylophlan/data-audit.json)
+
 ## Example 8: Bioreactor MAGs
+
+**Sourced metadata, reconstructed tree · 183 tips · circular tree**
 
 [![Bioreactor MAG tree with published bin statistics and reconstructed heatmap colors](https://treeviz.newlineages.com/examples/example-8-reactor-stability/thumbnail.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-8-reactor-stability/session.treeviz.json)
 
@@ -187,15 +216,19 @@ describe the drawing, not evolutionary change.
 
 The matching MAG tree and per-sample abundance matrix were not supplied.
 Heatmap cells retain their published colors as display categories; no abundance
-measurements are inferred from them. The metadata, legends and provenance audit
+measurements are inferred from them. The metadata, legends and data audit
 identify this limit.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-8-reactor-stability/session.treeviz.json) ·
 [SVG figure](https://treeviz.newlineages.com/examples/example-8-reactor-stability/thumbnail.svg) ·
-[Source paper](https://doi.org/10.1038/s41522-025-00679-w) ·
+[Mills et al. (2025)](https://doi.org/10.1038/s41522-025-00679-w) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-8-reactor-stability/recipe.md)
 
+Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-8-reactor-stability/session.treeviz.json) · [tree.nwk](https://treeviz.newlineages.com/examples/example-8-reactor-stability/tree.nwk) · [metadata.tsv](https://treeviz.newlineages.com/examples/example-8-reactor-stability/metadata.tsv) · [figure-tree.nwk](https://treeviz.newlineages.com/examples/example-8-reactor-stability/figure-tree.nwk) · [data-audit.json](https://treeviz.newlineages.com/examples/example-8-reactor-stability/data-audit.json)
+
 ## Example 9: HMP and MetaHIT gut microbiota
+
+**Sourced profiles, reconstructed layout · 135 tips · circular tree**
 
 [![Gut microbiota taxonomic cladogram with HMP and MetaHIT cohort annotations](https://treeviz.newlineages.com/examples/example-9-metaphlan/thumbnail.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-9-metaphlan/session.treeviz.json)
 
@@ -210,10 +243,12 @@ The paper reports 102 species for the combined cohorts; 102 instead matches
 HMP alone in the archived table. The example retains all source rows and
 records this discrepancy.
 
-The original profiles accompany the session, tree, leaf and node metadata and provenance
-audit so the cohort calculations can be checked.
+The archived profiles (`source-profiles.tsv`) are hosted with the session, so
+the cohort calculations can be checked.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-9-metaphlan/session.treeviz.json) ·
 [SVG figure](https://treeviz.newlineages.com/examples/example-9-metaphlan/thumbnail.svg) ·
-[Source paper](https://doi.org/10.1038/nmeth.2066) ·
+[Segata et al. (2012)](https://doi.org/10.1038/nmeth.2066) ·
 [Style prompt and metadata requirements](https://treeviz.newlineages.com/examples/example-9-metaphlan/recipe.md)
+
+Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-9-metaphlan/session.treeviz.json) · [tree.nwk](https://treeviz.newlineages.com/examples/example-9-metaphlan/tree.nwk) · [metadata.tsv](https://treeviz.newlineages.com/examples/example-9-metaphlan/metadata.tsv) · [node-metadata.tsv](https://treeviz.newlineages.com/examples/example-9-metaphlan/node-metadata.tsv) · [source-profiles.tsv](https://treeviz.newlineages.com/examples/example-9-metaphlan/source-profiles.tsv) · [reconstructed-taxonomy.nwk](https://treeviz.newlineages.com/examples/example-9-metaphlan/reconstructed-taxonomy.nwk) · [data-audit.json](https://treeviz.newlineages.com/examples/example-9-metaphlan/data-audit.json)
