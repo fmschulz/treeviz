@@ -2,6 +2,11 @@
 
 TreeViz separates complete session exports from figure and data exports.
 
+The **Export** button above the tree opens the **Tree package** panel. Its
+**Images**, **Data**, and **Session** sections group the download buttons.
+**Export Session (JSON)** is in the **Session** section. Downloads go to the
+location that the browser chooses. The panel closes after a successful export.
+
 ## Session JSON
 
 Use `.treeviz.json` when the output must preserve the full visualization:
@@ -40,6 +45,9 @@ zoom 1 and below, the SVG contains the unzoomed figure. When the in-figure
 legend is displayed, the export includes it, along with any hand-written
 `legends`.
 
+From the browser API, `await window.__treeviz.exportImage()` returns a PNG or
+SVG data URL; see [Export an image](API.md#export-an-image).
+
 For automated rendering, inspect the output after the final layout change.
 Whitespace, clipped labels, or unreadable metadata tracks should be fixed in
 the layout before the figure is considered final.
@@ -70,7 +78,9 @@ The CSV and TSV leaf-name exports and the metadata TSV export protect against
 spreadsheet formulas. When a cell begins with `=`, `+`, `-` or `@`, it gets a
 leading apostrophe, and spreadsheet apps show it as literal text. Leaf-name
 exports also guard a leading tab or carriage return, while the metadata TSV
-replaces tabs and line breaks inside cells with spaces. Numeric metadata
+replaces tabs and line breaks inside cells with spaces. The leaf-name TSV
+export does the same, and the leaf-name CSV export quotes cells that contain
+commas, quotes, or line breaks. Numeric metadata
 values are written as they are. TXT leaf-name exports have no guard.
 
 ## Python static export
@@ -97,3 +107,9 @@ render_tree(
 With `auto_crop=True`, exported SVG, PNG, and PDF artifacts are trimmed to
 their visible content. The metrics JSON records the content bounds, crop
 bounds, whitespace margins, fill ratios, and any crop warnings.
+
+Without `command`, `render_tree` runs `bun run treeviz render`, which works
+only inside a TreeViz source checkout. `output` and `metrics` are resolved
+against the current working directory, not `cwd`, and the returned path is
+absolute. If the command cannot be started, `render_tree` raises
+`FileNotFoundError`. See [Static export](PYTHON.md#static-export).

@@ -10,7 +10,8 @@ app and requires no installation.
 The saved Extended Data Figure 9 session contains 1,204 tips and 18 metadata
 tracks. See the
 [source paper](https://doi.org/10.1038/s41564-025-02190-6) for the biological
-context.
+context. The example opens as a copy in this browser tab. Changes to it do not
+change the public example.
 
 ## 2. Check the metadata tracks
 
@@ -54,7 +55,10 @@ not preserve the interactive state.
 
 ## Continue with your data
 
+- [Your first annotated tree](tutorials/first-tree.md): build a small figure from a Newick file and a CSV table.
 - [Browser app](BROWSER.md): load a tree and metadata table from your computer.
+- [Add metadata tracks](how-to/metadata-tracks.md), [Edit labels](how-to/labels.md),
+  and [Style and collapse clades](how-to/style-clades.md): task guides.
 - [Metadata](METADATA.md): choose a row key and handle unmatched rows or leaves.
 - [Examples](EXAMPLES.md): inspect the hosted example and its provenance.
 - [Python package](PYTHON.md): build sessions from scripts and notebooks.

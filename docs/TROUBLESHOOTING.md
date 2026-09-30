@@ -3,7 +3,15 @@
 ## Metadata rows do not match leaves
 
 Check the row-key column first. Its values should match the visible tree leaf
-labels exactly unless you intentionally use normalization.
+labels exactly unless you intentionally use normalization. After a leaf is
+renamed in TreeViz, matching still uses its original imported identifier in
+that session.
+
+In the browser, read **Preview** during metadata import. For a complete table
+that matches, **unmatched leaves** and **unmatched rows** should both be zero.
+Choose **Cancel** to correct the file before importing. After import,
+**Rebind leaves…** in the **Tracks** panel header reviews normalization and
+matching. To change the row-key column, import the CSV or TSV again.
 
 Common causes:
 
@@ -73,8 +81,8 @@ Gap, outline, and overlap rules for wedges are described in
   spacing**. In the radial layout it shapes the angle split, so a higher value
   keeps the drawing compact and it renders larger, which spreads the crowded
   labels apart.
-- When the labels rather than the wedges collide, set **Collapsed wedge
-  labels** to **Leader lines**; see
+- When the labels rather than the wedges collide, set **Wedge labels** under
+  **Collapsed wedges** to **Leader lines**; see
   [Label color, direction, and position](STYLING.md#label-color-direction-and-position).
 
 ## Labels are missing at the fitted view
@@ -119,9 +127,59 @@ reported whitespace margins.
 
 ## Labels or tracks are clipped
 
+Open **Controls** and check **Show labels** and **Show metadata tracks**. In
+**Tracks**, each track also has a **Visible** checkbox. If labels disappear
+only when zoomed out, **Auto-cull overlaps** is hiding overlapping text.
+
 Check the layout settings before you increase the canvas size. Labels, clade
 annotations, metadata tracks, and legends all take up space. After the final
 layout change, re-render and inspect the latest figure.
+
+## The track kind I want is missing
+
+The **+ Add Track** menu offers only the kinds that fit the column's inferred
+type. Use `yes/no` for **binary-dots**; a column of only `0` and `1` is numeric.
+A non-numeric column with 32 or fewer distinct values is categorical and offers
+**color-strip**, not **text**. See [Values and types](METADATA.md#values-and-types).
+
+## A file does not reopen after cancelling import
+
+If choosing the same file again does nothing, drag the file onto the page. The
+file picker may keep the previous selection after a cancel.
+
+## I cannot find my previous session
+
+**Previous sessions** in the **Sessions** panel belongs to the browser profile
+that saved the work. A different browser, device, or private window does not
+have those entries. Open an exported `.treeviz.json` file with **Add Tree** to
+restore the work there. Clearing website data also removes browser-local
+sessions.
+
+## A link or example shows "Could not open the session"
+
+TreeViz opens `?session=<url>` links only for files on the same site under
+`/examples/` or `/sessions/`. When such a link does not open, or an example's
+**Open session** button fails, the landing page (or the **Sessions** panel)
+shows a red notice above the examples. It names the URL and gives the reason:
+
+- **Not an allowed location**: the URL is outside those paths or on another
+  site. Download the file and open it with **Add Tree**.
+- **The server answered HTTP 404** (or another status): the file is not at that
+  address. Check the path.
+- **The response is not valid JSON**: the URL returned something other than a
+  session. A note that the server returned a web page usually means the file
+  does not exist and the site served its own page instead.
+- **The file is not a valid TreeViz session**: the JSON parsed but is not a
+  `.treeviz.json` session. The notice quotes the first problem found.
+- **The request failed**: the browser could not reach the server.
+
+A share link (`#s=...`) that does not open gets the same notice. It shows the
+start and end of the fragment and its length, and says the link looks truncated
+or corrupted, followed by the reason. Share links are often cut off when they
+are copied out of a chat or an email. Ask for a fresh link or for the exported
+`.treeviz.json` file.
+
+Dismiss the notice with **×**. The examples and **Add Tree** stay available.
 
 ## Browser API is not available
 

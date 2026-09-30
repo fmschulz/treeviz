@@ -6,6 +6,30 @@ phylogenetic visualization, use the hosted TreeViz API. Through
 diagnostics, layout metrics, and session state, along with SVG and PNG
 export.
 
+## Install the skill
+
+Clone the public repository and copy the whole `treeviz-agent` directory into
+the agent's personal skills folder:
+
+```bash
+git clone --depth 1 https://github.com/fmschulz/treeviz.git
+# Claude Code: personal skills folder
+mkdir -p ~/.claude/skills
+cp -R treeviz/.agents/skills/treeviz-agent ~/.claude/skills/
+# Codex: personal skills folder
+mkdir -p ~/.codex/skills
+cp -R treeviz/.agents/skills/treeviz-agent ~/.codex/skills/
+```
+
+Claude Code also reads project skills from `.claude/skills/<name>/`. Codex
+reads `$CODEX_HOME/skills` (default `~/.codex/skills`) and repo-level
+`.agents/skills`. Restart the agent after installing. To update, pull the clone
+and copy the directory again.
+
+The skill works through `window.__treeviz` in the hosted page, so the agent
+needs a way to drive a browser, for example Playwright, agent-browser, or
+Claude in Chrome.
+
 ## Runtime
 
 Open the browser app with the API enabled:

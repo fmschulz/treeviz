@@ -142,7 +142,9 @@ For repeatable file-based rerooting from metadata, use
   and shown in the Legend panel, the in-figure legend and exports.
   `figure_legend = true` in `[view]` (view `figureLegendVisible`) opens the
   in-figure legend on load. No command edits `legends`; set it on the document
-  and `session.restore`.
+  and `session.restore`. Set legend `shape = "circle"` for round markers;
+  entry `size` sets a positive diameter (default 10). The session JSON uses the
+  same `shape` and entry `size` fields.
 - Readable names for node-meta keys in the Controls pickers and hover
   tooltips: TOML `[attribute_labels]` (`vc = "Domain colour"`), compiled to
   the top-level `attributeLabels` map; pickers show `Domain colour (vc)`.
@@ -181,6 +183,14 @@ For repeatable file-based rerooting from metadata, use
 - Session and data export: `session.save`, `export.newick`, `export.nexus`,
   `export.leaf-names`, and `export.metadata-tsv`. Data exports return content,
   filename, and MIME type in `ExecuteResult.value`.
+- Width-sized radial phylogram wedges: `view.set-collapsed-wedge-options` with
+  `sizeTarget: 'width'` and `lengthMode: 'max-path'`. Wedge depth then follows
+  the longest summed root-to-tip path in the clade. The default is
+  `'footprint'`.
+- Tighter fitted radial clade backgrounds: `tree.style-clade` with
+  `patch.cladeBackgroundPadding`, in pixels before zoom.
+- Stable keys by name, regex, or metadata value, for any node:
+  `findNodes(query)`. `view.search` sees only leaves and collapsed clades.
 - Layout choice: circular gives every leaf an equal angular slot, so a clade's
   footprint tracks taxon count. Radial draws true branch lengths, so a clade
   with longer root-to-tip depths covers more area. Pick the layout by what the
