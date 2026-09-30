@@ -10,9 +10,9 @@ inspect clades, line up metadata with leaves, compare visual encodings, and
 export SVG, PNG, or PDF. All tree and metadata processing runs in the
 browser, and no account is needed.
 
-When someone else needs to reopen the tree with the same metadata binding,
-tracks, edits, and view settings, save the complete visualization as a
-`.treeviz.json` session.
+To share the tree with other people or move it to another machine with the same
+metadata binding, tracks, edits, and view settings, save the complete
+visualization as a `.treeviz.json` session.
 
 ![Circular Mirusviricota phylogeny with 18 metadata tracks](assets/gallery/example-1-mirusviricota.svg)
 
