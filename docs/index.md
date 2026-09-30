@@ -5,9 +5,9 @@
 [GitHub](https://github.com/fmschulz/treeviz){ .md-button }
 
 TreeViz takes a Newick, CONTree, or Nexus tree, plus an optional CSV or TSV
-table, and turns them into an interactive phylogenetic figure. You can use it to
-inspect clades, line up metadata with leaves, compare visual encodings, and
-export SVG, PNG, or PDF. All tree and metadata processing runs in the
+table, and turns them into an interactive phylogenetic figure. It supports
+inspecting clades, lining up metadata with leaves, comparing visual encodings,
+and exporting SVG, PNG, or PDF. All tree and metadata processing runs in the
 browser, and no account is needed.
 
 To share the tree with other people or move it to another machine with the same
@@ -32,9 +32,9 @@ visualization as a `.treeviz.json` session.
 ## Start with sourced data
 
 To try TreeViz without installing it, follow the [getting-started
-tutorial](GETTING_STARTED.md). It opens the Mirusviricota tree from Example 1,
-where you can look through the metadata tracks, the fitted circular opening, and
-the exported figure.
+tutorial](GETTING_STARTED.md). It opens the Mirusviricota tree from Example 1
+and walks through its metadata tracks, fitted circular opening, and exported
+figure.
 
 The [example gallery](EXAMPLES.md) also contains the 3,843-taxon SILVA 123.1
 taxonomy from Figure 4 and the 550-taxon TARA Metazoa tree from Figure 3a of

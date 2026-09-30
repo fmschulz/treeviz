@@ -80,7 +80,7 @@ The published TARA Oceans W5 data and plotting recipe supply the taxonomy,
 statistics, colors, and the 73 selected labels. Display positions, on the other
 hand, are reconstructed. Named nodes are aligned to the published raster, and
 the remaining nodes follow the reconstructed local geometry. The session keeps
-these positions as node attributes you can edit.
+these positions as editable node attributes.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-3-tara-metazoa/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-3-tara-metazoa.svg) ·

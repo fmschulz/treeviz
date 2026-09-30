@@ -240,12 +240,12 @@ leaf_spacing = 1.6
 
 ## Collapsed clades
 
-You can collapse a clade in the browser (`tree.collapse-clade`) or through a
-config attribute. When `collapse_attribute` is set, each non-root internal
-node with a truthy node attribute value for that key compiles to a collapsed
-clade. Truthy means present and not `""`, `"0"`, or `"false"`. This covers
-nodes that name-based `[[branch_rule]]` selectors cannot reach, for example
-many clades that share one name.
+A clade can be collapsed in the browser (`tree.collapse-clade`) or through a
+config attribute. When `collapse_attribute` is set, each non-root internal node
+with a truthy node attribute value for that key compiles to a collapsed clade.
+Truthy means present and not `""`, `"0"`, or `"false"`. This covers nodes that
+name-based `[[branch_rule]]` selectors cannot reach, for example many clades
+that share one name.
 
 ```toml
 [view]
@@ -434,7 +434,7 @@ clade = "Bdellovibrionota"
 label_flip = true
 ```
 
-You can also drag any label. Press on the text and move it. TreeViz stores the
+Any label can also be dragged. Press on the text and move it. TreeViz stores the
 offset on that clade as `cladeLabelOffsetX` and `cladeLabelOffsetY`, so it is
 kept when the session is saved and shows up in exports. To set the same values
 from the browser API:
