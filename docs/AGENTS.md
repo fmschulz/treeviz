@@ -1,9 +1,10 @@
 # Agent automation
 
-Use the hosted TreeViz API when a script or coding agent needs to build,
-inspect, or export a phylogenetic visualization. The API exposes command
-schemas, diagnostics, render diagnostics, layout metrics, session state, and
-SVG and PNG export through `window.__treeviz`.
+When a script or coding agent needs to build, inspect, or export a
+phylogenetic visualization, use the hosted TreeViz API. Through
+`window.__treeviz`, it exposes command schemas, diagnostics, render
+diagnostics, layout metrics, and session state, along with SVG and PNG
+export.
 
 ## Runtime
 

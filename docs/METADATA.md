@@ -1,10 +1,10 @@
 # Metadata
 
-TreeViz metadata is a TSV or CSV table that attaches values to tree leaves.
-Those values can drive color strips, gradients, heatmaps, bars, text tracks,
-binary dots, branch coloring, clade resolution, and legends.
-The hosted browser can also map metadata columns to exact terminal-node circles
-and terminal-branch styles.
+In TreeViz, metadata is a TSV or CSV table whose values attach to the leaves
+of the tree. You can use those values to drive color strips, gradients,
+heatmaps, bars, text tracks, binary dots, branch coloring, clade resolution,
+and legends. In the hosted browser, metadata columns can also map to exact
+terminal-node circles and terminal-branch styles.
 
 ## Table shape
 
@@ -53,12 +53,12 @@ await api.execute('session.import-metadata', {
 })
 ```
 
-Row-key inference depends on the interface. In Python, omitting
-`row_key_column` makes the builder choose the metadata column with the most
-exact leaf-name matches. In the browser API, call
-`planMetadataImport(source, format, prompt)` first, then pass
-`suggestedBinding.rowKeyColumn` to `session.import-metadata`. Explicit row keys
-keep workflows reproducible.
+How the row key is inferred depends on the interface you use. In Python, leave
+out `row_key_column` and the builder picks the metadata column with the most
+exact leaf-name matches. In the browser API, first call
+`planMetadataImport(source, format, prompt)`, then pass
+`suggestedBinding.rowKeyColumn` to `session.import-metadata`. Setting the row
+key explicitly keeps a workflow reproducible.
 
 ## Matching rules
 
@@ -135,18 +135,19 @@ await api.execute('view.set-tree-style-attributes', {
 await api.execute('view.set-pretty-terminal-branches', { enabled: true })
 ```
 
-Node attributes are key-value pairs stored on tree nodes, for example values
-from Newick or Nexus comments. They are separate from the node metadata table
-(`session.import-node-metadata`), which binds TSV rows to internal nodes for
-node marks and node search.
+Node attributes are key-value pairs stored on the tree nodes themselves, such
+as values read from Newick or Nexus comments. They are not the same as the node
+metadata table (`session.import-node-metadata`). That table binds TSV rows to
+internal nodes and feeds node marks and node search.
 
-Terminal leaves use node attributes first and then the bound metadata row.
-Internal nodes only use node attributes. Branch style values are keyed by
-the child node, so a row for `A1` styles the branch entering `A1`.
+For terminal leaves, TreeViz reads node attributes first and then falls back
+to the bound metadata row. Internal nodes read node attributes only. Branch
+style values are keyed by the child node, so a row for `A1` styles the branch
+that enters `A1`.
 
-A node attribute can carry a display name through `[attribute_labels]` in a
-TOML config (session `attributeLabels`); the Controls pickers and hover
-tooltips then show `Name (key)`. See
+You can give a node attribute a display name with `[attribute_labels]` in a
+TOML config (session `attributeLabels`). The Controls pickers and hover
+tooltips then show it as `Name (key)`. For details, see
 [Legends and attribute names](STYLING.md#legends-and-attribute-names).
 
 See [Tree styling](STYLING.md) for current browser examples.

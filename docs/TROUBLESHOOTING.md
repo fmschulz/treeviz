@@ -79,22 +79,23 @@ Gap, outline, and overlap rules for wedges are described in
 
 ## Labels are missing at the fitted view
 
-With **Auto-cull overlaps** ticked (TOML `allow_label_overlap = false`) a label
-that would land on one already drawn is dropped. Zoom in: labels keep their
-screen size above zoom 1 while the tree grows, and the culler brings a label
-back once it has room. Untick **Auto-cull overlaps** to draw every label,
-for instance before a large export.
+When **Auto-cull overlaps** is ticked (TOML `allow_label_overlap = false`),
+any label that would land on one already drawn is dropped. Zooming in helps:
+above zoom 1, labels keep their screen size as the tree grows, and the culler
+restores a label once it has room. To draw every label, for instance before a
+large export, untick **Auto-cull overlaps**.
 
-On a small viewport the fitted zoom can be below 1. Labels then shrink with the
-tree and read small at fit; zoom in, or export at a larger canvas.
+On a small viewport, the fitted zoom can fall below 1. Labels then shrink
+along with the tree and look small at fit. Zoom in, or export at a larger
+canvas.
 
 ## The inline notebook view is missing
 
-Sessions up to 256 KB of encoded URL fragment (roughly 1,500 tips with a few
-tracks) are embedded inline. Larger sessions are too large for inline display
-and should be saved as `.treeviz.json` instead. The hosted app allows framing
-(`frame-ancestors *`); a blank iframe on a self-hosted copy usually means a
-`X-Frame-Options` or `frame-ancestors` header on that server.
+A session is embedded inline when its encoded URL fragment is 256 KB or less,
+which is roughly 1,500 tips with a few tracks. Anything larger is too large for
+inline display; save it as `.treeviz.json` instead. The hosted app allows
+framing (`frame-ancestors *`). If a self-hosted copy shows a blank iframe, the
+usual cause is a `X-Frame-Options` or `frame-ancestors` header on that server.
 
 ```python
 view = view_session(session, open_browser=False)
@@ -118,9 +119,9 @@ reported whitespace margins.
 
 ## Labels or tracks are clipped
 
-Increase canvas size only after checking layout settings. Labels, clade
-annotations, metadata tracks, and legends all need space. Re-render after the
-final layout change and inspect the latest figure.
+Check the layout settings before you increase the canvas size. Labels, clade
+annotations, metadata tracks, and legends all take up space. After the final
+layout change, re-render and inspect the latest figure.
 
 ## Browser API is not available
 

@@ -80,13 +80,13 @@ the Inspector's branch, circle, and label controls. Saved views let you keep
 more than one arrangement of the same session. [Tree styling](STYLING.md)
 lists every option.
 
-The **Legend** panel lists the legends derived from tracks, markers, node marks
-and connections, then any hand-written legends stored on the session
-(`legends`, from `[[legend]]` tables in a TOML config). **Display in figure**
-places a section on the canvas; the in-figure legend is part of SVG, PNG, and
-PDF exports. Session JSON can also supply a continuous size/color legend. Its
-standalone figure section is frameless, with the title above the ramp; the side
-panel keeps its normal container.
+The **Legend** panel starts with the legends derived from tracks, markers, node
+marks, and connections. After those come any hand-written legends stored on the
+session (`legends`, from `[[legend]]` tables in a TOML config). **Display in
+figure** places a section on the canvas, and that in-figure legend is included
+in SVG, PNG, and PDF exports. Session JSON can also provide a continuous
+size/color legend. In the figure, that section is drawn without a frame and with
+the title above the ramp, while the side panel shows it in its normal container.
 
 ## Navigate
 
@@ -119,17 +119,17 @@ A collapsed clade's label sits past its wedge tip. Two controls under
 
 See [Tree styling](STYLING.md#label-color-direction-and-position).
 
-The search field (**Search taxa and clades…**) matches leaf names, leaf labels
-and collapsed-clade labels. A hit inside a collapsed clade lands on that
-clade's wedge. **Enter** zooms to the active hit (to at least 2x);
-**Shift+Enter** and the arrow keys step through the hits; **Escape** clears
-the search.
+Type in the search field (**Search taxa and clades…**) to match leaf names, leaf
+labels, and collapsed-clade labels. When a hit sits inside a collapsed clade,
+the search lands on that clade's wedge. Press **Enter** to zoom to the active
+hit (to at least 2x), use **Shift+Enter** or the arrow keys to step through the
+hits, and press **Escape** to clear the search.
 
 ## Save and export
 
-Use `.treeviz.json` to preserve the full visualization. Use SVG, PNG, or PDF
-for figures. Use Newick, Nexus, and metadata TSV exports for downstream data
-exchange.
+Save a `.treeviz.json` file when you need the full visualization preserved. For
+figures, export SVG, PNG, or PDF. For downstream data exchange, the Newick,
+Nexus, and metadata TSV exports are the right choice.
 
 See [Exports](EXPORTS.md) for format guidance.
 

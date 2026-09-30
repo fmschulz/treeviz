@@ -14,9 +14,9 @@ reusable prompt with the required metadata formats. **Copy prompt** and
 your tree and metadata files. To reproduce the published figure, open its
 session. To apply the style to your own data, use the prompt.
 
-Each example below lists its data, tip count and layout, then links the
-session, the SVG figure, the source paper, the style prompt and the hosted
-files.
+Every example below starts with its data, tip count, and layout. After that come
+links to the session, the SVG figure, the source paper, the style prompt, and
+the hosted files.
 
 The prompts specify leaf tables, internal-node attributes, optional display
 coordinates and synthetic values. A leaf table alone does not supply values
@@ -28,11 +28,10 @@ for internal nodes.
 
 [![Circular Mirusviricota phylogeny with 18 metadata tracks](assets/gallery/example-1-mirusviricota.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-1-mirusviricota/session.treeviz.json)
 
-This is the saved TreeViz view of the Mirusviricota phylogeny from Extended
-Data Figure 9 in
-[Medvedeva et al. (2026)](https://doi.org/10.1038/s41564-025-02190-6).
-It has 18 metadata tracks, and its fitted circular opening keeps their names
-visible.
+Here the Mirusviricota phylogeny from Extended Data Figure 9 in [Medvedeva et
+al. (2026)](https://doi.org/10.1038/s41564-025-02190-6) appears as a saved
+TreeViz view. The tree carries 18 metadata tracks, and the fitted circular
+opening leaves room for their names to stay visible.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-1-mirusviricota/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-1-mirusviricota.svg) ·
@@ -47,16 +46,15 @@ Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-1
 
 [![SILVA taxonomy with sequence-count-scaled nodes, branches, and selected taxon labels](assets/gallery/example-2-silva.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-2-silva/session.treeviz.json)
 
-This saved view reconstructs the upper-left SILVA **Whole database** panel of
-Figure 4 from
-[Foster et al. (2017)](https://doi.org/10.1371/journal.pcbi.1005404), using the
-3,843-taxon SILVA 123.1 taxonomy. Node diameters, branch widths, and colors encode the 513,121
-bacterial 16S sequences assigned across the taxonomy. The view labels 50
-selected taxa.
+Built on the 3,843-taxon SILVA 123.1 taxonomy, this saved view reconstructs the
+upper-left SILVA **Whole database** panel of Figure 4 from [Foster et al.
+(2017)](https://doi.org/10.1371/journal.pcbi.1005404). Node diameters, branch
+widths, and colors together encode the 513,121 bacterial 16S sequences assigned
+across the taxonomy. Labels appear on 50 selected taxa.
 
-Branch depth counts steps through the taxonomy. Circular
-angles were reconstructed with the historical igraph 1.0.1 layout algorithm
-used by the source workflow. They were not measured from the saved 2017 plot.
+Branch depth is the number of steps through the taxonomy. The circular angles
+come from a reconstruction with the historical igraph 1.0.1 layout algorithm
+that the source workflow used, not from measurements of the saved 2017 plot.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-2-silva/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-2-silva.svg) ·
@@ -71,17 +69,18 @@ Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-2
 
 [![TARA Metazoa taxonomy with OTU-scaled circles, read-scaled branches and two numeric legends](assets/gallery/example-3-tara-metazoa.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-3-tara-metazoa/session.treeviz.json)
 
-This view reconstructs the upper Metazoa panel of Figure 3a from
-[Foster et al. (2017)](https://doi.org/10.1371/journal.pcbi.1005404.g003). The
-taxonomy has 550 taxa. Circle sizes encode the 20,212 OTUs and branch widths encode
-250,296,231 reads. Colors show the percentage of OTUs with at least
-90% identity to their closest reference sequence, following the archived code.
-Two legends show independent percentage and count scales.
+The upper Metazoa panel of Figure 3a from [Foster et al.
+(2017)](https://doi.org/10.1371/journal.pcbi.1005404.g003) is reconstructed here
+from a taxonomy of 550 taxa. Circle sizes represent the 20,212 OTUs, and branch
+widths represent 250,296,231 reads. Following the archived code, color shows the
+percentage of OTUs whose closest reference sequence is at least 90% identical.
+Two legends show the independent percentage and count scales.
 
-Taxonomy, statistics, colors and the 73 selected labels come from the published
-TARA Oceans W5 data and plotting recipe. Display positions are reconstructed:
-named nodes align to the published raster and other nodes use the reconstructed
-local geometry. The session retains these positions as editable node attributes.
+The published TARA Oceans W5 data and plotting recipe supply the taxonomy,
+statistics, colors, and the 73 selected labels. Display positions, on the other
+hand, are reconstructed. Named nodes are aligned to the published raster, and
+the remaining nodes follow the reconstructed local geometry. The session keeps
+these positions as node attributes you can edit.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-3-tara-metazoa/session.treeviz.json) ·
 [SVG figure](assets/gallery/example-3-tara-metazoa.svg) ·
@@ -96,19 +95,20 @@ Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-3
 
 [![Archaeal tree with two metadata bands and synthetic transfer connections](assets/gallery/example-4-archaeal-acquisitions.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-4-archaeal-acquisitions/session.treeviz.json)
 
-This example reconstructs Figure 3 from
-[Nelson-Sathi et al. (2015)](https://doi.org/10.1038/nature13805), on page 4 of the
-[paper PDF](https://www.molevol.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Biologie/Institute/Molekulare_Evolution/Dokumente/Nelson-Sathi_2015_Nature.pdf#page=4).
-The published topology contains 134 archaeal genomes and 44 placeholder tips
-representing 22 bacterial groups. Branch grays encode agreement with 70
-single-gene trees; terminal colors inherit parent agreement for display.
+This example reconstructs Figure 3 of [Nelson-Sathi et al.
+(2015)](https://doi.org/10.1038/nature13805), found on page 4 of the [paper
+PDF](https://www.molevol.hhu.de/fileadmin/redaktion/Fakultaeten/Mathematisch-Naturwissenschaftliche_Fakultaet/Biologie/Institute/Molekulare_Evolution/Dokumente/Nelson-Sathi_2015_Nature.pdf#page=4).
+Its published topology holds 134 archaeal genomes plus 44 placeholder tips that
+stand for 22 bacterial groups. Shades of gray on the branches show agreement
+with 70 single-gene trees, and for display, terminal branches take their color
+from the parent's agreement.
 
-Twelve acquisition nodes connect to the bacterial groups through 264 straight
-lines. The pairwise weights are **synthetic** because the source supplements
-do not supply the transfer matrix. The session retains published group counts
-separately and records the paper's count discrepancies. Branch lengths and
-node angles are reconstructed display geometry. Both color scales have
-horizontal legends.
+Twelve acquisition nodes link to the bacterial groups through 264 straight
+lines. Because the source supplements do not include the transfer matrix, the
+pairwise weights are **synthetic**. The session keeps the published group counts
+separately and notes where the paper's counts disagree. Branch lengths and node
+angles are reconstructed display geometry, and each of the two color scales has
+a horizontal legend.
 
 The session restores the full figure. `transfer-metadata.tsv` holds the
 synthetic transfer table.
@@ -167,11 +167,12 @@ The fixture uses an approximate topology and display branch distances recovered
 from the vector figure. These distances reproduce the printed geometry; they
 are not evolutionary distances or time estimates.
 
-The figure labels two tips `SAMN39605011`. Figure row 2231 is associated with
-Supplementary Data 1 accession `SAMN39605010` because its vector profile is
-compatible and it is the only workbook accession left after mapping the other
-rows. The profile alone is not unique. The metadata and data audit mark this inference. The two tree keys
-have explicit figure-row suffixes so their annotations bind separately.
+Two tips in the figure carry the label `SAMN39605011`. Figure row 2231 is linked
+to Supplementary Data 1 accession `SAMN39605010` because its vector profile is
+compatible and, once the other rows are mapped, it is the only workbook
+accession left. The profile by itself is not unique, and both the metadata and
+the data audit mark this inference. Each of the two tree keys has an explicit
+figure-row suffix, so their annotations bind separately.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-6-cc398/session.treeviz.json) ·
 [SVG figure](https://treeviz.newlineages.com/examples/example-6-cc398/thumbnail.svg) ·
@@ -209,15 +210,16 @@ Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-7
 
 [![Bioreactor MAG tree with published bin statistics and reconstructed heatmap colors](https://treeviz.newlineages.com/examples/example-8-reactor-stability/thumbnail.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-8-reactor-stability/session.treeviz.json)
 
-This view reconstructs Figure 7 from [Mills et al. (2025)](https://doi.org/10.1038/s41522-025-00679-w).
-The 183 plotted bins use the supplement's taxonomy, GC content and completeness.
-Topology and branch distances come from the vector figure. These distances
-describe the drawing, not evolutionary change.
+This view reconstructs Figure 7 from [Mills et al.
+(2025)](https://doi.org/10.1038/s41522-025-00679-w). Taxonomy, GC content, and
+completeness for the 183 plotted bins come from the supplement, while topology
+and branch distances are taken from the vector figure. Those distances describe
+the drawing, not evolutionary change.
 
-The matching MAG tree and per-sample abundance matrix were not supplied.
-Heatmap cells retain their published colors as display categories; no abundance
-measurements are inferred from them. The metadata, legends and data audit
-identify this limit.
+Neither the matching MAG tree nor the per-sample abundance matrix was supplied.
+Heatmap cells keep their published colors as display categories, and no
+abundance measurements are inferred from them. The metadata, legends, and data
+audit all note this limit.
 
 [Open in TreeViz](https://treeviz.newlineages.com/?session=/examples/example-8-reactor-stability/session.treeviz.json) ·
 [SVG figure](https://treeviz.newlineages.com/examples/example-8-reactor-stability/thumbnail.svg) ·
@@ -232,11 +234,12 @@ Files: [session.treeviz.json](https://treeviz.newlineages.com/examples/example-8
 
 [![Gut microbiota taxonomic cladogram with HMP and MetaHIT cohort annotations](https://treeviz.newlineages.com/examples/example-9-metaphlan/thumbnail.svg){ loading=lazy }](https://treeviz.newlineages.com/?session=/examples/example-9-metaphlan/session.treeviz.json)
 
-This view adapts Figure 3a from [Segata et al. (2012)](https://doi.org/10.1038/nmeth.2066).
-The archived MetaPhlAn table contains 139 HMP and 85 MetaHIT samples. Its
-taxonomic lineages define the tree. Branch lengths count taxonomy steps;
-they are not evolutionary distances. Abundance and cohort annotations derive
-from the source profiles, and the layout is reconstructed.
+This view adapts Figure 3a from [Segata et al.
+(2012)](https://doi.org/10.1038/nmeth.2066), drawing on the archived MetaPhlAn
+table of 139 HMP and 85 MetaHIT samples. The table's taxonomic lineages define
+the tree. Branch lengths count taxonomy steps, so they are not evolutionary
+distances. Abundance and cohort annotations are derived from the source
+profiles, and the layout is reconstructed.
 
 The table contains 290 taxa and 135 terminal clades, including 123 species-level rows.
 The paper reports 102 species for the combined cohorts; 102 instead matches
