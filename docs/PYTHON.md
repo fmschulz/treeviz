@@ -1,9 +1,9 @@
 # Use TreeViz from Python
 
-`treeviz-phylo` builds TreeViz-native `.treeviz.json` sessions from Python
-scripts and notebooks. It handles tree input, metadata binding, schema
-validation, notebook iframe views, basic tree inspection, and static export
-through an external renderer command.
+`treeviz-phylo` lets Python scripts and notebooks build TreeViz-native
+`.treeviz.json` sessions. It covers tree input, metadata binding, schema
+validation, notebook iframe views, and basic tree inspection. It also handles
+static export through an external renderer command.
 
 The package does not vendor the TreeViz browser app or frontend source. It
 ships Python helpers and the TreeViz session schema.
@@ -88,10 +88,10 @@ view = view_tree(
 display(view)
 ```
 
-The session travels in the iframe URL fragment (gzip + base64). Sessions up to
-256 KB encoded, roughly 1,500 tips with a few tracks, display inline. Larger
-sessions are too large for inline display; save them as `.treeviz.json` and
-open the file in the browser.
+The session is carried in the iframe URL fragment (gzip + base64). A session
+of up to 256 KB encoded, roughly 1,500 tips with a few tracks, displays
+inline. Anything larger is too large for inline display. Save it as
+`.treeviz.json` instead and open the file in the browser.
 
 ```python
 if view.fragment is None:
@@ -189,12 +189,12 @@ The browser can further adjust and save view settings.
 
 ### Browser styling fields
 
-The hosted app can map metadata to exact node circles and branch width/color,
-apply conditional rules, draw compact symbol or wedge lanes, and style terminal
-branches. `treeviz-phylo` 0.8.2 validates these view fields in Python; pass
-them through the `view` argument or apply them later through `window.__treeviz`.
-Metadata branch colors extend to the MRCA stem of each same-colored clade (see
-[Tree styling](STYLING.md)).
+In the hosted app, metadata can map to exact node circles and to branch
+width/color. The app can also apply conditional rules, draw compact symbol or
+wedge lanes, and style terminal branches. `treeviz-phylo` 0.8.2 validates
+these view fields in Python. Pass them through the `view` argument, or apply
+them later through `window.__treeviz`. Metadata branch colors extend to the
+MRCA stem of each same-colored clade (see [Tree styling](STYLING.md)).
 
 ## Session fields
 
@@ -261,11 +261,12 @@ duplicate row keys.
 
 ## Static export
 
-`render_tree(...)` writes a temporary `.treeviz.json` session and calls a
-compatible external renderer command. It supports `svg`, `png`, and `pdf`.
-Neither the PyPI package nor this public repository installs that renderer.
-`auto_crop=None` (the default) follows the renderer default, which fits the
-output to its content. Pass `auto_crop=False` for a fixed-viewport output.
+`render_tree(...)` writes a temporary `.treeviz.json` session and then calls
+a compatible external renderer command, with support for `svg`, `png`, and
+`pdf`. That renderer is not installed by the PyPI package or by this public
+repository. By default, `auto_crop=None` follows the renderer default, which
+fits the output to its content. For a fixed-viewport output, pass
+`auto_crop=False`.
 
 ```python
 from treeviz import render_tree

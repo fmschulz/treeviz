@@ -30,14 +30,15 @@ cropped to the visible content.
   or **A4**. Letter and A4 pages take **Portrait** or **Landscape** and center
   the figure on the page.
 
-**Include tracks (images)** lists the visible metadata tracks. Clear a track's
-checkbox to leave it out of SVG, PNG, and PDF exports. The session is not
-changed.
+**Include tracks (images)** lists every visible metadata track. To leave a
+track out of SVG, PNG, and PDF exports, clear its checkbox. This setting does
+not change the session.
 
-SVG export follows the on-screen rule for zoom: above zoom 1 text, strokes and
-node marks are scaled so the file matches what the screen shows; at zoom 1 and
-below the SVG is the unzoomed figure. The in-figure legend, including
-hand-written `legends`, is part of the export when it is displayed.
+SVG export treats zoom the same way the screen does. Above zoom 1, text,
+strokes and node marks are scaled so the file matches the on-screen view. At
+zoom 1 and below, the SVG contains the unzoomed figure. When the in-figure
+legend is displayed, the export includes it, along with any hand-written
+`legends`.
 
 For automated rendering, inspect the output after the final layout change.
 Whitespace, clipped labels, or unreadable metadata tracks should be fixed in
@@ -56,20 +57,21 @@ through `window.__treeviz.execute`.
 | `export.leaf-names` | leaf names under one clade as `txt`, `csv`, or `tsv` | `stableKey`, `format`, `includeMetadata` |
 | `export.metadata-tsv` | current metadata table as TSV | none |
 
-`export.leaf-names` writes one name per line for `txt`. For `csv` and `tsv`
-it writes a `leaf_name` header row, and `includeMetadata: true` adds the
+For `txt`, `export.leaf-names` writes one name per line. For `csv` and `tsv`,
+it starts with a `leaf_name` header row, and `includeMetadata: true` adds the
 binding's `row_key` and `confidence` columns. The panel exports the whole
-tree; **Export leaf names…** in a clade's context menu exports that clade.
+tree. To export a single clade, use **Export leaf names…** in that clade's
+context menu.
 
 Newick, Nexus, leaf-name, and metadata exports do not preserve the TreeViz
 visual state. Use `.treeviz.json` when visual state matters.
 
-CSV and TSV leaf-name exports and the metadata TSV export guard against
-spreadsheet formulas. A cell that begins with `=`, `+`, `-` or `@` gets a leading apostrophe, so
-spreadsheet apps display it literally. Leaf-name exports also guard a leading
-tab or carriage return; the metadata TSV replaces tabs and line breaks inside
-cells with spaces. Numeric metadata values are written unchanged. TXT leaf-name
-exports are not guarded.
+The CSV and TSV leaf-name exports and the metadata TSV export protect against
+spreadsheet formulas. When a cell begins with `=`, `+`, `-` or `@`, it gets a
+leading apostrophe, and spreadsheet apps show it as literal text. Leaf-name
+exports also guard a leading tab or carriage return, while the metadata TSV
+replaces tabs and line breaks inside cells with spaces. Numeric metadata
+values are written as they are. TXT leaf-name exports have no guard.
 
 ## Python static export
 
@@ -92,6 +94,6 @@ render_tree(
 )
 ```
 
-`auto_crop=True` trims exported SVG, PNG, and PDF artifacts to the visible
-content. The metrics JSON records content bounds, crop bounds, whitespace
-margins, fill ratios, and crop warnings.
+With `auto_crop=True`, exported SVG, PNG, and PDF artifacts are trimmed to
+their visible content. The metrics JSON records the content bounds, crop
+bounds, whitespace margins, fill ratios, and any crop warnings.
