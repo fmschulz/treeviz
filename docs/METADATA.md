@@ -1,10 +1,10 @@
 # Metadata
 
-In TreeViz, metadata is a TSV or CSV table whose values attach to the leaves
-of the tree. You can use those values to drive color strips, gradients,
-heatmaps, bars, text tracks, binary dots, branch coloring, clade resolution,
-and legends. In the hosted browser, metadata columns can also map to exact
-terminal-node circles and terminal-branch styles.
+In TreeViz, metadata is a TSV or CSV table whose values attach to the leaves of
+the tree. These values can drive color strips, gradients, heatmaps, bars, text
+tracks, binary dots, branch coloring, clade resolution, and legends. In the
+hosted browser, metadata columns can also map to exact terminal-node circles and
+terminal-branch styles.
 
 ## Table shape
 
@@ -145,10 +145,10 @@ to the bound metadata row. Internal nodes read node attributes only. Branch
 style values are keyed by the child node, so a row for `A1` styles the branch
 that enters `A1`.
 
-You can give a node attribute a display name with `[attribute_labels]` in a
-TOML config (session `attributeLabels`). The Controls pickers and hover
-tooltips then show it as `Name (key)`. For details, see
-[Legends and attribute names](STYLING.md#legends-and-attribute-names).
+A node attribute can be given a display name with `[attribute_labels]` in a TOML
+config (session `attributeLabels`). The Controls pickers and hover tooltips then
+show it as `Name (key)`. For details, see [Legends and attribute
+names](STYLING.md#legends-and-attribute-names).
 
 See [Tree styling](STYLING.md) for current browser examples.
 

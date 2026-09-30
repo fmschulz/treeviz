@@ -33,8 +33,8 @@ bars, labels get text tracks, and presence and absence get binary dots. In the
 columns, palette, width, and other settings. When the panel appears, the first
 track is already open. You add and remove tracks from the same panel.
 
-From the stage toolbar you can switch the layout, turn **Auto size** on or
-off, fit the tree, search taxa and clades, show or hide branch lengths, and
+The stage toolbar provides controls to switch the layout, turn **Auto size** on
+or off, fit the tree, search taxa and clades, show or hide branch lengths, and
 open the panels. The toolbar holds a few layout-specific settings as well: tip
 alignment in the rectangular layout, and arc or straight connectors in the
 circular layout. It is also where you save and restore named views. The
@@ -71,7 +71,7 @@ Collapsed-wedge controls appear under **Branches & nodes** in the radial
 layout. They include shape, fill source and opacity, gap, minimum body, overlap
 policy, data-driven size, background outline, and label placement.
 
-You can drag any label to a new position by pressing on its text and moving
+Any label can be dragged to a new position by pressing on its text and moving
 it. The offset is stored on that clade, which means it survives saving and
 appears in exports.
 
