@@ -55,7 +55,7 @@ await api.whenSettled()
 ```
 
 The session's default saved view applies during restore. Add
-`skipAutoApplyDefault: true` only when you need the document's current view.
+`skipAutoApplyDefault: true` only to keep the document's current view.
 
 ## Standard sequence
 

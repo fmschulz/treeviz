@@ -23,7 +23,7 @@ match the leaf labels in the tree.
 ## Row-key column
 
 The row-key column is the metadata column used to bind rows to tree leaves.
-Pass it explicitly when you can.
+Pass it explicitly where possible.
 
 Python:
 
