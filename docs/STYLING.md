@@ -178,6 +178,8 @@ own direction, and no point is treated as the root.
 The `circular` layout accepts a connector style. With `arc`, the default,
 each node gets a polar elbow: an arc that spans its children, with a radial
 spoke out to each one. With `straight`, a direct line joins parent and child.
+Through TreeViz 0.3.1, this `straight` form was the layout named `radial`.
+Sessions saved before that release are migrated onto it when they load.
 
 ```toml
 [view]
@@ -206,6 +208,26 @@ await window.__treeviz.execute('view.set-layout', {
   circularAngleAttribute: 'paper_angle_degrees',
   showScaleBar: false
 })
+```
+
+In the circular layout, **Controls > Layout** sets the **Opening angle**, which
+leaves an empty sector, and the **Rotation**, which positions it. **Opening
+fill** and **Interior fill** choose a color for each region; clear the
+checkbox for transparency. Branches and clade backgrounds are drawn above the
+interior fill. At openings of at least 90 degrees, track names appear
+horizontally inside the gap. **Auto-fit to labels** closes the opposite edge
+of the opening to those names. **Tip-to-track guides** connect terminal
+branches to the inner metadata ring with thin dashed lines. The ranges and
+defaults are in [Circular opening and fills](API.md#circular-opening-and-fills).
+
+```toml
+[view]
+layout = "circular"
+circular_opening_angle = 90
+circular_rotation = 45
+circular_opening_auto_fit = true
+circular_opening_color = "#ffffff"
+circular_interior_color = "#ffffff"
 ```
 
 To go back to automatic angles, pass `circularAngleAttribute: null`. The
@@ -239,6 +261,11 @@ leaf_spacing = 1.6
 ```
 
 ## Collapsed clades
+
+Collapsed clades are drawn as wedges. The outline uses the clade's effective
+branch color and width. In the rectangular and circular layouts, the wedge is
+a triangle or an annulus sector. In the radial layout, the wedge follows the
+space that the expanded subtree occupies, and the keys below shape it.
 
 A clade can be collapsed in the browser (`tree.collapse-clade`) or through a
 config attribute. When `collapse_attribute` is set, each non-root internal node
@@ -308,9 +335,10 @@ clade_background_outline = "hull"      # or "fitted"
 - `collapsed_wedge_size_attribute` replaces the footprint width with a data
   value: the wedge runs out to its footprint depth and its outer-edge width is
   the value mapped (as-is, or after `log10`) from the range of values across
-  the collapsed clades onto `collapsed_wedge_size_range`. Clades without a
-  numeric value, and values of zero or below under `log`, keep the footprint
-  wedge.
+  the collapsed clades onto `collapsed_wedge_size_range`. A width-sized wedge
+  is neither inset nor thickened, because its outer edge is the value itself.
+  Clades without a numeric value, and values of zero or below under `log`,
+  keep the footprint wedge.
 - `collapsed_wedge_size_target` chooses the dimension. `width` (default) puts
   the value in the outer edge. A radial fan constrains that: the angular room
   around each clade belongs to its neighbors, so widths that collide are all

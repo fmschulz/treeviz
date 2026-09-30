@@ -4,9 +4,47 @@ View, annotate and edit phylogenetic trees in your browser. Add metadata, choose
 a rectangular, circular or radial layout, and export SVG, PNG or PDF figures.
 Save your work as an editable session.
 
+TreeViz is built to be driven by AI coding agents such as Claude Code and
+Codex. Install the `treeviz-agent` skill from this repository, then describe
+the figure in plain language. The agent loads the tree and metadata, styles the
+figure through the TreeViz browser API, checks the layout diagnostics and
+exports the result. The same app also works by hand in the browser.
+
 **[Open TreeViz](https://treeviz.newlineages.com/)** ·
 **[Documentation](https://fmschulz.github.io/treeviz/)** ·
+[Agent automation](https://fmschulz.github.io/treeviz/AGENTS/) ·
 [Getting started](https://fmschulz.github.io/treeviz/GETTING_STARTED/)
+
+## Use TreeViz from an AI agent
+
+Copy the skill directory into the agent's skills folder:
+
+```bash
+git clone --depth 1 https://github.com/fmschulz/treeviz.git
+# Claude Code
+mkdir -p ~/.claude/skills
+cp -R treeviz/.agents/skills/treeviz-agent ~/.claude/skills/
+# Codex
+mkdir -p ~/.codex/skills
+cp -R treeviz/.agents/skills/treeviz-agent ~/.codex/skills/
+```
+
+Restart the agent so it loads the skill. The skill uses the hosted app at
+`https://treeviz.newlineages.com/?api=1`, so the agent also needs a way to
+drive a browser, such as Playwright, agent-browser or Claude in Chrome. To
+update the skill, pull the clone and copy the directory again.
+
+Example request:
+
+```text
+Use the treeviz-agent skill. Draw tree.nwk as a circular tree, color the
+leaves by the phylum column in metadata.tsv, add a heatmap ring for the
+abundance columns, and export an SVG and a .treeviz.json session.
+```
+
+The [agent automation guide](https://fmschulz.github.io/treeviz/AGENTS/)
+describes the workflow, and the [browser API reference](https://fmschulz.github.io/treeviz/API/)
+lists every method and command.
 
 ## Examples
 
@@ -62,5 +100,13 @@ Guides: [browser](https://fmschulz.github.io/treeviz/BROWSER/),
 [Python](https://fmschulz.github.io/treeviz/PYTHON/) and
 [agent automation](https://fmschulz.github.io/treeviz/AGENTS/).
 
-This repository contains the public documentation, example scripts and agent
-skill. The application source is maintained separately.
+## Repository contents
+
+| Path | Contents |
+| --- | --- |
+| `.agents/skills/treeviz-agent/` | Agent skill: `SKILL.md`, references and helper scripts |
+| `docs/` | Documentation site source, published to [fmschulz.github.io/treeviz](https://fmschulz.github.io/treeviz/) |
+| `examples/` | Python script that builds example sessions with the `treeviz-phylo` package |
+
+The application source is maintained separately. Report problems in the
+[issue tracker](https://github.com/fmschulz/treeviz/issues).

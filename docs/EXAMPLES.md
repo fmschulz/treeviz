@@ -5,6 +5,13 @@ tree, metadata binding, tracks, view, and diagnostics. The [live
 manifest](https://treeviz.newlineages.com/examples/manifest.json) is the
 machine-readable catalog.
 
+Open an example from its preview or its **Open session** button on the app's
+landing page. **Sessions** also lists the examples while a tree is open.
+Opening an example replaces the current tree in that tab, so save your session
+first. Changes to the opened copy do not change the public example. For a small
+example built step by step, follow [Your first annotated
+tree](tutorials/first-tree.md).
+
 Each gallery card lists the paper title, first author, citation year, figure
 and DOI. It links **Session**, **Tree**, **Metadata** and, where one exists,
 **Config**.

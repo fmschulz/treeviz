@@ -4,13 +4,15 @@ Use this reference for dense layouts, visual polish, and exported figures.
 
 ## QA Loop
 
-1. Apply one batch of changes. After restore, wait for `onReady`, fonts, and
-   stable camera and layout metrics across several animation frames. For later
-   edits, wait for fonts and stable metrics as shown in `browser-api.md`.
+1. Apply one batch of changes, then `await api.whenSettled()`. It waits for
+   fonts, a rendered frame after the change, and a still camera and metrics,
+   after a restore and after later edits alike.
 2. Read `getDiagnostics()`.
 3. Read `getRenderDiagnostics()`.
 4. Read `getLayoutMetrics()`.
-5. Capture a screenshot or export SVG, PNG, or PDF.
+5. Capture a screenshot or export SVG, PNG, or PDF. In the page,
+   `await api.exportImage({ scale: 2 })` returns the Export panel's PNG as a
+   data URL.
 6. Inspect clipping, collisions, whitespace, legend placement, and track
    readability.
 7. Adjust and render again when the evidence still shows a problem.
@@ -82,8 +84,8 @@ camera they were measured at:
 ```js
 const atFit = api.getLayoutMetrics()
 await api.execute('view.zoom', { factor: 2 })
-// the culler re-runs ~150 ms after the camera settles
-const atTwo = api.getLayoutMetrics()
+// the culler re-runs ~150 ms after the camera settles; whenSettled waits for it
+const { metrics: atTwo } = await api.whenSettled()
 ```
 
 Compare `labelsVisible`, `labelsCulled`, `labelCollisions` and `warnings`
@@ -95,6 +97,7 @@ then shrink with the tree; zoom in, or export at a larger canvas.
 Open the app with `?api=1`, make the final change, then collect:
 
 ```js
+await window.__treeviz.whenSettled()
 const evidence = {
   diagnostics: window.__treeviz.getDiagnostics(),
   renderDiagnostics: window.__treeviz.getRenderDiagnostics(),
@@ -128,6 +131,8 @@ requested output.
 ## Final Checklist
 
 - Diagnostics contain no unresolved errors relevant to the requested figure.
+  To check one batch, take `mark = getDiagnostics().at(-1)?.seq ?? 0` first
+  and read `getDiagnostics({ since: mark })`.
 - The camera and layout metrics are stable after fonts load.
 - `labelsClipped` is zero.
 - Occupancy uses the available canvas; any remaining gap has a named cause.

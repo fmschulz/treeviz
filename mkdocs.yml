@@ -79,15 +79,20 @@ not_in_nav: |
 nav:
   - Home: index.md
   - Getting started: GETTING_STARTED.md
+  - Automation:
+      - Agent automation: AGENTS.md
+      - Browser API: API.md
+  - Tutorial: tutorials/first-tree.md
+  - How-to:
+      - Add metadata tracks: how-to/metadata-tracks.md
+      - Style clades: how-to/style-clades.md
+      - Control labels: how-to/labels.md
   - Guides:
       - Browser app: BROWSER.md
       - Python package: PYTHON.md
       - Metadata: METADATA.md
       - Tree styling: STYLING.md
       - Exports: EXPORTS.md
-  - Automation:
-      - Agent automation: AGENTS.md
-      - Browser API: API.md
   - Examples: EXAMPLES.md
   - Troubleshooting: TROUBLESHOOTING.md
 

@@ -19,6 +19,9 @@ ships Python helpers and the TreeViz session schema.
 pip install treeviz-phylo
 ```
 
+The package needs Python 3.10 or later. Its only required dependency is
+`jsonschema`.
+
 Optional extras:
 
 ```bash
@@ -26,11 +29,15 @@ pip install "treeviz-phylo[notebook]"   # IPython display for notebook views
 pip install "treeviz-phylo[dataframe]"  # pandas, for DataFrame metadata
 ```
 
-Import name:
+Import name and version:
 
 ```python
 import treeviz
+
+treeviz.__version__
 ```
+
+The package ships a `py.typed` marker, so type checkers use its annotations.
 
 ## Schema compatibility
 
@@ -104,11 +111,25 @@ if view.fragment is None:
 
 - Newick strings;
 - Newick or Nexus file paths;
+- Nexus text that starts with `#NEXUS`;
 - supported tree objects with Newick export methods;
 - Biopython tree objects when Biopython is installed.
 
 Passing a list of trees to `build_session(...)` returns a list of independent
 session dictionaries.
+
+The parser follows the browser app's Newick and Nexus rules:
+
+- `[...]` comments are skipped wherever they appear, including a leading
+  `[&R]` or `[&U]`. They never become part of a label or branch length.
+- `[&&NHX:key=value:...]` and BEAST-style `[&key=value,...]` comments become
+  node `meta`. The values `true` and `false` become booleans, and numbers
+  become numbers. View settings such as `nodeCircleColorAttribute` can select
+  these node `meta` keys.
+- A number after `)` is a support value, not a label.
+- For Nexus input, the first `TREE` (or `UTREE`) statement is used and its
+  `TRANSLATE` table is applied, so numeric leaf aliases become the real names.
+  An alias that is missing from the table raises a `UserWarning`.
 
 ## Metadata inputs
 
@@ -116,7 +137,8 @@ Metadata can be:
 
 - a list or iterable of row dictionaries;
 - a pandas `DataFrame` (install the `dataframe` extra);
-- a CSV or TSV file path;
+- a CSV or TSV file path (`.tsv` and `.tab` files are read as tab-separated,
+  all other paths as CSV);
 - `None`.
 
 Each row should describe one leaf. One column should match the tree leaf
@@ -134,7 +156,51 @@ session = build_session("(A,B);", metadata=metadata, row_key_column="sample_id")
 ```
 
 If `row_key_column` is omitted, the package chooses the metadata column with
-the most exact leaf-name matches.
+the most exact leaf-name matches. If no column matches any leaf, it uses the
+first column. A row with a missing or blank row key raises a `ValueError`. A
+row key that appears twice keeps the last row and raises a `UserWarning` that
+names the key.
+
+Cell values may be strings, numbers, booleans, `None`, or empty strings. Empty
+strings, `None`, pandas missing values, and float `NaN` or infinity are
+missing values and are stored as JSON `null`. Saved sessions and share URLs
+are always strict JSON. A `NaN` anywhere else in a session, for example in
+`view`, raises a `ValueError` when the session is serialized.
+
+Column types follow the browser app:
+
+- A column whose non-missing values are all finite numbers is continuous. The
+  text `"NaN"` or `"inf"` is not a number, so a column that holds it is not
+  continuous.
+- A column of booleans, or of the tokens `true`/`false`, `yes`/`no`, `y`/`n`,
+  `1`/`0`, and `present`/`absent` in any case, is binary. A column of only
+  `1` and `0` numbers is continuous, because the number rule comes first.
+- A column with up to 32 distinct values is categorical.
+- Any other column is text.
+
+### Binding leaves to rows
+
+Leaf labels are matched to row keys after the normalization that
+`binding_flags` sets. By default only whitespace is trimmed, so a row key
+`"A "` binds to leaf `A` with confidence `normalized`. The snake_case and
+camelCase flag names both work:
+
+```python
+session = build_session(
+    tree,
+    metadata=metadata,
+    binding_flags={
+        "case_insensitive": True,
+        "strip_underscores": True,
+        "strip_quoted_label_decorations": True,
+    },
+)
+```
+
+An unknown flag name raises a `ValueError`. A leaf without a label never
+binds. When a leaf matches more than one row after normalization, for example
+`A` and `A ` under trim, the exact row is the recorded match and the leaf is
+listed in the `duplicates` diagnostics.
 
 ## Track definitions
 
@@ -155,7 +221,7 @@ Example:
 ```python
 tracks = [
     {"kind": "color_strip", "column_key": "lineage", "title": "Lineage"},
-    {"kind": "gradient", "column_key": "load", "title": "Load", "palette": "viridis"},
+    {"kind": "gradient", "column_key": "load", "title": "Load", "palette": "Viridis"},
     {"kind": "heatmap", "column_keys": ["score_a", "score_b"], "title": "Scores"},
     {"kind": "bar", "column_key": "day", "title": "Collection day", "show_axis": True},
     {"kind": "binary_dots", "column_key": "detected", "title": "Detected", "shape": "circle"},
@@ -165,6 +231,35 @@ tracks = [
 
 Underscores and hyphens are both accepted in track kinds:
 `color_strip` and `color-strip` are equivalent.
+
+Track fields also accept camelCase, for example `columnKey` for `column_key`.
+The TOML spelling `column` is not accepted. A track without its column, or
+with a column that is not in the metadata, raises a `ValueError` that lists
+the available columns.
+
+Stacked bars normalize each row by default. Set `normalize=False` to show
+unnormalized values. `color_strip` and `stacked_bar` tracks take
+`category_colors`, a map from category or column name to color. `gradient`,
+`heatmap`, and `bar` tracks take `domain` as `[low, high]`, two finite numbers
+that fix the value range.
+
+Fields left out take the defaults that the app uses when a track is added:
+
+| Kind | Defaults |
+| --- | --- |
+| `color_strip` | width 20, palette `okabe-ito`, missing color `#cccccc` |
+| `gradient` | width 30, palette `Viridis`, `clip` true |
+| `heatmap` | cell width 14, palette `Viridis` |
+| `bar` | width 80, color `#4393c3`, axis on top, helper lines off |
+| `stacked_bar` | width 90, palette `okabe-ito`, normalized, missing color `#e2e8f0` |
+| `text` | width 100, Inter 12 px, align `start` |
+| `binary_dots` | width 16, shape `circle`, color `#2166ac` |
+
+`color_strip` tracks take `display_mode` values `strip`, `symbol`, and
+`wedge`. `bar` tracks take `bar`, `symbol`, and `wedge`, with manual `bins` or
+automatic `auto_bins`. `symbol_shape` sets the symbol. Each of these fields
+also has a camelCase spelling. Palette ids are listed in the
+[palette registry](STYLING.md#palette-registry).
 
 ## View settings
 
@@ -187,6 +282,12 @@ session = build_session(tree, metadata=metadata, tracks=tracks, view=view)
 
 The browser can further adjust and save view settings.
 
+`view` keys are the camelCase names in the session schema's `view` object. An
+unknown key raises a `ValueError` that names it and the closest valid names,
+so `layuot` suggests `layout`. Setting `branchScale` or `leafSpacing` without
+`branchScaleMode` switches the session to manual width, as the browser
+controls do. Automatic mode would otherwise ignore both settings.
+
 ### Browser styling fields
 
 In the hosted app, metadata can map to exact node circles and to branch
@@ -205,11 +306,11 @@ keyword-only arguments for the optional session fields:
 | --- | --- | --- |
 | `legends` | `legends` | Swatch legends: `[{"title": ..., "entries": [{"label": ..., "color": ...}]}]`. |
 | `attribute_labels` | `attributeLabels` | Node-metadata key to the display name the app's pickers show. |
-| `connections` | `connections` | Link sets: `[{"pairs": [{"from": ..., "to": ...}]}]`. `id`, `title`, `visible`, and `geometry` are optional. |
+| `connections` | `connections` | Link sets: `[{"pairs": [{"from": ..., "to": ...}]}]`. `id`, `title`, `visible`, and `geometry` are optional and default to `connections-0` (by position), `Connections`, `True`, and `ribbon`. Other fields raise a `ValueError`. |
 | `node_metadata` | `nodeMetadata` | Rows that describe internal nodes, as records, a `DataFrame`, or a path. Rows bind by internal node label or by an `mrca_of` column of `|`-separated leaf names. |
 | `node_row_key_column` | | Key column of `node_metadata`. Default: the first column. |
 | `node_marks` | `nodeMarks` | Pie marks from `node_metadata` columns: `[{"columns": [...]}]`, with optional `style`, `palette`, `size_by`, and `max_radius`. |
-| `saved_views` | `views` | Named views: `[{"name": ..., "view": {...}}]`. Each `view` is applied on top of the session view. |
+| `saved_views` | `views` | Named views: `[{"name": ..., "view": {...}}]`, with optional `id` and `is_default`. Each `view` is applied on top of the session view. |
 | `binding_flags` | binding flags | How leaf labels match metadata row keys. The default trims whitespace. `case_insensitive`, `strip_underscores`, and `strip_quoted_label_decorations` are opt-in. |
 
 ```python
@@ -243,6 +344,11 @@ session = build_session(
 validate_session(session)
 ```
 
+A numeric node-metadata row key is never a node label, because a number on an
+internal node is a support value; such a row needs `mrca_of`. Rows that do not
+bind, and labels shared by several nodes, are listed in
+`session["nodeBinding"]["diagnostics"]` with the same codes as the app.
+
 A TOML config can also define legends and attribute names; see
 [Legends and attribute names](STYLING.md#legends-and-attribute-names).
 
@@ -256,8 +362,14 @@ tree_stats(session)
 binding_diagnostics(session)
 ```
 
-`binding_diagnostics(session)` reports unmatched leaves, unmatched rows, and
-duplicate row keys.
+`binding_diagnostics(session)` returns `unmatchedLeaves` (stable keys),
+`unmatchedRows` (row keys), and `duplicates`. Each `duplicates` entry is a
+`{"leafStableKey", "rowKeys"}` pair for a leaf that matches more than one row
+after normalization. Row keys repeated in the input are not listed there; see
+[Binding leaves to rows](#binding-leaves-to-rows).
+
+`tree_stats` returns leaf, internal-node, and total-node counts, the maximum
+depth, the tree height, rooted and binary flags, and a branch-length summary.
 
 ## Static export
 
@@ -286,6 +398,20 @@ render_tree(
 )
 ```
 
+Without `command`, `render_tree` runs `bun run treeviz render`, which works
+only inside a TreeViz source checkout; `cwd` sets the directory it runs in.
+The session path, `-o`, `--format`, and the other options are appended to the
+command. `output` and `metrics` are resolved against the current working
+directory, not `cwd`, and the returned path is absolute. With no `output`, a
+temporary file is created and returned. The temporary session file is removed
+afterwards, also when the renderer fails. If the command cannot be started,
+`render_tree` raises `FileNotFoundError`.
+
+`auto_crop=True` trims the export to the visible content. `crop_padding` is in
+pixels. `metrics` writes a JSON file with the content box, crop box,
+whitespace margins, fill ratios, and warnings such as
+`excess-vertical-whitespace`.
+
 If no renderer command is available, use `view_session(...)`,
 `view_tree(...)`, or `session_url(...)` and open the session in the hosted
 browser app.
@@ -300,12 +426,13 @@ browser app.
 | `load_session(path, *, validate=True, schema_path=None)` | Read a saved session; validation is enabled by default. |
 | `view_tree(tree, metadata=None, tracks=None, view=None, open_browser=True, app_url=..., name=None, row_key_column=None, *, ...)` | Build a session and return a notebook/browser view object. Takes the same keyword-only arguments as `build_session`. |
 | `view_session(session, open_browser=True, app_url=...)` | Return a notebook/browser view for an existing session. |
-| `session_url(session, app_url=...)` | Return the hosted TreeViz URL for a session. |
+| `session_url(session, app_url=...)` | Return the hosted TreeViz URL for a session. A session larger than 256 KB encoded returns the base app URL without the session. |
 | `leaf_names(tree_or_session)` | Return terminal leaf labels. |
 | `tree_stats(tree_or_session)` | Return topology and branch-length summary statistics. |
 | `binding_diagnostics(session)` | Return metadata binding diagnostics. |
-| `render_tree(tree, metadata=None, tracks=None, view=None, format="svg", output=None, command=None, width=None, height=None, auto_crop=None, crop_padding=None, metrics=None, cwd=None, *, ...)` | Render SVG, PNG, or PDF through an external renderer command. Takes the same keyword-only arguments as `build_session`. |
+| `render_tree(tree, metadata=None, tracks=None, view=None, format="svg", output=None, command=None, width=None, height=None, auto_crop=None, crop_padding=None, metrics=None, cwd=None, *, ...)` | Render SVG, PNG, or PDF through an external renderer command and return the absolute output path. Takes the same keyword-only arguments as `build_session`. |
 | `TreeVizSession(session, app_url=...)` | Notebook-friendly view object with `.url`, `.fragment`, and `._repr_html_()`. |
+| `treeviz.__version__` | The installed `treeviz-phylo` version. |
 
 ## Runnable example script
 

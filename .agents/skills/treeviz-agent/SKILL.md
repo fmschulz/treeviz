@@ -1,6 +1,6 @@
 ---
 name: treeviz-agent
-description: "Use for agent-driven phylogenetic tree visualization in TreeViz: load Newick/Nexus/.treeviz.json sessions, import leaf or node metadata, choose row keys, plan tracks, style clades, add node marks, tip connections, legends and attribute names, tune layouts and label culling, check legibility at a zoom, search and inspect nodes, and export figures through the hosted TreeViz browser API."
+description: "Use for agent-driven phylogenetic tree visualization in TreeViz: load Newick/Nexus/.treeviz.json sessions, import leaf or node metadata, choose row keys, plan tracks, style clades, add node marks, tip connections, legends and attribute names, tune layouts and label culling, check legibility at a zoom, search and inspect nodes, and export figures through the hosted TreeViz browser API (window.__treeviz in ?api=1 mode)."
 ---
 
 # TreeViz Agent
@@ -26,6 +26,13 @@ Use the hosted app unless the user explicitly provides another TreeViz runtime.
 Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
 `https://treeviz.newlineages.com/agent`.
 
+Install this whole directory, not only `SKILL.md`: copy `treeviz-agent` to
+`~/.claude/skills/` or `.claude/skills/` for Claude Code, or to
+`~/.codex/skills/` or a repo's `.agents/skills/` for Codex, then restart the
+agent. The guide lists the commands. The agent also needs a way to drive a
+browser, such as Playwright, agent-browser, or Claude in Chrome, because every
+call runs in the hosted page.
+
 ## Core Workflow
 
 1. Open TreeViz with `?api=1` and wait for `window.__treeviz`.
@@ -37,13 +44,21 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
    Adapt the input and styling instructions to the supplied data; restore
    `sessionUrl` for the exact example.
 3. Inspect `getSession()`, `commands()`, `palettes()`, and `getDiagnostics()`.
+   `describeFigure()` gives a compact summary of the figure.
+   `describeCommand(id)` gives one command's schema and a checked example.
+   `findNodes(query)` returns stable keys by name, regex, or metadata value.
 4. For metadata, call `planMetadataImport(source, format, prompt)` before import.
 5. Import metadata with the suggested row key, flags, and leaf identifier source.
 6. Add or update tracks through `track.add`, `track.update`, and `track.reorder`.
 7. Apply clade styles, conditional rules, node marks, or session connections as needed.
+   `execute(id, args)` resolves to `{ ok, value }` or `{ ok: false, error }`
+   and does not throw. Use `validate(id, args)` to check arguments without
+   running the command, and `executeBatch(steps)` to run dependent edits as one
+   unit that rolls back on the first failure.
 8. Tune layout with `view.set-layout`, automatic scale, spacing, labels, and legend commands.
-9. Let fonts and the rendered frame settle, then check `getDiagnostics()`, `getRenderDiagnostics()`, and layout metrics. See the waits in `references/browser-api.md`.
+9. `await api.whenSettled()`, then check `getDiagnostics()`, `getRenderDiagnostics()`, and layout metrics. See the waits in `references/browser-api.md`.
 10. Export evidence: `.treeviz.json` for state, SVG/PNG/PDF for figures, and screenshots when visual quality is the claim.
+    `exportImage({ scale: 2 })` returns the Export panel's PNG as a data URL.
 
 ## Visualization Defaults
 
@@ -107,7 +122,11 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
   Place, move or hide sections with `view.set-figure-legend-placement` and
   `{ sectionKey, visible, x, y }`. Custom legend keys are `custom:0`,
   `custom:1`, etc. Explicit section visibility overrides the
-  global `view.set-figure-legend-visibility` command.
+  global `view.set-figure-legend-visibility` command. Stored `x` and `y` are
+  stage pixels. The open stage keeps each box inside itself and below the
+  toolbar, and moves a clipped or overlapping box to a free slot, so check the
+  rendered result. A stored `view.scaleBarPosition` off the stage is drawn in
+  view the same way.
 - Give attribute encodings (branch colour, node-circle colour, wedge fill) a
   legend through `legends` on the session document and readable picker names
   through `attributeLabels`; set `view.figureLegendVisible` when the figure
@@ -124,8 +143,12 @@ Guide: `https://fmschulz.github.io/treeviz/AGENTS/`. Runtime entry:
   axes are left and right. See `references/browser-api.md`.
 - On crowded radial figures set `collapsedWedgeLabelDeclutter: true` and
   `allowLabelOverlap: false`; culled labels return as the reader zooms in.
-  `collapsedWedgeLabelOrientation: 'branch'` reads each label along the
-  branch entering its clade.
+  `collapsedWedgeLabelOrientation: 'branch'`, the default, reads each label
+  along the branch entering its clade; `'bearing'` reads it out from the
+  centre.
+- Set `collapsedCladeSpacing: 'compact'` through `view.set-layout` to give
+  each collapsed clade at most 12 leaf slots. The default `proportional` gives
+  one slot per descendant leaf.
 - Treat high unmatched-leaf or unmatched-row counts as a binding problem to fix or report.
 
 ## Reference Loading
@@ -157,13 +180,16 @@ Load only the reference needed for the task:
 - Check `getRenderDiagnostics()` after a render when the renderer may omit an
   item, such as a connection with an unresolved endpoint.
 - Check `getLayoutMetrics()` after layout changes.
-- After restore, wait for `onReady` and `document.fonts.ready`, then wait until
-  the camera and layout metrics stop changing across several animation frames.
+- After restore and after each edit, `await api.whenSettled()`. It waits for
+  fonts, a rendered frame, and a still camera and metrics, and rejects after
+  `timeoutMs` (default 30000). Pass a larger `timeoutMs` for a very large tree.
   Confirm that exported SVG dimensions match the settled stage before saving a
   thumbnail.
+- Take `mark = api.getDiagnostics().at(-1)?.seq ?? 0` before a batch and read
+  `getDiagnostics({ since: mark })` to see what that batch added.
 - Judge legibility at the zoom the reader will use: labels hold their screen
   size above zoom 1, so `labelsVisible` and `labelsCulled` at fit differ from
-  the counts at 2x. Call `view.zoom`, wait for the render, read the metrics again.
+  the counts at 2x. Call `view.zoom`, `await api.whenSettled()`, read the metrics again.
 - Start layout QA with `contentOccupancyX`, `contentOccupancyY`,
   `labelsClipped`, `labelCollisions`, `trackDensity`, and `p75BranchPx`.
 - Do not claim visual quality from configuration alone; inspect a recent screenshot, SVG, PNG, or PDF.

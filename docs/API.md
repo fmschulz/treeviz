@@ -212,6 +212,11 @@ swatches (`[{ title, entries: [{ label, color }] }]`) or continuous scales.
 No command edits those two fields. An optional `meta.description` string can
 record provenance in the saved `.treeviz.json` document.
 
+`session.import-tree` detects the format when `format` is omitted. A source
+that starts with `#NEXUS` (any case, after whitespace) is Nexus, and anything
+else is Newick. `format: 'newick'` on a source that starts with `#NEXUS` fails
+instead of loading a single leaf named `#NEXUS`.
+
 ## View commands
 
 | Command                               | Args                                                                                                       | Effect                                                                         |
@@ -339,13 +344,15 @@ await window.__treeviz.execute('view.set-tip-alignment', { alignment: 'label' })
 ```
 
 Auto-fit closes the opposite edge to the measured track names while keeping
-the label edge fixed. It updates when names, visible tracks, ring widths, or
+the label edge fixed. The checkbox is **Controls > Layout > Auto-fit to
+labels**; unchecking it restores the stored manual angle and rotation. It updates when names, visible tracks, ring widths, or
 the viewport change. Zoom and pan do not change the fit. With no readable
 names, auto-fit retains the manual opening.
 
 In circular layout, `alignment: 'label'` draws guides from terminal tips to
 the inner metadata edge, even when leaf labels are hidden. The guides require
-visible metadata. Use `'tip'` to turn them off. The same setting aligns labels
+visible metadata. Use `'tip'` to turn them off, or toggle **Controls > Layout >
+Tip-to-track guides**. The same setting aligns labels
 in rectangular layout and is ignored in radial layout.
 
 Set `showScaleBar: false` through `view.set-layout` to hide the distance scale
@@ -548,6 +555,10 @@ a horizontal ramp runs from left to right. `sizeRange` gives the ramp thickness
 at those endpoints, and `colors` supplies evenly spaced color stops. Tick
 positions use the selected `linear` or `sqrt` transform.
 
+A swatch legend accepts `shape: 'circle'` for round markers; the default
+`'square'` keeps square swatches. An entry `size` sets a positive marker
+diameter, default 10, scaled with the view zoom. Square swatches ignore it.
+
 For a loaded session whose node and branch attributes encode sequence counts:
 
 ```js
@@ -630,6 +641,15 @@ in the figure and export. Set `visible: true` to show it; provide both `x`
 and `y` to move it. Custom legend keys use zero-based indices. Explicit
 section visibility overrides `view.set-figure-legend-visibility`,
 which controls sections without their own placements.
+
+Stored legend positions are stage pixels. The open stage keeps every box inside
+itself and below the toolbar. A box that fits and clears the other boxes stays
+where it was placed. A box that is clipped or overlaps another box moves to the
+free slot that covers the least of the figure. `exportSvg()` and PNG export use
+the same positions, and nothing is written back to the session. A stored
+`view.scaleBarPosition` off the stage or under the toolbar is drawn in view the
+same way. A saved camera that would leave the figure mostly off-screen is
+replaced by Fit when the session opens.
 
 ## Data-defined node and branch styling
 

@@ -93,6 +93,11 @@ monophyletic group, the branches up to and including their MRCA stem. Track
 kinds are `color-strip`, `gradient`, `heatmap`, `bar`, `stacked-bar`, `text`,
 and `binary-dots`; underscore spellings such as `color_strip` are accepted.
 
+`build_session` also takes keyword-only `legends`, `attribute_labels`,
+`connections`, `node_metadata` (with `node_row_key_column` and `node_marks`),
+`saved_views`, and `binding_flags`. They map onto the session fields of the
+same name, and `view_tree` and `render_tree` forward them.
+
 ## Notebook Display
 
 ```python

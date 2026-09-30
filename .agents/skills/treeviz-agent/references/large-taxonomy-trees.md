@@ -22,7 +22,9 @@ taxonomy color strips, rerooting by named taxon, and dense no-label exports.
 ## Taxonomy Color Strips
 
 Categorical color strips depend on category values. Keep display categories
-clean and explicit.
+clean and explicit. Without `categoryColors`, palette slots follow the
+first-seen order of values in the visible rows, so rerooting or reordering can
+change which color a category gets.
 
 When query tips must share branch and track colors:
 
@@ -30,6 +32,11 @@ When query tips must share branch and track colors:
 - set all query rows to one explicit category such as `query_metabat`;
 - set `categoryColors.query_metabat` on the color-strip track;
 - use the same hex color for query branch styling.
+
+To show the taxonomy legend in the figure, call
+`view.set-figure-legend-section` with that section index after the color-strip
+track exists. Move it with `view.set-panel-position` and
+`panel: 'figureLegend'`. SVG, PNG, and PDF exports include it at that position.
 
 Do not leave query rows blank when the user expects query wedges to be colored.
 Use an explicit category instead.

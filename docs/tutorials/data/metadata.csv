@@ -1,0 +1,7 @@
+leaf_id,habitat,abundance,abundance_day2,present,display_name
+A,soil,12,15,yes,Sample A
+B,soil,4,5,no,Sample B
+C,water,8,7,yes,Sample C
+D,water,2,3,no,Sample D
+E,gut,15,18,yes,Sample E
+F,gut,,6,no,Sample F

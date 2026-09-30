@@ -27,26 +27,36 @@ const response = await fetch('/examples/example-1-mirusviricota/session.treeviz.
 if (!response.ok) throw new Error(`session request failed: ${response.status}`)
 const sessionDocument = await response.json()
 await window.__treeviz.execute('session.restore', { snapshot: sessionDocument })
-await new Promise(resolve => window.__treeviz.onReady(resolve))
-await document.fonts.ready
-await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+await window.__treeviz.whenSettled()
 ```
 
+Opening `?api=1&session=/examples/example-1-mirusviricota/session.treeviz.json`
+loads the same session from its URL.
+
 Pass `skipAutoApplyDefault: true` only when the restored snapshot must not apply
-its saved default view. After restore, wait until the camera and
-`getLayoutMetrics()` stop changing across several animation frames. A mounted
-editor can briefly report its previous viewport.
+its saved default view. After restore, `await whenSettled()` before reading
+`getLayoutMetrics()`. Without it, a mounted editor can briefly report its
+previous viewport.
 
 ## Core Methods
 
 - `version()`: app version; its `session` field is a legacy value. Read `getSession().version` or `/version.json` for the session document format.
-- `onReady(cb)`: calls `cb` after the first rendered frame for a load, or immediately if that load is ready. For later edits, use the font/frame wait below.
+- `onReady(cb)`: calls `cb` after the first rendered frame for a load, or immediately if that load is ready. For later edits, use `whenSettled()`.
 - `onChange(cb)`: subscribe to state changes.
 - `getSession()`: current session or `null`.
 - `commands()`: command descriptors and argument schemas.
+- `describeCommand(id)`: one command's JSON Schema and, for most commands, a
+  checked `example`. An unknown id throws with suggestions.
 - `palettes()`: palette ids, colors, roles, aliases, and usage notes.
 - `execute(id, args)`: run a command.
+- `validate(id, args?)`: check a call against the args schema without running
+  it. Returns `{ ok, errors, didYouMean? }`. It does not read the session, so it
+  cannot catch a stable key that does not exist.
+- `executeBatch(steps, { atomic, dryRun }?)`: run `[{ id, args? }]` as one unit.
 - `getDiagnostics()`: parse, binding, edit, session, and export diagnostics.
+  Each entry has an increasing `seq`; `getDiagnostics({ since: seq })` returns
+  only later entries. `clearDiagnostics()` empties the log and `seq` keeps
+  counting.
 - `getRenderDiagnostics()`: items the last frame could not draw.
 - `planMetadataImport(source, format, prompt?)`: plan row-key binding and tracks.
 - `analyzeSessionMetadata(prompt?)`: plan tracks for loaded metadata.
@@ -54,6 +64,68 @@ editor can briefly report its previous viewport.
 - `resolveClade(query)`: resolve leaves or metadata predicates to a stable key.
 - `getLayoutMetrics()`: label visibility, culling, collision and clipping counts, density, branch, and occupancy metrics, at the current camera.
 - `exportSvg()`: current figure as SVG text.
+- `exportImage(opts?)`: the exported figure as `{ dataUrl, width, height }`.
+- `whenSettled(opts?)`: waits for fonts, a rendered frame and a still camera,
+  then resolves with `{ revision, metrics, renderDiagnostics }`.
+- `findNodes(query)`: leaves and internal nodes by name, regex, or metadata.
+- `describeFigure()`: compact JSON summary of the current figure.
+- `parseMetadata(...)` and `bindMetadata(...)`: parse or bind a table without
+  changing the session.
+- `history`: `depth()`, `pointer()`, `canUndo()`, and `canRedo()`.
+
+## Command Results
+
+`execute` resolves to `{ ok: true, value? }` or
+`{ ok: false, error: { code, message, details? } }`. It does not throw for a
+failed command, and a failed command changes nothing. Omit `args` for commands
+that take none, such as `execute('history.undo')`. Calls run one at a time in
+call order, so `Promise.all` over several `execute` calls is safe.
+
+An unknown command id returns `command.unknown`. A stable key, track id,
+metadata column or saved-view id that does not exist returns
+`command.target-not-found`. Each message lists up to five close valid values,
+also in `details.suggestions`. `track.update` rejects a misspelled patch key
+with `command.invalid-patch`. `track.add` needs `columnKey` to be in
+`getSession().metadata.columns`. The full code table is in the API reference.
+
+`executeBatch` resolves to `{ ok, rolledBack, results }`. Steps see each
+other's writes and nothing interleaves. By default the first failing step stops
+the batch and restores the session, camera, undo history and diagnostics.
+`atomic: false` runs every step and keeps what succeeded. `dryRun: true` runs
+and reports the steps, then always restores the starting state, without
+running `session.save`. A kept batch leaves one undo entry per
+document-changing step.
+
+## Wait, Find, And Export
+
+```js
+const mark = api.getDiagnostics().at(-1)?.seq ?? 0
+await api.execute('view.set-metadata-gap', { gap: 0 })
+const { metrics, renderDiagnostics } = await api.whenSettled()
+const added = api.getDiagnostics({ since: mark })
+const figure = api.describeFigure()
+const { dataUrl } = await api.exportImage({ scale: 2 })
+```
+
+`whenSettled()` rejects after `timeoutMs` (default 30000) and names what it
+still waited for. Right after a large session load, app set-up can take 15 to
+20 s; pass a larger `timeoutMs` for a very large tree or a slow machine.
+
+`exportImage` accepts `{ format?: 'png' | 'svg', scale?, background?, crop? }`.
+It crops like the Export panel and needs a mounted canvas. To save the PNG
+outside the page, return `dataUrl` to the driver and decode the base64 part.
+
+`findNodes` takes `{ text?, regex?, flags?, meta?: { key, op, value? }, kind?, limit? }`.
+Every given field must match, and `limit` defaults to 50. It returns
+`{ stableKey, name, kind, depth, leafCount, parentKey }` in tree order. `text`
+and `regex` test the name and the clade label. `op` is `eq`, `ne`, `lt`,
+`lte`, `gt`, `gte`, `contains`, or `exists`. A bad regex throws.
+
+`describeFigure()` reports layout and key view settings, leaf counts, tracks
+with `missingPct`, legend sections with their `sectionKey`, binding counts with
+up to 10 unmatched leaf names, label culling, metric warnings, and
+`diagnosticsSinceLastCall`. Track and legend lists are capped; read
+`tracksTotal` and `legendsTotal`.
 
 ## Import Tree And Metadata
 
@@ -284,6 +356,7 @@ await api.execute('view.set-collapsed-wedge-options', {
   sizeScale: 'log',      // or 'linear'
   sizeTarget: 'length',  // or 'width'
   sizeRange: [40, 400],  // px [min, max]
+  lengthMode: 'footprint', // or 'max-path' for width-sized phylogram wedges
   outline: 'fitted',     // clade-background outline: 'hull' | 'fitted'
   labelDeclutter: true,  // push colliding labels outward on leader lines
   labelOrientation: 'branch' // default; 'bearing' reads out from the centre
@@ -294,8 +367,8 @@ The session view fields are `collapsedWedgeShape`, `collapsedWedgeFill`,
 `collapsedWedgeFillAttribute`, `collapsedWedgeFillOpacity`,
 `collapsedWedgeGap`, `collapsedWedgeMinBody`, `collapsedWedgeAllowOverlap`,
 `collapsedWedgeSizeAttribute`, `collapsedWedgeSizeScale`,
-`collapsedWedgeSizeTarget`, `collapsedWedgeSizeRange`, and
-`cladeBackgroundOutline`. A `treeviz.toml` uses the snake_case forms plus
+`collapsedWedgeSizeTarget`, `collapsedWedgeSizeRange`,
+`collapsedWedgeLengthMode`, and `cladeBackgroundOutline`. A `treeviz.toml` uses the snake_case forms plus
 `collapse_attribute`, which collapses every internal node whose node-meta value
 for that key is truthy.
 
@@ -361,10 +434,17 @@ hover tooltips show a labelled key as `Domain colour (vc)`. In a
 `treeviz.toml` these are `[[legend]]` tables, `[attribute_labels]`, and
 `figure_legend = true` under `[view]`.
 
+A swatch legend accepts `shape: 'circle'` for round markers. Each entry can set
+`size`, a positive diameter that defaults to 10. Square swatches, the default,
+ignore `size`.
+
 Custom legend keys are `custom:0`, `custom:1`, etc. Use
 `view.set-figure-legend-placement` with `visible: false` to hide a section
 in both the figure and export; pass `x` and `y` together to move it. Explicit
 section visibility overrides `view.set-figure-legend-visibility`.
+Stored `x` and `y` are stage pixels. The open stage keeps each box inside itself
+and below the toolbar, and moves a clipped or overlapping box to a free slot.
+Nothing is written back to the session, so check the rendered figure.
 
 For numeric size/color encodings, session JSON also accepts
 `{ kind: 'continuous-scale', title, axisLabel, colors, domain, sizeRange, transform, ticks, scale?, orientation? }`.
@@ -392,7 +472,7 @@ await api.execute('view.zoom', { factor: 2 })
 
 `view.search` matches leaf names, leaf labels and collapsed-clade labels; a hit
 inside a collapsed clade resolves to that clade's wedge. Clear it with an empty
-query. Above zoom 1 labels, strokes and node marks keep their screen size while
+query. `findNodes(...)` matches internal nodes too. Above zoom 1 labels, strokes and node marks keep their screen size while
 the tree grows, and the label culler re-runs once the camera has been still
 for about 150 ms, so read `getLayoutMetrics()` after that: `labelsVisible`,
 `labelsCulled`, `labelCollisions` and `labelsClipped` describe the current
@@ -416,11 +496,8 @@ await api.execute('view.set-tip-alignment', { alignment: 'label' })
 await api.execute('view.set-branch-scale-mode', { mode: 'auto' })
 await api.execute('view.set-metadata-gap', { gap: 0 })
 
-await document.fonts.ready
-await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+const { metrics, renderDiagnostics } = await api.whenSettled()
 const diagnostics = api.getDiagnostics()
-const renderDiagnostics = api.getRenderDiagnostics()
-const metrics = api.getLayoutMetrics()
 const svg = api.exportSvg()
 ```
 

@@ -20,6 +20,13 @@ C	Beta	soil	0.08	yes	candidate
 One column must identify the tree leaf. In the example above, `leaf_id` should
 match the leaf labels in the tree.
 
+Give each column a distinct header name. Duplicate or blank header names
+produce a warning, and columns that share a name collapse into one (the last
+value wins). Put one value in each cell, and keep units in the column name,
+such as `temperature_c`. Leave missing values empty. A literal `NA`,
+`unknown`, or `-` is text and can change the inferred type of a numeric
+column.
+
 ## Row-key column
 
 The row-key column is the metadata column used to bind rows to tree leaves.
@@ -62,8 +69,10 @@ key explicitly keeps a workflow reproducible.
 
 ## Matching rules
 
-TreeViz tries exact matches first. During browser import, the metadata planner
-can suggest normalization when it improves binding:
+TreeViz tries exact matches first. By default, row keys are matched to the
+original leaf labels after trimming whitespace only. Row order does not have to
+match leaf order. During browser import, the metadata planner can suggest
+normalization when it improves binding:
 
 - trim leading and trailing whitespace;
 - ignore case;
@@ -71,7 +80,9 @@ can suggest normalization when it improves binding:
 - strip common quoted-label decorations.
 
 Unmatched leaves are tree leaves without metadata rows. Unmatched rows are
-metadata rows that do not bind to any tree leaf.
+metadata rows that do not bind to any tree leaf. Partial metadata is allowed:
+an unmatched leaf stays in the tree with missing values. Normalization can make
+different names identical, so turn on only the rules that suit the identifiers.
 
 ## Duplicates and missing keys
 
@@ -92,9 +103,24 @@ TreeViz infers column types:
 | Column type | Typical values | Typical tracks |
 | --- | --- | --- |
 | `continuous` | `0.42`, `1.10`, `3` | gradient, heatmap, bar |
-| `binary` | `yes/no`, `true/false`, `1/0`, `present/absent` | binary dots |
+| `binary` | `yes/no`, `true/false`, `y/n`, `present/absent` | binary dots |
 | `categorical` | `Alpha`, `Beta`, `soil`, `water` | color strip |
 | `text` | labels, notes, long identifiers | text |
+
+The type comes from the non-empty values, and the first matching rule wins:
+
+1. `continuous`: every value is a finite number.
+2. `binary`: every value is one of `true`, `yes`, `present`, `y`, `1`,
+   `false`, `no`, `absent`, `n`, or `0`, in any case.
+3. `categorical`: at most 32 distinct values, ignoring case.
+4. `text`: everything else, including a column with no values.
+
+Because the number rule comes first, a column of only `0` and `1` is
+continuous. Write `yes` and `no` to get a binary column. Two arbitrary values,
+such as `Bacteria` and `Archaea`, make a categorical column. A short list of
+names is usually categorical even when it is meant as text, and the browser
+import does not offer a type override. A missing numeric value is different
+from zero.
 
 ## Track definitions in Python
 
@@ -162,6 +188,12 @@ Use CSV when fields need quoting, commas, or embedded newlines.
 
 Gzipped files (`*.tsv.gz`, `*.tab.gz`, `*.csv.gz`) are decompressed in the
 browser.
+
+Spreadsheets must be exported as CSV UTF-8 or tab-separated text first;
+`.xlsx` workbooks are not read. Files are read as UTF-8. A file with a UTF-16
+byte-order mark is read as UTF-16, and a file that is not valid UTF-8 is read
+as Latin-1. The browser rejects files larger than 100 MB, and a gzipped file
+may expand to at most 100 MB.
 
 ## Validation
 
