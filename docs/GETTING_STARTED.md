@@ -23,8 +23,7 @@ alignment with the terminal tips.
 Hovering over a tip shows its name, branch length, support value, and any
 attributes stored on the tree node. Values from the metadata table appear in the
 tracks rather than in the tooltip. To focus a named tip or clade, use search.
-Press **Escape** when you want to clear the search, and press **F** to fit the
-whole tree.
+Press **Escape** to clear the search and **F** to fit the whole tree.
 
 ## 4. Inspect the fitted opening
 
@@ -34,7 +33,7 @@ recalculated whenever the track names, visible tracks, ring widths, or viewport
 change. Zooming and panning leave the fitted opening as it is.
 
 Turning on **Tip-to-track guides** draws guides from terminal tips to the inner
-metadata edge. When the tracks are already easy to follow, you can leave it off.
+metadata edge. Leave it off if the tracks are already easy to follow.
 The fill colors for the opening and the interior sit under **Layout** as well.
 
 ## 5. Export or save

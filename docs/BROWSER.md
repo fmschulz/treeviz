@@ -103,8 +103,8 @@ layout the fitted view includes collapsed wedge tips and their labels.
 Hover over a leaf, an internal node or a collapsed wedge to see a tooltip.
 It shows the label or name, `N leaves` for a wedge, `Branch length x` and
 `Support y`, followed by the node's attributes under their display names.
-Color values come with a swatch. When you hover over or select a collapsed
-wedge, its polygon is outlined.
+Color values come with a swatch. Hovering over or selecting a collapsed wedge
+outlines its polygon.
 
 A collapsed clade's label sits past its wedge tip. Two controls under
 **Collapsed wedges** set its placement:
@@ -127,7 +127,7 @@ hits, and press **Escape** to clear the search.
 
 ## Save and export
 
-Save a `.treeviz.json` file when you need the full visualization preserved. For
+Save a `.treeviz.json` file to preserve the full visualization. For
 figures, export SVG, PNG, or PDF. For downstream data exchange, the Newick,
 Nexus, and metadata TSV exports are the right choice.
 
