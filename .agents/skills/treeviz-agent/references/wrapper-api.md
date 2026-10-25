@@ -5,8 +5,8 @@ pipeline.
 
 ## Compatibility
 
-The current PyPI release is `treeviz-phylo` 0.8.2. Its bundled session schema
-matches the hosted app 0.8.2, so sessions saved from the app, including
+The current PyPI release is `treeviz-phylo` 0.8.3. Its bundled session schema
+matches the hosted app 0.8.3, so sessions saved from the app, including
 `legends` and `attributeLabels`, validate with `validate_session`.
 
 Sessions written by 0.3.1 still load, and a 0.3.1 `radial` layout opens as
@@ -22,14 +22,14 @@ such a figure should follow automatic sizing.
 ## Install
 
 ```bash
-uv add treeviz-phylo==0.8.2                            # in a uv project
-uv run --with treeviz-phylo==0.8.2 python script.py    # one-off script
+uv add treeviz-phylo==0.8.3                            # in a uv project
+uv run --with treeviz-phylo==0.8.3 python script.py    # one-off script
 ```
 
 Notebook support:
 
 ```bash
-uv add "treeviz-phylo[notebook]==0.8.2"
+uv add "treeviz-phylo[notebook]==0.8.3"
 ```
 
 Import:

@@ -9,7 +9,7 @@ The package does not vendor the TreeViz browser app or frontend source. It
 ships Python helpers and the TreeViz session schema.
 
 !!! note "Published package compatibility"
-    The examples on this page target `treeviz-phylo` 0.8.2, the current PyPI
+    The examples on this page target `treeviz-phylo` 0.8.3, the current PyPI
     release. Browser-side styling is documented in
     [Tree styling](STYLING.md) and [Browser API](API.md).
 
@@ -42,7 +42,7 @@ The package ships a `py.typed` marker, so type checkers use its annotations.
 ## Schema compatibility
 
 `validate_session` checks a session against the schema bundled in the package.
-The 0.8.2 package schema matches the schema of the hosted app, so a session
+The 0.8.3 package schema matches the schema of the hosted app, so a session
 saved from the app validates with `validate_session`. To check a session
 against the live schema directly, download it:
 
@@ -292,7 +292,7 @@ controls do. Automatic mode would otherwise ignore both settings.
 
 In the hosted app, metadata can map to exact node circles and to branch
 width/color. The app can also apply conditional rules, draw compact symbol or
-wedge lanes, and style terminal branches. `treeviz-phylo` 0.8.2 validates
+wedge lanes, and style terminal branches. `treeviz-phylo` 0.8.3 validates
 these view fields in Python. Pass them through the `view` argument, or apply
 them later through `window.__treeviz`. Metadata branch colors extend to the
 MRCA stem of each same-colored clade (see [Tree styling](STYLING.md)).
