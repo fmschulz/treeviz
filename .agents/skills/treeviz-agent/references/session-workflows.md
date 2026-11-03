@@ -169,6 +169,10 @@ For repeatable file-based rerooting from metadata, use
 - Authored circular angles: `view.set-layout` with
   `circularAngleAttribute: '<direct-node-meta-key>'`; pass `null` for automatic
   angles. The values are degrees from 0 through 360.
+- Exact-area radial petals: use `view.optimize-petal-layout` with explicit
+  `areaAttribute` and `areaScale`. It computes once and saves coordinates,
+  angles and areas. Follow [the petal workflow](petal-layout.md), including
+  image inspection and rerunning after source-value or collapse changes.
 - Imported radial positions: `view.set-layout` with both `radialXAttribute`
   and `radialYAttribute`. Every node needs both direct metadata values as
   finite numbers or nonempty numeric strings; positive Y points down. An

@@ -219,6 +219,9 @@ instead of loading a single leaf named `#NEXUS`.
 
 ## View commands
 
+For exact-area collapsed petals, use `view.optimize-petal-layout` as described
+in [Optimize radial petals](how-to/petal-layout.md).
+
 | Command                               | Args                                                                                                       | Effect                                                                         |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `view.pan`                            | `{ dx, dy }`                                                                                               | Pan the camera.                                                                |
@@ -282,7 +285,10 @@ fill reads; `null` clears it. `fillOpacity` (0 to 1) sets the translucency of th
 
 `labelDeclutter` pushes crowded wedge labels outward on leader lines instead of
 seating them at the wedge tip. `labelOrientation` reads them along the incoming
-branch (`branch`) or outward from the center (`bearing`).
+branch (`branch`), outward from the center (`bearing`), or horizontally
+(`horizontal`). With `horizontal` and `labelDeclutter` together, the labels get
+no leader lines: all horizontal labels are seated together, each against its
+own wedge.
 
 `lengthMode` sets the length of a width-sized radial wedge: `footprint`
 (default) or `max-path`, the longest summed root-to-tip path in the clade.
@@ -388,6 +394,43 @@ in sessions and named views. Rectangular and radial layouts ignore it.
 Reordering children leaves imported angles attached to their nodes; clear the
 setting to lay out the new order.
 
+### Exact-area petal layout
+
+`view.optimize-petal-layout` is a document edit that sets radial layout and
+saves optimized node positions, petal angles and scaled areas. It runs once,
+supports undo and redo, and returns these fields in `ExecuteResult.value`:
+`initialScore`, `finalScore`, `acceptedMoves` and `petalCount`.
+
+| Argument | Meaning | Default |
+| --- | --- | --- |
+| `areaAttribute` | Numeric attribute on each visible outermost collapsed root; direct node attributes take precedence over bound node metadata. | Required |
+| `areaScale` | Positive finite squared layout units per attribute unit. | Required |
+| `aspect` | Maximum petal width divided by length, greater than zero and at most 10. | `0.4` |
+| `seed` | Unsigned 32-bit random seed. | `53` |
+| `steps` | Search iterations, integer from 0 to 200000. Zero keeps the daylight initialization. | `2000` |
+| `clearance` | Nonnegative requested separation in layout units. It is a search target, not a guarantee. | `0` |
+| `labelUnit` | Layout units per label pixel. Above zero, the search keeps room past each petal tip for a horizontal label of the clade's text and font size. | `0` |
+
+At least one visible collapsed clade is required. Manual and automatic
+collapse both count. Missing, negative or nonfinite values reject the command
+without editing the session. Zero values have zero filled area. Negative
+source branch lengths are rejected. Phylograms use source branch lengths,
+shortened where `tree.set-branch-break` marks a branch; cladograms use unit edges. The command changes drawing coordinates, not the
+tree topology or stored branch lengths. A search that exceeds the estimated
+work budget returns `petal.work-budget` without changes; reduce `steps` or
+collapse more of the tree.
+
+The command records `__treeviz_petal_x` and `__treeviz_petal_y` on every node,
+and `__treeviz_petal_angle` and `__treeviz_petal_area` on petal roots. These are
+saved drawing attributes. `view.radialPetals` stores the command's arguments.
+The root's `__treeviz_petal_settings` records which settings produced them.
+An incompatible hidden or collapse set, edge geometry or settings produces automatic
+wedges and a `render.radial-coordinates-invalid` diagnostic requesting a rerun.
+Rerun after changing values or hidden or collapsed clades. Selecting either
+coordinate outside the reserved pair with `view.set-layout` exits petal mode.
+Clear both selections to use automatic radial positions. See the
+[runnable workflow](how-to/petal-layout.md) for import, inspection and saving.
+
 ### Imported radial positions
 
 `radialXAttribute` and `radialYAttribute` select node attributes for a
@@ -421,6 +464,7 @@ views, and undo history. Rectangular and circular layouts ignore them.
 | Command                                     | Args                             | Effect                                                      |
 | ------------------------------------------- | -------------------------------- | ----------------------------------------------------------- |
 | `tree.rename-leaf`                          | `{ stableKey, newName }`         | Rename a leaf.                                              |
+| `tree.set-branch-break`                     | `{ stableKey, fraction }`        | Draw the branch above a node at `fraction` (above 0, below 1) of its length in radial layout, with a break mark. `null` removes the break. The stored length does not change. |
 | `tree.style-clade`                          | `{ stableKey, patch }`           | Apply clade color, line, label, dot, or leaf-shape styling. |
 | `tree.reset-clade-style`                    | `{ stableKey }`                  | Clear clade style.                                          |
 | `tree.hide-clade` / `tree.unhide-clade`     | `{ stableKey }`                  | Hide or unhide a subtree.                                   |
@@ -452,12 +496,21 @@ returns `{ session, keyMap }`; `keyMap` is a plain object (it survives JSON and
 - Clade annotations: `label`, `cladeLabelColor`, `cladeLabelBold`,
   `cladeLabelFontSize`, `cladeLabelPlacement`, `cladeLabelOffsetX`,
   `cladeLabelOffsetY`.
+- Clade annotation typography: `cladeLabelFontFamily` takes a view label face
+  or one of the display faces `Cormorant Garamond`, `Space Grotesk` and `Sora`,
+  for figure titles. Each display face ships one weight. `cladeLabelLetterSpacing`
+  adds space between letters, in em from 0 to 1.
 - Clade underlay: `cladeBackground`. `cladeLabelBackground` is still accepted
   as a legacy alias.
 - Fitted radial underlay padding: `cladeBackgroundPadding` sets nonnegative
   pixel padding before zoom for this clade only. Omitting the field keeps
   automatic padding; `undefined` in a style patch restores it.
 - Collapsed wedge fill: `wedgeFill`, read from the clade's own entry only.
+- Collapsed wedge outline: `wedgeOutline` (color) and `wedgeOutlineWidth` (pixels,
+  0 to 20) replace the branch color and width on a radial wedge's outline.
+- Collapsed wedge hatch: `wedgeHatch` is the color of diagonal hatch lines drawn
+  over a radial wedge, for a clade without data. Set `wedgeFill` for the
+  background behind the lines.
 - Two-color fills: `cladeBackgroundGradient` and `wedgeFillGradient`, each
   `{ startColor, endColor }`. Colors interpolate from the clade root toward its
   descendants. Endpoints accept `#rrggbb` and `rgba(r,g,b,a)`. These fields
@@ -558,6 +611,12 @@ positions use the selected `linear` or `sqrt` transform.
 A swatch legend accepts `shape: 'circle'` for round markers; the default
 `'square'` keeps square swatches. An entry `size` sets a positive marker
 diameter, default 10, scaled with the view zoom. Square swatches ignore it.
+`shape: 'petal'` draws each marker as a petal. With a saved petal layout,
+`size` is a value of the area attribute and the marker has the area of a figure
+petal with that value, at the figure's current scale; without one, `size` is
+the marker length in pixels at aspect 0.4. An entry `hatch` color draws hatch
+lines over that petal marker. Use it as the size key of a
+petal figure; see [the petal workflow](how-to/petal-layout.md#add-a-legend).
 
 For a loaded session whose node and branch attributes encode sequence counts:
 
@@ -633,7 +692,7 @@ must be nonnegative, and each tick must be within its own domain.
 The legend describes an encoding; it does not calculate node or branch
 attributes. Use the same transform and domain when computing those display
 values. Continuous legends are available in session JSON. TOML `[[legend]]`
-tables define swatch legends only.
+tables define swatch legends only, with `shape` `square`, `circle` or `petal`.
 
 Use `view.set-figure-legend-placement` with
 `{ sectionKey: 'custom:0', visible: false }` to hide the first custom legend
@@ -1029,6 +1088,7 @@ backend is mounted. Call `whenSettled()` first.
 | `scale`      | `1`                                             | Multiplies the natural CSS-pixel size. PNG is clamped to 16384 px a side.      |
 | `background` | theme canvas color (PNG), transparent (SVG)    | A CSS color, or `null` for a transparent image.                               |
 | `crop`       | `true`                                          | Crop to the painted content plus 16 px, as the panel does. `false`: full canvas. |
+| `embedFonts` | `false`                                         | SVG only: inline the app fonts the figure uses. PNG always embeds them.        |
 
 `width` and `height` are the PNG pixel size, or the SVG size in CSS pixels times
 `scale`. The SVG data URL is percent-encoded (`decodeURIComponent` after the

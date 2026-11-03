@@ -97,6 +97,13 @@ call runs in the hosted page.
   values fall back per node. Keep angles in traversal order for arc connectors
   and collapsed spans. Pass `null` to restore automatic angles. Rectangular and
   radial layouts ignore this setting.
+- For area-sized petals, collapse the intended clades, supply a nonnegative
+  numeric value for every visible outermost collapsed root, and execute
+  `view.optimize-petal-layout` with `areaAttribute` and `areaScale` (squared
+  layout units per value unit). It saves one seeded layout; ordinary edits
+  do not rerun it. Check the returned score, layout metrics and an image.
+  Rerun after topology, hidden-clade, collapse or value edits. See
+  [the petal workflow](references/petal-layout.md) for a complete example.
 - For a source radial layout, select `radialXAttribute` and `radialYAttribute`
   through `view.set-layout`, or use **Node X coordinate** and **Node Y
   coordinate** under **Controls > Layout**. Every node needs both direct
@@ -144,8 +151,8 @@ call runs in the hosted page.
 - On crowded radial figures set `collapsedWedgeLabelDeclutter: true` and
   `allowLabelOverlap: false`; culled labels return as the reader zooms in.
   `collapsedWedgeLabelOrientation: 'branch'`, the default, reads each label
-  along the branch entering its clade; `'bearing'` reads it out from the
-  centre.
+  along the branch entering its clade; `'horizontal'` keeps it horizontal;
+  `'bearing'` reads it out from the centre.
 - Set `collapsedCladeSpacing: 'compact'` through `view.set-layout` to give
   each collapsed clade at most 12 leaf slots. The default `proportional` gives
   one slot per descendant leaf.

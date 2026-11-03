@@ -399,7 +399,8 @@ named is labelled beyond its wedge tip in radial, and that label follows
 `showLabels`. `collapsedWedgeLabelDeclutter: true` pushes colliding labels
 outward with leader lines; `collapsedWedgeLabelOrientation` turns each label
 to the branch entering its clade (`'branch'`, the default) or out from the
-centre (`'bearing'`), with the seat at the wedge tip under both;
+centre (`'bearing'`), or keeps it horizontal (`'horizontal'`), with the seat
+at the wedge tip;
 `allowLabelOverlap: false` culls the ones that still collide, judged at their
 pushed seats. Hovering or selecting a collapsed clade outlines its wedge.
 

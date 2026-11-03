@@ -87,6 +87,7 @@ nav:
       - Add metadata tracks: how-to/metadata-tracks.md
       - Style clades: how-to/style-clades.md
       - Control labels: how-to/labels.md
+      - Optimize radial petals: how-to/petal-layout.md
   - Guides:
       - Browser app: BROWSER.md
       - Python package: PYTHON.md
